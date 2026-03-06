@@ -1,0 +1,92 @@
+## Footer Implementation
+
+### Para páginas RFX (RECOMENDADO - Sin parpadeo entre rutas)
+
+**El footer NO debe añadirse directamente en las páginas individuales RFX.** En su lugar, se usa el componente `RFXLayout` que incluye el footer de forma persistente, evitando el parpadeo al navegar entre rutas RFX.
+
+#### Uso en App.tsx (nivel de routing):
+```tsx
+import RFXLayout from "@/components/RFXLayout";
+
+// Ejemplo de ruta RFX:
+<Route path="/rfxs" element={
+  <ProtectedSupplierRoute>
+    <Layout>
+      <RFXLayout>
+        <RFXProjects />
+      </RFXLayout>
+    </Layout>
+  </ProtectedSupplierRoute>
+} />
+```
+
+#### Páginas RFX que usan RFXLayout:
+Las siguientes páginas NO deben incluir `<RFXFooter />` ya que está en `RFXLayout`:
+- `/rfxs` - RFXProjects
+- `/rfxs/:id` - RFXDetail
+- `/rfxs/specs/:rfxId` - RFXSpecsPage
+- `/rfxs/candidates/:rfxId` - RFXCandidatesPage
+- `/rfxs/sending/:rfxId` - RFXSendingPage
+- `/rfxs/responses/:rfxId` - RFXResponsesPage
+- `/rfx-viewer/:invitationId` - RFXViewer
+
+#### Estructura de una página RFX:
+```tsx
+const RFXSomePage = () => {
+  return (
+    <div className="flex-1 overflow-y-auto flex flex-col min-h-full">
+      <div className="container mx-auto px-4 py-8 flex-1">
+        {/* Contenido de la página */}
+      </div>
+      {/* NO incluir <RFXFooter /> aquí - ya está en RFXLayout */}
+    </div>
+  );
+};
+```
+
+### Para páginas NO-RFX (Implementación individual)
+
+Si necesitas añadir el footer a una página que NO es parte del flujo RFX, úsalo directamente en la página:
+
+#### Importar el footer:
+```tsx
+import RFXFooter from '@/components/rfx/RFXFooter';
+```
+
+#### Estructura para páginas con contenido scrolleable:
+```tsx
+const MyPage = () => {
+  return (
+    <div className="flex-1 overflow-y-auto flex flex-col min-h-full">
+      <div className="container mx-auto px-4 py-8 flex-1">
+        <div className="max-w-7xl mx-auto">
+          {/* Contenido de la página */}
+        </div>
+      </div>
+      <RFXFooter />
+    </div>
+  );
+};
+```
+
+### Cómo funciona (Footer siempre al fondo):
+- El contenedor principal debe tener: `flex flex-col` - establece flexbox en columna
+- El contenedor principal debe tener: `min-h-full` - **IMPORTANTE**: asegura que el contenedor ocupe al menos toda la altura disponible, permitiendo que el footer se empuje al fondo
+- El contenido principal debe tener: `flex-1` - ocupa todo el espacio disponible
+- El footer tiene `mt-auto` y `shrink-0` (ya incluido en el componente) - se empuja al fondo automáticamente
+- **Resultado**: Si hay poco contenido, el footer estará pegado al fondo de la pantalla. Si hay mucho contenido, el footer aparecerá después de hacer scroll.
+
+### Notas importantes:
+- **PREFERIR RFXLayout** para todas las rutas relacionadas con RFX para evitar el parpadeo del footer al navegar entre ellas.
+- El footer siempre debe estar dentro del contenedor con `overflow-y-auto flex flex-col` para que funcione correctamente.
+- El footer debe estar fuera de los contenedores de contenido (después del cierre del container) para que no afecte al layout interno.
+- **CRÍTICO**: El contenedor principal DEBE incluir `min-h-full` además de `flex-1 overflow-y-auto flex flex-col` para que el footer se pegue al fondo cuando hay poco contenido.
+- Si hay elementos flotantes (botones flotantes, asistentes), deben tener un `bottom` mayor a 160px para no solaparse con el footer (usar `bottom-40` o superior).
+- **IMPORTANTE**: No añadas `<RFXFooter />` en páginas que ya usan `RFXLayout` en el routing.
+
+### Ventajas del patrón RFXLayout:
+- ✅ **Sin parpadeo**: El footer permanece montado al navegar entre rutas RFX
+- ✅ **Consistencia**: Todas las páginas RFX comparten el mismo layout
+- ✅ **Mantenibilidad**: Cambios en el footer se aplican automáticamente a todas las páginas RFX
+- ✅ **Performance**: Evita montajes/desmontajes innecesarios del componente footer
+

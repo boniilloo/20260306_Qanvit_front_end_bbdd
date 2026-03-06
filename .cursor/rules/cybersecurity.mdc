@@ -1,0 +1,172 @@
+---
+alwaysApply: true
+---
+# Protocolo de Ciberseguridad y Criptografía
+
+Este documento define los estándares de seguridad obligatorios para el desarrollo de la plataforma. El objetivo es garantizar la confidencialidad, integridad y disponibilidad de los datos mediante el uso de criptografía robusta y prácticas de desarrollo seguro.
+
+## 1. Estándares Criptográficos
+
+### 1.1. Cifrado Simétrico (AES)
+Se utilizará **AES-256-GCM** (Advanced Encryption Standard en modo Galois/Counter) para el cifrado de datos en reposo y datos sensibles almacenados localmente.
+*   **Uso:** Protección de datos PII (Información Personal Identificable) en base de datos, claves de API almacenadas, y tokens de sesión en almacenamiento local.
+*   **Implementación Cliente:** Usar `window.crypto.subtle` (Web Crypto API).
+*   **Implementación Servidor/Edge:** Usar librerías nativas o `crypto` de Node/Deno.
+*   **Claves:** Deben ser de 256 bits. Nunca deben almacenarse junto con los datos cifrados.
+
+### 1.2. Cifrado Asimétrico (RSA)
+Se utilizará **RSA-OAEP** con claves de **4096 bits** para cifrado/descifrado y **RSA-PSS** para firmas digitales.
+*   **Uso:** Intercambio seguro de claves, firmas digitales de documentos/contratos, y comunicación segura entre partes sin secreto compartido previo.
+*   **Generación:** Las pares de claves deben generarse preferiblemente en el cliente para asegurar que la clave privada nunca abandone el dispositivo del usuario (si aplica E2EE).
+*   **Formato:** PEM para exportación/almacenamiento, DER para transmisión binaria.
+
+### 1.3. Hashing
+*   **Contraseñas:** Delegar siempre en Supabase Auth (usa bcrypt/argon2).
+*   **Integridad de Datos:** SHA-256 o SHA-512.
+
+## 2. Manejo de Datos y Secretos
+
+### 2.1. Clasificación de Datos
+Antes de crear una tabla o campo, clasifica la información:
+*   **Pública:** Información visible para todos (ej. Catálogo público).
+*   **Interna:** Visible para usuarios autenticados de la organización.
+*   **Confidencial:** Requiere cifrado en reposo (ej. Datos financieros, contratos, PII).
+*   **Restringida:** Requiere cifrado y auditoría de acceso (ej. Claves privadas, secretos bancarios).
+
+### 2.2. Gestión de Secretos
+*   **Variables de Entorno:** NUNCA commitear secretos en el código. Usar `.env` (local) y Secretos de Supabase (producción).
+*   **Cliente:** No exponer claves secretas (`SERVICE_ROLE_KEY`, `MASTER_ENCRYPTION_KEY`) en el código del cliente (React). Solo usar `ANON_KEY`.
+
+## 3. Seguridad en Base de Datos (Supabase)
+
+### 3.1. Row Level Security (RLS)
+*   **Obligatorio:** Todas las tablas deben tener RLS habilitado.
+*   **Política Deny-by-Default:** Empezar restringiendo todo y abrir permisos específicos.
+*   **Funciones de Base de Datos:** Usar `SECURITY DEFINER` con precaución extrema. Preferir `SECURITY INVOKER`.
+
+### 3.2. Extensiones
+*   Utilizar la extensión `pgsodium` de Supabase para operaciones criptográficas dentro de la base de datos cuando sea posible.
+
+## 4. Implementación en Código
+
+### 4.1. Validación de Entradas
+*   Usar **Zod** para validar estrictamente todos los inputs en formularios y APIs.
+*   Sanitizar entradas para prevenir inyección SQL y XSS.
+
+### 4.2. Ejemplo de Uso (Web Crypto API)
+
+```typescript
+// Ejemplo conceptual para cifrado simétrico (AES-GCM)
+async function encryptData(data: string, key: CryptoKey): Promise<{ cipherText: ArrayBuffer, iv: Uint8Array }> {
+  const encoder = new TextEncoder();
+  const encodedData = encoder.encode(data);
+  const iv = crypto.getRandomValues(new Uint8Array(12)); // IV único por cifrado
+
+  const cipherText = await crypto.subtle.encrypt(
+    { name: "AES-GCM", iv },
+    key,
+    encodedData
+  );
+
+  return { cipherText, iv };
+}
+```
+
+## 6. Cifrado Maestro y Gestión de Claves (Edge Function)
+
+La plataforma cuenta con un sistema centralizado de cifrado simétrico a través de una Edge Function segura para proteger las claves privadas de los usuarios y permitir el acceso multidispositivo.
+
+### 6.1. Edge Function: `crypto-service`
+*   **Clave Maestra:** `MASTER_ENCRYPTION_KEY` (Stored in Supabase Secrets / .env.local).
+*   **Algoritmo:** AES-256-GCM.
+*   **Uso:** Oráculo de cifrado que nunca revela la clave maestra.
+
+### 6.2. Flujo de Claves de Usuario (Asimétrico)
+Para permitir cifrado E2EE y firmas digitales:
+1.  **Generación:** El cliente genera un par de claves **RSA-OAEP 4096 bits**.
+2.  **Clave Pública:** Se guarda tal cual en la tabla `app_user` (`public_key`).
+3.  **Clave Privada:** 
+    *   El cliente envía la clave privada (base64) a `crypto-service`.
+    *   `crypto-service` la cifra con la `MASTER_ENCRYPTION_KEY`.
+    *   El cliente recibe el blob cifrado (`{ data, iv }`) y lo guarda en `app_user` (`encrypted_private_key`).
+4.  **Recuperación:** Al iniciar sesión, el cliente descarga el blob cifrado, lo envía a `crypto-service` para descifrarlo, y mantiene la clave privada en memoria (`window.crypto`) durante la sesión.
+
+### 6.3. API de crypto-service
+*   **Endpoint:** `POST /crypto-service`
+*   **Auth:** Requiere token JWT de Supabase válido.
+*   **Body:**
+    *   Encrypt: `{ "action": "encrypt", "data": "<string_base64>" }`
+    *   Decrypt: `{ "action": "decrypt", "data": "<encrypted_base64>", "iv": "<iv_base64>" }`
+
+## 8. Implementación Específica RFX
+
+### 8.1. Gestión de Claves por Proyecto (RFX)
+Cada RFX funciona como un silo criptográfico con su propia clave simétrica.
+1.  **Creación de RFX:**
+    *   Se genera una clave simétrica **AES-256-GCM** única para el RFX.
+    *   Se cifra esta clave con la **clave pública** del creador.
+    *   Se almacena en `rfx_key_members` (`rfx_id`, `user_id`, `encrypted_symmetric_key`).
+
+2.  **Invitación de Miembros (Manual):**
+    *   El usuario que invita (quien ya tiene acceso) descifra la clave del RFX con su clave privada.
+    *   Vuelve a cifrar la clave del RFX con la **clave pública** del nuevo miembro.
+    *   Guarda la nueva entrada en `rfx_key_members` (RLS permite inserciones por miembros existentes).
+
+3.  **Distribución Automática de Claves:**
+    
+    El sistema distribuye automáticamente las claves en dos fases:
+    
+    **Fase 1: Envío para Revisión (Buyer → Developers FQ Source)**
+    *   Cuando el buyer envía una RFX por primera vez (desde `RFXSendingPage`), el sistema automáticamente:
+        1.  Actualiza el status a "revision requested by buyer"
+        2.  Obtiene la clave simétrica de la RFX del usuario actual
+        3.  Busca todos los usuarios con acceso de developer en `developer_access`
+        4.  Recupera las claves públicas de esos developers mediante `get_user_public_keys` RPC
+        5.  Encripta la clave simétrica con la clave pública de cada developer
+        6.  Almacena cada clave encriptada en `rfx_key_members` usando `share_rfx_key_with_member` RPC
+    
+    **Fase 2: Aprobación (Developer → Suppliers)**
+    *   Cuando un developer aprueba la RFX (desde `RFXManagement`), el sistema automáticamente:
+        1.  Actualiza el status a "waiting for supplier proposals"
+        2.  Obtiene la clave simétrica de la RFX del developer actual
+        3.  Busca todos los usuarios de las compañías invitadas en la tabla `app_user`
+        4.  Recupera las claves públicas de esos usuarios mediante `get_user_public_keys` RPC
+        5.  Encripta la clave simétrica con la clave pública de cada usuario supplier
+        6.  Almacena cada clave encriptada en `rfx_key_members` usando `share_rfx_key_with_member` RPC
+    
+    *   **Implementación:** Ver `src/lib/rfxKeyDistribution.ts` para funciones `getCurrentUserRFXSymmetricKey`, `distributeRFXKeyToDevelopers` y `distributeRFXKeyToCompanies`.
+    *   **Resiliencia:** Si algún usuario no tiene clave pública o falla la distribución, el proceso continúa y registra warnings sin bloquear el flujo.
+    *   **Documentación completa:** Ver `docs/RFX_KEY_DISTRIBUTION_IMPLEMENTATION.md`.
+
+### 8.2. Cifrado de Datos en RFX
+*   **Campos de Texto:** Los campos sensibles (`description`, `technical_requirements`, `company_requirements`) en la tabla `rfx_specs` y su histórico `rfx_specs_commits` se almacenan cifrados con la clave del RFX.
+*   **Descifrado:** El cliente descarga los datos cifrados y los descifra al vuelo usando la clave del RFX que tiene en memoria.
+*   **Comunicación con Agente:** La información enviada al Agente RFX vía WebSocket (WSS) se envía descifrada (texto plano), ya que el canal WSS proporciona la seguridad necesaria y el Agente requiere los datos legibles para su procesamiento.
+
+### 8.3. Cifrado de Archivos (Imágenes)
+Las imágenes subidas a un RFX siguen un proceso de cifrado de extremo a extremo (E2EE) antes de llegar al almacenamiento.
+*   **Bucket:** `rfx-images` (Público a nivel de acceso HTTP, pero contenido ilegible).
+*   **Subida:**
+    1.  El cliente genera un IV único para el archivo.
+    2.  Cifra el binario del archivo con la clave del RFX (AES-256-GCM).
+    3.  Concatena `IV (12 bytes) + Contenido Cifrado`.
+    4.  Sube el archivo con extensión `.enc`.
+*   **Descarga/Visualización:**
+    1.  El cliente descarga el blob cifrado.
+    2.  Separa los primeros 12 bytes (IV).
+    3.  Descifra el resto con la clave del RFX.
+    4.  Genera una URL local (`blob:`) para mostrar la imagen en el navegador.
+    5.  Detecta dinámicamente el tipo MIME original basándose en la extensión del archivo original (eliminando el `.enc`).
+
+### 8.4. Sincronización de Carga de Claves
+Para evitar condiciones de carrera donde se intenta descifrar datos antes de tener las claves disponibles:
+*   **Hook useRFXCrypto:** Debe exponer un estado `isReady` que sea verdadero SOLO cuando el proceso de carga de claves haya finalizado (con éxito o error) para el `rfxId` actual.
+*   **Componentes Consumidores:** Cualquier componente que necesite descifrar datos al montar (ej. `RFXSpecsPage`, `RFXChatSidebar`) debe esperar a que `isReady` sea `true` antes de iniciar la carga de datos cifrados.
+*   **Estado Inicial:** El estado `isLoading` en `useRFXCrypto` debe inicializarse a `true` si se proporciona un `rfxId`, para evitar un falso negativo en el primer renderizado.
+
+## 7. Flujo de Trabajo
+1.  **Diseño:** Definir qué datos son sensibles.
+2.  **Desarrollo Local:** Usar `.env.local` para secretos.
+3.  **Revisión:** Verificar que no haya secretos hardcodeados.
+4.  **Despliegue:** Configurar secretos en Supabase Dashboard antes de desplegar Edge Functions.
+- Cuando se quiera actualizar la edge function de billing-webhook hay que hacerlo con el comando de supabase functions deploy billing-webhook --no-verify-jwt para evitar que salga un error de missing header.

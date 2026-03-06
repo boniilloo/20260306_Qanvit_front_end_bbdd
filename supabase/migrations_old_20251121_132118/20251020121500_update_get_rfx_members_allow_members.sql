@@ -1,0 +1,36 @@
+-- Allow RFX members (not only owner) to view members list
+create or replace function public.get_rfx_members(p_rfx_id uuid)
+returns table (
+  user_id uuid,
+  email text,
+  name text,
+  surname text,
+  role text,
+  created_at timestamptz
+) as $$
+begin
+  if not (
+    exists (select 1 from public.rfxs r where r.id = p_rfx_id and r.user_id = auth.uid())
+    or exists (select 1 from public.rfx_members m where m.rfx_id = p_rfx_id and m.user_id = auth.uid())
+  ) then
+    raise exception 'Access denied. Members or owner only.' using errcode = 'P0001';
+  end if;
+
+  return query
+  select m.user_id,
+         (u.email)::text as email,
+         pu.name,
+         pu.surname,
+         m.role,
+         m.created_at
+  from public.rfx_members m
+  join auth.users u on u.id = m.user_id
+  left join public.app_user pu on pu.auth_user_id = m.user_id
+  where m.rfx_id = p_rfx_id
+  order by m.created_at desc;
+end;
+$$ language plpgsql security definer;
+
+revoke all on function public.get_rfx_members(uuid) from public;
+grant execute on function public.get_rfx_members(uuid) to authenticated;
+

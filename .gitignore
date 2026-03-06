@@ -1,0 +1,50 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment variables (never commit secrets)
+.env
+.env.*
+!.env.example
+supabase/functions/.env
+supabase/.env
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Supabase seed data (too large for GitHub)
+supabase/seed_data.sql
+supabase/seed*.sql
+supabase/**/seed*.sql
+
+# Python scraper (keep isolated from the main web app)
+scraper_python/
+scraper_python/**/__pycache__/
+scraper_python/**/*.py[cod]
+scraper_python/**/.pytest_cache/
+scraper_python/**/.mypy_cache/
+scraper_python/**/.ruff_cache/
+scraper_python/**/.cache/
+scraper_python/**/.venv/
+scraper_python/**/venv/
+scraper_python/**/env/
+scraper_python/**/.env
+scraper_python/**/.env.*

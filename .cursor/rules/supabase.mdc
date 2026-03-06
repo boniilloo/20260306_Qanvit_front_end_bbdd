@@ -1,0 +1,11 @@
+---
+alwaysApply: true
+---
+
+Para crear una migracion, usa siempre supabase migration new <nombre_de_la_migracion> para que todas las migraciones queden bien y sincronizadas.
+
+Para hacer un dump de la base de datos local, usamos el comando supabase db dump   --local   --data-only   --schema auth   --schema public   > supabase/seed.sql. De esta manera no metemos otros esquemas que hacen que no se pueda hacer el reset de manera correcta.
+
+Cuando estamos trabajando con edge functions hayq que tener supabase functions serve corriendo para que las edge functions se vayan actualizando sobre la marcha.
+
+De momento trabajamos con la base de datos remota, por lo que tienes que hacer push al remoto después de haber creado migraciones para poder probar.

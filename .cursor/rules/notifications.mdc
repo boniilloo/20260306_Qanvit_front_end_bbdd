@@ -1,0 +1,164 @@
+## Notifications and Email Sending - FQ Source
+
+Goal: Consistent process to add in-app notifications and optionally send emails for those notifications.
+
+### Database model (public)
+- `notification_events` (one row per event):
+  - `scope`: 'user' | 'company' | 'global'
+    - user → set `user_id` (auth.users.id)
+    - company → set `company_id` (public.company.id)
+    - global → no `user_id`/`company_id`
+  - `type`: business type (e.g., 'rfx_sent_for_review')
+  - `title`, `body`
+  - `target_type`, `target_id`, `target_url` (optional deep link)
+  - `delivery_channel`: 'in_app' | 'email' | 'both'
+  - RLS “Users can view applicable notifications”: users see global, their direct, or their company notifications.
+
+- `notification_user_state` (per user-event state):
+  - `user_id`: auth.users.id (default auth.uid())
+  - `is_read`, `read_at`
+  - `is_reviewed`, `reviewed_at`
+  - `is_archived`, `archived_at`
+  - Unique (notification_id, user_id); RLS self-only.
+  - If no row exists: default interpretation → unread, unreviewed, unarchived.
+
+### Add a new notification (in code)
+Set scope, content, and delivery channel. Examples:
+
+```ts
+// Insert a direct notification to one user (in-app only)
+await supabase
+  .from('notification_events')
+  .insert({
+    scope: 'user',
+    user_id: someAuthUserId,     // auth.users.id
+    type: 'example_event',
+    title: 'Action required',
+    body: 'Please review your settings.',
+    target_url: '/settings',
+    delivery_channel: 'in_app'
+  });
+```
+
+```ts
+// Notification to all users in a company, email + in-app
+await supabase
+  .from('notification_events')
+  .insert({
+    scope: 'company',
+    company_id: companyId,
+    type: 'company_update',
+    title: 'New policy',
+    body: 'A new policy is available for review.',
+    target_url: '/my-company',
+    delivery_channel: 'both'
+  });
+```
+
+### Send the email for a notification (generic)
+We have a generic Edge Function: `send-notification-email`
+- Subject: `FQ Source: {title}`
+- Body: Explains there is a new notification, includes `title` and `body`
+- Button: always points to `https://app.fqsource.com`
+- Recipients resolved by scope:
+  - user → that user
+  - company → all users in the company (via `app_user.auth_user_id`)
+  - global → all users (use with caution)
+
+Usage examples:
+```ts
+// Method 1: By notification ID(s) - use when you have the IDs
+await supabase.functions.invoke('send-notification-email', {
+  body: { notificationId: 'uuid-here' }
+});
+
+await supabase.functions.invoke('send-notification-email', {
+  body: { notificationIds: [id1, id2, id3] }
+});
+
+// Method 2: By filter (RECOMMENDED for DB triggers) - uses service role to bypass RLS
+await supabase.functions.invoke('send-notification-email', {
+  body: { 
+    type: 'rfx_announcement_posted',
+    targetType: 'rfx',
+    targetId: rfxId
+  }
+});
+```
+
+Notes:
+- The function uses Resend with `RESEND_API_KEY`. Deploy with:
+  - `supabase functions deploy send-notification-email --no-verify-jwt`
+- **Method 2 (filter)** is preferred when calling from client code after DB triggers because it uses service role key and bypasses RLS
+- Add a small delay (500ms) before calling to ensure trigger has executed
+
+### UI behaviors (reference)
+- Sidebar bell shows unread count (not archived, not read). Opening the dropdown marks listed notifications as read (via RPC).
+- Notifications Center allows marking reviewed and archive/unarchive; “Show archived” toggles archived visibility.
+
+### Automated notifications (DB triggers)
+When creating DB triggers to auto-generate notifications:
+
+**IMPORTANT - Common pitfalls:**
+1. ⚠️ Always use `AFTER INSERT` (not `BEFORE` or `INSTEAD OF`)
+2. ⚠️ Use `SECURITY DEFINER` to bypass RLS and access all related data
+3. ⚠️ The `app_user` table does NOT have an `email` column (it's in `auth.users`)
+4. ⚠️ Always include `RAISE NOTICE` for debugging in production
+5. ⚠️ Wrap notifications INSERT in exception handler to not fail the original operation
+
+**Example trigger function structure:**
+```sql
+create or replace function public.create_notifications_on_event()
+returns trigger
+language plpgsql
+security definer  -- Important: bypasses RLS
+set search_path = public
+as $$
+declare
+  v_notifications_created int;
+begin
+  -- Always check operation type
+  if tg_op <> 'INSERT' then
+    return new;
+  end if;
+
+  -- Insert notifications (query will use SECURITY DEFINER permissions)
+  insert into public.notification_events (scope, company_id, type, title, body, ...)
+  select 'company', company_id, 'event_type', 'Title', 'Body', ...
+  from related_table
+  where conditions;
+
+  get diagnostics v_notifications_created = row_count;
+  raise notice 'Notifications created: %', v_notifications_created;
+
+  return new;  -- Always return new
+exception
+  when others then
+    raise warning 'Error creating notifications: %', sqlerrm;
+    return new;  -- Don't fail the original operation
+end;
+$$;
+
+-- Create the trigger (AFTER INSERT, not INSTEAD OF)
+create trigger trg_name
+after insert on table_name  -- AFTER, not INSTEAD OF
+for each row
+execute function public.create_notifications_on_event();
+```
+
+**Existing notification types in the system:**
+- `rfx_sent_for_review` - RFX sent for approval
+- `rfx_approved` - RFX approved by admin
+- `company_rfx_invitation` - Company invited to RFX
+- `supplier_accepted_invitation` - Supplier accepted RFX invitation
+- `supplier_signed_nda` - Supplier signed NDA
+- `nda_validated` - NDA validated by buyer
+- `supplier_document_uploaded` - Supplier uploaded document (proposal/offer)
+- `rfx_announcement_posted` - New announcement posted in RFX
+
+### Security and RLS
+- `notification_events` RLS ensures users only see relevant notifications.
+- `notification_user_state` RLS is self-only.
+- Company scope uses `app_user.auth_user_id = auth.uid()` to resolve membership.
+- Trigger functions use `SECURITY DEFINER` to bypass RLS and access all related data.
+

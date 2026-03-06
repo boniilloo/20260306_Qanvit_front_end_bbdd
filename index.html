@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="img-src 'self' data: https: blob:;" />
+    <title>FQ Source</title>
+    <meta name="description" content="FQ Source is the AI-powered platform for discovering machine vision suppliers globally." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="https://app.fqsource.com/" />
+    <meta name="author" content="FQ Source" />
+    <link rel="icon" href="/lovable-uploads/6a6ae9f6-302b-4bf4-8b06-03ebdd647f34.png" type="image/png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+
+    <meta property="og:title" content="FQ Source" />
+    <meta property="og:description" content="AI-powered supplier discovery for Machine Vision and Industrial Procurement." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://www.fqsource.com/FQ_LOGO.png" />
+    <meta property="og:url" content="https://app.fqsource.com" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@fqsource" />
+    <meta name="twitter:image" content="https://www.fqsource.com/FQ_LOGO.png" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script type="module">
+      // Load GPT Engineer tooling only on localhost (dev).
+      // In production this script can cause unexpected reload-like behavior on focus/tab switching.
+      const isLocalhost =
+        location.hostname === 'localhost' ||
+        location.hostname === '127.0.0.1' ||
+        location.hostname === '[::1]';
+      if (isLocalhost) {
+        const s = document.createElement('script');
+        s.type = 'module';
+        s.src = 'https://cdn.gpteng.co/gptengineer.js';
+        document.head.appendChild(s);
+      }
+    </script>
+    
+
+    
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- Suppress PostHog rate limiting warnings -->
+    <script>
+      const originalError = console.error;
+      console.error = function(...args) {
+        if (typeof args[0] === 'string' && args[0].includes('[PostHog.js]') && args[0].includes('rate limiting')) {
+          return; // Suppress PostHog rate limiting messages
+        }
+        originalError.apply(console, args);
+      };
+    </script>
+  </body>
+</html>

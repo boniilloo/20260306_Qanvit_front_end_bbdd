@@ -1,0 +1,326 @@
+# Cybersecurity Audit Report Style Guide
+
+This document defines the mandatory style and format for all cybersecurity audit reports in the `cybersecurity_report_YYYYMMDD` directory. All reports must follow this structure and style to ensure consistency and professionalism.
+
+## Document Structure
+
+### 1. Header Section
+
+Every report must start with:
+
+```markdown
+# Cybersecurity Audit - Control [CONTROL-ID]
+
+## Control Information
+
+- **Control ID**: [CONTROL-ID]
+- **Control Name**: [Control Name]
+- **Audit Date**: YYYY-MM-DD
+- **Client Question**: [Client's question]
+```
+
+### 2. Executive Summary
+
+Always include an executive summary immediately after the header:
+
+```markdown
+## Executive Summary
+
+✅ **COMPLIANCE**: [Brief statement of compliance status and key findings]
+
+1. **Key finding 1** - Brief description
+2. **Key finding 2** - Brief description
+3. **Key finding 3** - Brief description
+```
+
+**Rules:**
+- Use ✅ for compliant status, ⚠️ for partial compliance, ❌ for non-compliant
+- List 3-5 key findings in bold
+- Keep it concise (5-10 lines)
+
+### 3. Main Content Sections
+
+Structure the main content using numbered sections (1, 2, 3...) with subsections (1.1, 1.2, 2.1, 2.2...):
+
+```markdown
+## 1. [Main Topic]
+
+### 1.1. [Sub-topic]
+
+[Content with detailed explanation]
+
+**Evidence**:
+```[language]
+// Code or SQL examples
+```
+
+### 1.2. [Another Sub-topic]
+```
+
+**Rules:**
+- Use descriptive section titles
+- Number all sections and subsections
+- Include evidence blocks with code examples
+- Use horizontal rules (`---`) to separate major sections
+
+### 4. Evidence Formatting
+
+Always format evidence consistently:
+
+```markdown
+**Evidence**:
+```[language]
+// [File path or context]
+[Code example]
+```
+
+**Rules:**
+- Include file paths in comments when relevant
+- Use appropriate language tags (sql, typescript, javascript, etc.)
+- Keep code examples focused and relevant
+- Add comments to explain context
+
+### 5. Code Blocks
+
+**Format:**
+- Use triple backticks with language tags
+- Include file paths in comments when showing actual code
+- Use `// ...` to indicate truncated sections
+- Always explain what the code does
+
+**Example:**
+```markdown
+```sql
+-- supabase/migrations/20251126085807_fix_app_user_rls_policies.sql
+CREATE POLICY "Users can create their own profile"
+  ON "public"."app_user"
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = auth_user_id);
+```
+```
+
+### 6. Tables
+
+Use tables for structured data, especially in compliance sections:
+
+```markdown
+| Criterion | Status | Evidence |
+|-----------|--------|----------|
+| Criterion 1 | ✅ COMPLIANT | Evidence description |
+| Criterion 2 | ⚠️ PARTIAL | Evidence description |
+```
+
+**Rules:**
+- Use ✅ for compliant, ⚠️ for partial, ❌ for non-compliant
+- Keep table headers in English
+- Align columns properly
+
+### 7. Status Indicators
+
+Use consistent status indicators throughout:
+
+- ✅ **COMPLIANT** / **COMPLIANCE** - Full compliance
+- ⚠️ **PARTIAL** / **PARTIALLY COMPLIANT** - Partial compliance
+- ❌ **NON-COMPLIANT** - Non-compliance
+
+### 8. Conclusions Section
+
+Always include a conclusions section with:
+
+```markdown
+## 7. Conclusions
+
+### 7.1. Strengths
+
+✅ **Strength title**: Description of strength
+- Point 1
+- Point 2
+- Point 3
+
+### 7.2. Recommendations
+
+1. **Recommendation title**: Description
+2. **Recommendation title**: Description
+3. **Recommendation title**: Description
+```
+
+**Rules:**
+- List 3-5 strengths
+- List 3-5 recommendations
+- Use bold for titles
+- Keep recommendations actionable
+
+### 9. Compliance Assessment
+
+Include a compliance table and final verdict:
+
+```markdown
+## 8. Control Compliance
+
+| Criterion | Status | Evidence |
+|-----------|--------|----------|
+| Criterion 1 | ✅ COMPLIANT | Evidence |
+| Criterion 2 | ✅ COMPLIANT | Evidence |
+
+**FINAL VERDICT**: ✅ **COMPLIANT** with control [CONTROL-ID]. [Brief summary statement].
+```
+
+### 10. Appendices
+
+Include relevant appendices at the end:
+
+```markdown
+## Appendices
+
+### A. [Appendix Title]
+
+[Content]
+
+### B. [Another Appendix]
+
+[Content]
+```
+
+**Rules:**
+- Use letters (A, B, C) for appendices
+- Include examples, diagrams, or additional technical details
+- Keep appendices relevant and useful
+
+## Writing Style
+
+### Tone and Language
+
+- **Language**: English for all content, including main text, code comments, and technical terms
+- **Tone**: Professional, technical, objective
+- **Voice**: Third person, passive voice acceptable for technical descriptions
+- **Formality**: Formal but clear
+
+### Formatting Rules
+
+1. **Bold text**: Use for emphasis on key terms, section titles in lists, and important concepts
+2. **Code formatting**: Use backticks for inline code, file paths, function names, table names
+3. **Lists**: Use numbered lists for sequential items, bullet points for non-sequential
+4. **Quotes**: Use blockquotes sparingly, only for external references
+
+### Technical Terms
+
+- Keep technical terms in English (e.g., "Row Level Security", "JWT", "AES-256")
+- Use standard English terminology for all concepts (e.g., "Identity Management" not "Gestión de identidades")
+- Use consistent terminology throughout
+
+### Evidence Presentation
+
+**Structure:**
+1. Explain the concept/implementation
+2. Show the structure (if applicable)
+3. Provide evidence with code examples
+4. Explain what the evidence demonstrates
+
+**Example pattern:**
+```markdown
+### 1.1. Authentication
+
+The platform uses **Supabase Auth** as centralized authentication:
+
+- **Provider**: Supabase Auth
+- **Session management**: Automatic via JWT tokens
+- **Context**: `AuthContext.tsx` manages global auth state
+
+**Evidence**:
+```typescript
+// src/contexts/AuthContext.tsx
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // ... code
+}
+```
+```
+
+## File Naming Convention
+
+Reports must be named using the pattern:
+```
+[CONTROL-ID]_[Control_Name_Snake_Case].md
+```
+
+**Example:**
+- `IAM-01_Identity_and_Role_Management.md`
+- `EKM-03_Encryption_at_Rest.md`
+- `DSI-01_Information_Classification.md`
+
+## Required Sections Checklist
+
+Every report must include:
+
+- [ ] Header with control information
+- [ ] Executive summary with compliance status
+- [ ] Numbered main sections (1, 2, 3...)
+- [ ] Evidence blocks with code examples
+- [ ] Conclusions section (Strengths + Recommendations)
+- [ ] Compliance assessment table
+- [ ] Final verdict statement
+- [ ] Appendices (if relevant)
+- [ ] Footer: "**End of Audit Report - Control [CONTROL-ID]**"
+
+## Quality Standards
+
+1. **Completeness**: All client questions must be addressed
+2. **Evidence**: Every claim must be backed by code examples or technical evidence
+3. **Clarity**: Technical concepts must be explained clearly
+4. **Consistency**: Use consistent terminology and formatting
+5. **Accuracy**: All code examples and file paths must be correct
+6. **Professionalism**: Maintain professional tone throughout
+
+## Common Patterns
+
+### Describing Implementation
+
+```markdown
+The platform implements **[concept]** through:
+
+1. **Component 1**: Description
+2. **Component 2**: Description
+3. **Component 3**: Description
+```
+
+### Showing Hierarchy
+
+```markdown
+```
+Role 1 (location)
+  └── Permission description
+
+Role 2 (location)
+  └── Permission description
+```
+```
+
+### Explaining Security Functions
+
+```markdown
+#### X.X.X. `function_name()`
+- **Usage**: Purpose of the function
+- **Type**: Function type (SECURITY DEFINER, etc.)
+- **Application**: Where/how it's used
+
+**Usage example**:
+```sql
+[Example SQL]
+```
+```
+
+## Prohibited Practices
+
+❌ **DO NOT:**
+- Use informal language or slang
+- Include personal opinions without evidence
+- Skip evidence for technical claims
+- Use inconsistent formatting
+- Mix languages inconsistently
+- Create overly long sections without subsections
+- Use emojis except for status indicators (✅ ⚠️ ❌)
+- Include placeholder text or TODOs
+
+## Example Structure Reference
+
+Note: All reports should be written in English following this style guide. The structure and format defined here ensure consistency across all cybersecurity audit reports.

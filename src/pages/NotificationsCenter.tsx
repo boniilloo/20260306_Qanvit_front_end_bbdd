@@ -94,7 +94,7 @@ const NotificationsCenter: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-6 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
+        <div className="mb-6 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
           <div className="flex items-start md:items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight truncate">
@@ -107,7 +107,7 @@ const NotificationsCenter: React.FC = () => {
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                className="bg-white border-gray-200 text-[#1A1F2C]"
+                className="bg-white border-gray-200 text-[#22183a]"
                 onClick={() => setShowArchived(prev => !prev)}
               >
                 {showArchived ? 'Hide archived' : 'Show archived'}
@@ -118,7 +118,7 @@ const NotificationsCenter: React.FC = () => {
 
         {loading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
           </div>
         ) : visibleNotifications.length === 0 ? (
           <Card>
@@ -132,7 +132,7 @@ const NotificationsCenter: React.FC = () => {
               <Card key={n.id} className="border-gray-200">
                 <CardHeader>
                   <div className="flex items-center justify-between gap-2">
-                    <CardTitle className="text-[#1A1F2C]">{n.title}</CardTitle>
+                    <CardTitle className="text-[#22183a]">{n.title}</CardTitle>
                     <div className="flex items-center gap-2">
                       {states[n.id]?.is_reviewed && <Badge variant="secondary">Reviewed</Badge>}
                       {states[n.id]?.is_archived && <Badge variant="destructive">Archived</Badge>}
@@ -145,7 +145,7 @@ const NotificationsCenter: React.FC = () => {
                   {n.target_url && (
                     <Button
                       onClick={() => navigate(n.target_url!)}
-                      className="bg-gradient-to-r from-[#80c8f0] to-[#80c8f0]/80 hover:from-[#80c8f0]/90 hover:to-[#80c8f0] text-[#1A1F2C] font-bold"
+                      className="bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa]/80 hover:from-[#f4a9aa]/90 hover:to-[#f4a9aa] text-[#22183a] font-bold"
                     >
                       Go to
                     </Button>

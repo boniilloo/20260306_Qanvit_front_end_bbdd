@@ -70,7 +70,7 @@ const PropuestasMobileList = ({
     <section className="w-full max-w-[100svw] overflow-hidden px-4">
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-xl font-bold text-[#1b2c4a] mb-1">{title}</h2>
+        <h2 className="text-xl font-bold text-[#22183a] mb-1">{title}</h2>
         {subtitle && <p className="text-sm text-gray-600">{subtitle}</p>}
       </div>
 
@@ -86,7 +86,7 @@ const PropuestasMobileList = ({
           <ToggleGroupItem 
             value="overall" 
             aria-label="Sort by overall match"
-            className="flex items-center gap-2 data-[state=on]:bg-[#80c8f0] data-[state=on]:text-white"
+            className="flex items-center gap-2 data-[state=on]:bg-[#f4a9aa] data-[state=on]:text-white"
           >
             <Target className="w-4 h-4" />
             <span className="text-xs sm:text-sm">Overall Match</span>

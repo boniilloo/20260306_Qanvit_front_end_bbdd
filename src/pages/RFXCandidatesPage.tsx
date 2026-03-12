@@ -256,7 +256,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
     // Find the "Ask FQ Agent" button by looking for the specific text content
     const buttons = Array.from(document.querySelectorAll('button'));
     const askAgentButton = buttons.find(btn => 
-      btn.textContent?.includes('Ask FQ Agent') || btn.textContent?.includes('Ask FQ')
+      btn.textContent?.includes('Ask Qanvit Agent') || btn.textContent?.includes('Ask Qanvit')
     );
     
     if (askAgentButton) {
@@ -267,7 +267,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
     } else {
       toast({
         title: 'Button not found',
-        description: 'Could not find the Ask FQ Agent button. Please click it manually.',
+        description: 'Could not find the Ask Qanvit Agent button. Please click it manually.',
         variant: 'destructive',
       });
     }
@@ -505,7 +505,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       <div className="flex-1 overflow-y-auto flex flex-col min-h-full">
         <div className="container mx-auto px-4 py-8 flex-1">
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
           </div>
         </div>
       </div>
@@ -521,7 +521,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       <div className="container mx-auto px-4 py-8 flex-1">
         <div className="max-w-7xl mx-auto">
         {/* Header styled consistent with RFX Specs */}
-        <div className="mb-8 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
+        <div className="mb-8 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
           <div className="flex items-start md:items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight truncate">
@@ -545,7 +545,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                         navigate(`/rfxs/sending/${rfxId}`);
                       }
                     }}
-                    className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-black"
+                    className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-black"
                   >
                     Go to Validation & Sending
                   </Button>
@@ -556,7 +556,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                         <span className="inline-flex" tabIndex={0}>
                           <Button
                             disabled
-                            className="bg-[#7de19a] text-black opacity-70 cursor-not-allowed"
+                            className="bg-[#f4a9aa] text-black opacity-70 cursor-not-allowed"
                             aria-disabled="true"
                           >
                             Go to Validation & Sending
@@ -572,7 +572,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 <Button
                   variant="outline"
                   onClick={handleBackToOverview}
-                  className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+                  className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
@@ -587,7 +587,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                           onClick={handleGeneratePDF}
                           disabled={!hasCandidates || generatingPdf || pdfCryptoLoading || !pdfCryptoReady}
                           variant="outline"
-                          className="bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white border-[#80c8f0] disabled:opacity-70"
+                          className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white border-[#f4a9aa] disabled:opacity-70"
                         >
                           {generatingPdf ? (
                             <>
@@ -641,19 +641,19 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
             <TabsTrigger
               value="recommended"
               data-onboarding-target="candidates-tab-recommended"
-              className="group rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50"
+              className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
             >
-              FQ recommended candidates
+              Qanvit recommended candidates
             </TabsTrigger>
             <TabsTrigger
               value="manual"
               data-onboarding-target="candidates-tab-manual"
-              className="group rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50"
+              className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
             >
               Manual selection
             </TabsTrigger>
-            <TabsTrigger value="selected" className="group rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50">Selected candidates</TabsTrigger>
-            <TabsTrigger value="specs" className="group rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50">Specs overview</TabsTrigger>
+            <TabsTrigger value="selected" className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50">Selected candidates</TabsTrigger>
+            <TabsTrigger value="specs" className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50">Specs overview</TabsTrigger>
           </TabsList>
 
           <TabsContent value="recommended">
@@ -693,31 +693,31 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
               {selectedLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-[#80c8f0]" />
+                    <Loader2 className="h-8 w-8 animate-spin text-[#f4a9aa]" />
                     <p className="text-sm text-gray-600">Loading and decrypting selected candidates...</p>
                   </div>
                 </div>
               ) : !hasSelectedCandidates ? (
                 <div className="py-12">
                   <div className="max-w-xl mx-auto text-center bg-white border border-gray-200 rounded-2xl p-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#f1f1f1] text-[#1A1F2C] mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#f1f1f1] text-[#22183a] mb-4">
                       <Users className="h-8 w-8" />
                     </div>
-                    <h3 className="text-xl font-semibold text-[#1A1F2C] mb-2">No candidates selected yet</h3>
+                    <h3 className="text-xl font-semibold text-[#22183a] mb-2">No candidates selected yet</h3>
                     <p className="text-sm text-gray-600 mb-6">
                       Choose your preferred way to start selecting candidates for this RFX.
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <Button
                         onClick={() => setActiveTab('recommended')}
-                        className="bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white"
+                        className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white"
                       >
-                        Explore FQ recommendations
+                        Explore Qanvit recommendations
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => setActiveTab('manual')}
-                        className="border-[#80c8f0] text-[#1A1F2C] hover:bg-[#80c8f0]/10"
+                        className="border-[#f4a9aa] text-[#22183a] hover:bg-[#f4a9aa]/10"
                       >
                         Go to manual selection
                       </Button>
@@ -765,7 +765,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                           className={selectedFilter === 'fq' ? 'bg-navy text-white' : ''}
                           onClick={() => { setSelectedFilter('fq'); setSelectedPage(1); }}
                         >
-                          FQ recommended ({fqCount})
+                          Qanvit recommended ({fqCount})
                         </Button>
                         <Button
                           variant={selectedFilter === 'manual' ? 'default' : 'outline'}
@@ -827,7 +827,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                               </div>
                             </div>
                           ) : (
-                            <div className="flex items-center justify-center px-3 py-2 rounded-md bg-[#f1f1f1] text-[#1A1F2C] text-sm font-medium flex-shrink-0">
+                            <div className="flex items-center justify-center px-3 py-2 rounded-md bg-[#f1f1f1] text-[#22183a] text-sm font-medium flex-shrink-0">
                               Manually selected
                             </div>
                           )}
@@ -953,9 +953,9 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
           <TabsContent value="specs">
             <div className="grid grid-cols-1 gap-6">
               <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-md px-3 py-2">
-                  <h3 className="text-lg font-bold text-[#1A1F2C] flex items-center gap-2 m-0">
-                    <FileTextIcon className="h-5 w-5 text-[#1A1F2C]/70" />
+                <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-md px-3 py-2">
+                  <h3 className="text-lg font-bold text-[#22183a] flex items-center gap-2 m-0">
+                    <FileTextIcon className="h-5 w-5 text-[#22183a]/70" />
                     Project Description
                   </h3>
                 </div>
@@ -966,9 +966,9 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 )}
               </div>
               <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-md px-3 py-2">
-                  <h3 className="text-lg font-bold text-[#1A1F2C] flex items-center gap-2 m-0">
-                    <Cog className="h-5 w-5 text-[#1A1F2C]/70" />
+                <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-md px-3 py-2">
+                  <h3 className="text-lg font-bold text-[#22183a] flex items-center gap-2 m-0">
+                    <Cog className="h-5 w-5 text-[#22183a]/70" />
                     Technical Specifications
                   </h3>
                 </div>
@@ -979,9 +979,9 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 )}
               </div>
               <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-md px-3 py-2">
-                  <h3 className="text-lg font-bold text-[#1A1F2C] flex items-center gap-2 m-0">
-                    <Building2 className="h-5 w-5 text-[#1A1F2C]/70" />
+                <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-md px-3 py-2">
+                  <h3 className="text-lg font-bold text-[#22183a] flex items-center gap-2 m-0">
+                    <Building2 className="h-5 w-5 text-[#22183a]/70" />
                     Company Requirements
                   </h3>
                 </div>
@@ -1071,8 +1071,8 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       <Dialog open={showRevisionModal} onOpenChange={setShowRevisionModal}>
         <DialogContent className="sm:max-w-md">
           <div className="flex flex-col items-center gap-4 py-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#80c8f0]/20">
-              <FileText className="h-6 w-6 text-[#1A1F2C]" />
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[#f4a9aa]/20">
+              <FileText className="h-6 w-6 text-[#22183a]" />
             </div>
             <div className="text-center">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -1084,7 +1084,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
             </div>
             <div className="flex gap-3 w-full">
               <Button
-                className="flex-1 bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="flex-1 bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 onClick={() => setShowRevisionModal(false)}
               >
                 Understood
@@ -1107,7 +1107,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 This RFX has been archived by the project creator.
               </p>
               <div className="bg-[#f1f1f1] border-l-4 border-l-gray-400 rounded-lg p-4 space-y-2">
-                <p className="font-medium text-[#1A1F2C]">
+                <p className="font-medium text-[#22183a]">
                   While archived:
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-2">
@@ -1134,7 +1134,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => setShowArchivedModal(false)}
-              className="w-full sm:w-auto bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+              className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
             >
               View Only
             </AlertDialogAction>

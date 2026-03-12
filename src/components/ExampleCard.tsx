@@ -31,7 +31,7 @@ const ExampleCard: React.FC<ExampleCardProps> = ({
 }) => {
   return (
     <Card
-      className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-[#80c8f0] h-full"
+      className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-[#f4a9aa] h-full"
       onClick={onClick}
     >
       <CardContent className="p-4 h-full flex flex-col">
@@ -56,7 +56,7 @@ const ExampleCard: React.FC<ExampleCardProps> = ({
           )}
         </div>
 
-        <h3 className="font-semibold text-[#1A1F2C] mb-2 line-clamp-2 text-sm flex-shrink-0">
+        <h3 className="font-semibold text-[#22183a] mb-2 line-clamp-2 text-sm flex-shrink-0">
           {title}
         </h3>
 
@@ -73,7 +73,7 @@ const ExampleCard: React.FC<ExampleCardProps> = ({
               {formatDistanceToNow(createdAt, { addSuffix: true })}
             </span>
           </div>
-          <div className="flex items-center gap-1 text-[#80c8f0] text-xs font-medium">
+          <div className="flex items-center gap-1 text-[#f4a9aa] text-xs font-medium">
             <span>View</span>
             <ArrowRight className="w-3 h-3" />
           </div>

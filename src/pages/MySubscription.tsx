@@ -199,7 +199,7 @@ function PricingCard({
   return (
     <Card
       className={`relative h-full flex flex-col ${
-        isPopular ? "border-[#80c8f0] border-2 shadow-lg bg-slate-50/50" : ""
+        isPopular ? "border-[#f4a9aa] border-2 shadow-lg bg-slate-50/50" : ""
       } ${isCurrentPlan ? "ring-2 ring-green-500 ring-offset-2 bg-green-50/30" : ""}`}
     >
       {isCurrentPlan && (
@@ -209,7 +209,7 @@ function PricingCard({
       )}
       {isPopular && !isCurrentPlan && (
         <div className="absolute -top-3 left-0 right-0 flex justify-center">
-          <Badge className="bg-[#80c8f0] text-[#1A1F2C] font-semibold px-3">MOST POPULAR</Badge>
+          <Badge className="bg-[#f4a9aa] text-[#22183a] font-semibold px-3">MOST POPULAR</Badge>
         </div>
       )}
       <CardHeader className="pb-2">
@@ -217,17 +217,17 @@ function PricingCard({
           {plan.icon}
           <span>{plan.tier}</span>
         </div>
-        <CardTitle className="text-xl font-bold text-[#1A1F2C]">{plan.title}</CardTitle>
+        <CardTitle className="text-xl font-bold text-[#22183a]">{plan.title}</CardTitle>
         <CardDescription className="text-sm min-h-[40px]">{plan.description}</CardDescription>
         <div className="pt-2">
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-black text-[#1A1F2C]">{plan.priceMain}</span>
+            <span className="text-3xl font-black text-[#22183a]">{plan.priceMain}</span>
             {plan.priceSub && <span className="text-sm text-gray-500">{plan.priceSub}</span>}
           </div>
           {plan.effectiveLabel && effective && (
             <>
               <p className="text-xs text-gray-500 mt-0.5">{plan.effectiveLabel}</p>
-              <p className="text-sm font-medium text-[#1A1F2C]">{effective}</p>
+              <p className="text-sm font-medium text-[#22183a]">{effective}</p>
             </>
           )}
         </div>
@@ -256,8 +256,8 @@ function PricingCard({
           <Button
             className={
               isPopular
-                ? "flex-1 bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-[#1A1F2C] font-semibold"
-                : "flex-1 bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                ? "flex-1 bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a] font-semibold"
+                : "flex-1 bg-[#22183a] hover:bg-[#22183a]/90 text-white"
             }
             disabled={isLoading || isFree}
             onClick={() => onCta(plan)}
@@ -275,7 +275,7 @@ function PricingCard({
             <Button
               variant="outline"
               size="icon"
-              className="shrink-0 border-[#1A1F2C]/30 text-[#1A1F2C] h-10 w-10"
+              className="shrink-0 border-[#22183a]/30 text-[#22183a] h-10 w-10"
               disabled={isLoading}
               onClick={() => onGenerateLink?.(plan)}
               title="Generar enlace de pago"
@@ -366,7 +366,7 @@ function FreePlanVisual({ onSeePlans, onJoinWithCode }: { onSeePlans: () => void
           <Sparkles className="h-7 w-7" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-[#1A1F2C] mb-1">You're on the Free (Pilot) plan</h3>
+          <h3 className="text-lg font-bold text-[#22183a] mb-1">You're on the Free (Pilot) plan</h3>
           <p className="text-sm text-gray-600 mb-3">
             You have access to 1 pilot project and 1 seat — enough to validate fit and run a real RFX with our agents.
           </p>
@@ -380,13 +380,13 @@ function FreePlanVisual({ onSeePlans, onJoinWithCode }: { onSeePlans: () => void
               Centralized project workspace
             </li>
           </ul>
-          <p className="text-sm font-medium text-[#1A1F2C] mb-3">
+          <p className="text-sm font-medium text-[#22183a] mb-3">
             Need more projects or a team? Compare plans below and upgrade when you're ready.
           </p>
           <div className="flex flex-wrap gap-2">
             <Button
               onClick={onSeePlans}
-              className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white inline-flex items-center gap-2"
+              className="bg-[#22183a] hover:bg-[#22183a]/90 text-white inline-flex items-center gap-2"
             >
               See plans and upgrade
               <ChevronDown className="h-4 w-4" />
@@ -394,7 +394,7 @@ function FreePlanVisual({ onSeePlans, onJoinWithCode }: { onSeePlans: () => void
             {onJoinWithCode ? (
               <Button
                 variant="outline"
-                className="border-[#1A1F2C]/30 text-[#1A1F2C] inline-flex items-center gap-2"
+                className="border-[#22183a]/30 text-[#22183a] inline-flex items-center gap-2"
                 onClick={onJoinWithCode}
               >
                 <Link2 className="h-4 w-4" />
@@ -436,20 +436,20 @@ function PaidPlanVisual({
   const planName = isGrowth ? "Growth" : "Professional";
   const bgClass = isGrowth
     ? "rounded-xl border border-blue-200/80 bg-gradient-to-br from-blue-50/80 to-white p-6"
-    : "rounded-xl border border-[#80c8f0]/60 bg-gradient-to-br from-[#80c8f0]/10 to-white p-6";
+    : "rounded-xl border border-[#f4a9aa]/60 bg-gradient-to-br from-[#f4a9aa]/10 to-white p-6";
 
   return (
     <div className={bgClass}>
       <div className="flex flex-col sm:flex-row sm:items-start gap-6">
         <div
           className={`flex items-center justify-center w-14 h-14 rounded-xl shrink-0 ${
-            isGrowth ? "bg-blue-100 text-blue-600" : "bg-[#80c8f0]/20 text-[#1A1F2C]"
+            isGrowth ? "bg-blue-100 text-blue-600" : "bg-[#f4a9aa]/20 text-[#22183a]"
           }`}
         >
           {icon}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-bold text-[#1A1F2C] mb-1">You're on the {planName} plan</h3>
+          <h3 className="text-lg font-bold text-[#22183a] mb-1">You're on the {planName} plan</h3>
           <p className="text-sm text-gray-600 mb-3">
             {isGrowth
               ? "For small procurement teams running occasional CAPEX projects. Launch projects anytime during the term."
@@ -476,7 +476,7 @@ function PaidPlanVisual({
               onClick={onManageStripe}
               disabled={loadingPortal}
               size="sm"
-              className={isGrowth ? "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white" : "bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-[#1A1F2C]"}
+              className={isGrowth ? "bg-[#22183a] hover:bg-[#22183a]/90 text-white" : "bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a]"}
             >
               {loadingPortal ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -963,11 +963,11 @@ const MySubscription = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header Card - mismo estilo que RFX Projects */}
           <div className="mb-8">
-            <Card className="bg-gradient-to-r from-white to-[#f1f1f1] border-0 border-l-4 border-l-[#80c8f0] shadow-sm">
+            <Card className="bg-gradient-to-r from-white to-[#f1f1f1] border-0 border-l-4 border-l-[#f4a9aa] shadow-sm">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <h1 className="text-3xl font-black text-[#1A1F2C] font-intro mb-2 tracking-tight" style={{ fontWeight: 900 }}>
+                    <h1 className="text-3xl font-black text-[#22183a] font-intro mb-2 tracking-tight" style={{ fontWeight: 900 }}>
                       My Subscription
                     </h1>
                     <p className="text-gray-600 font-inter text-lg">
@@ -979,7 +979,7 @@ const MySubscription = () => {
                       <Button
                         onClick={openPortal}
                         disabled={openingPortal}
-                        className="inline-flex items-center px-4 py-2 rounded-md bg-[#1A1F2C] text-white hover:bg-[#1A1F2C]/90"
+                        className="inline-flex items-center px-4 py-2 rounded-md bg-[#22183a] text-white hover:bg-[#22183a]/90"
                       >
                         {openingPortal ? (
                           <>
@@ -1075,7 +1075,7 @@ const MySubscription = () => {
                     openPortal();
                   }}
                   disabled={openingPortal}
-                  className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                  className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 >
                   {openingPortal ? (
                     <>
@@ -1110,7 +1110,7 @@ const MySubscription = () => {
                 <Button variant="outline" onClick={() => { setIsShareableLinkExplainModalOpen(false); setPendingShareableTier(null); }}>
                   Cancel
                 </Button>
-                <Button onClick={continueFromShareableExplainToTerms} className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white">
+                <Button onClick={continueFromShareableExplainToTerms} className="bg-[#22183a] hover:bg-[#22183a]/90 text-white">
                   Continue
                 </Button>
               </DialogFooter>
@@ -1460,7 +1460,7 @@ const MySubscription = () => {
           <DialogHeader>
             <DialogTitle>Payment link generated</DialogTitle>
             <DialogDescription>
-              Share this link with whoever is going to pay. After completing the payment, the payer will see a code on the success page; any user with an FQ Source account can enter that code in My Subscription to join if there are seats available.
+              Share this link with whoever is going to pay. After completing the payment, the payer will see a code on the success page; any user with a Qanvit account can enter that code in My Subscription to join if there are seats available.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">

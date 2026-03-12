@@ -286,7 +286,7 @@ const CompanyManagement = () => {
       {/* Header Section */}
       <header className="h-16 border-b border-gray-100 px-6 flex items-center justify-between hidden lg:flex">
         <div className="flex items-center gap-4">
-          <div className="text-2xl font-bold text-navy">FQ</div>
+          <div className="text-2xl font-bold text-navy">Qanvit</div>
           <nav className="flex items-center text-sm text-charcoal">
             <Link to="/" className="hover:text-navy transition-colors">Search</Link>
             <span className="mx-2 text-gray-300">/</span>

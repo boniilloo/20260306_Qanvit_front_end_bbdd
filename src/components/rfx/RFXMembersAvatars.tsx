@@ -46,9 +46,9 @@ const RFXMembersAvatars: React.FC<RFXMembersAvatarsProps> = ({
         <TooltipProvider key={member.user_id} delayDuration={100}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Avatar className="w-8 h-8 border border-[#1A1F2C]">
+              <Avatar className="w-8 h-8 border border-[#22183a]">
                 <AvatarImage src={member.avatar_url || ''} />
-                <AvatarFallback className="bg-[#80c8f0] text-white text-xs font-medium">
+                <AvatarFallback className="bg-[#f4a9aa] text-white text-xs font-medium">
                   {(member.name?.[0] || member.email?.[0] || 'U').toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -61,7 +61,7 @@ const RFXMembersAvatars: React.FC<RFXMembersAvatarsProps> = ({
       ))}
       {cachedMembers.length > maxVisible && (
         <div
-          className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-medium border border-[#1A1F2C]"
+          className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-medium border border-[#22183a]"
           title={`${cachedMembers.length - maxVisible} more users`}
         >
           +{cachedMembers.length - maxVisible}

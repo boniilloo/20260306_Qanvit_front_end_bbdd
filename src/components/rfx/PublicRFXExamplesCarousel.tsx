@@ -38,7 +38,7 @@ const ImageWithSkeleton: React.FC<ImageWithSkeletonProps> = ({ src, alt, classNa
   if (!src || imageError) {
     // Show default icon if no image or error
     return (
-      <div className="w-10 h-10 bg-gradient-to-br from-[#80c8f0] to-[#7de19a] rounded-lg flex items-center justify-center flex-shrink-0">
+      <div className="w-10 h-10 bg-gradient-to-br from-[#f4a9aa] to-[#f4a9aa] rounded-lg flex items-center justify-center flex-shrink-0">
         <FileText className="w-5 h-5 text-white" />
       </div>
     );
@@ -100,8 +100,8 @@ const PublicRFXExamplesCarousel: React.FC = () => {
     <div className="w-full max-w-4xl mx-auto mb-8">
       <div className="flex items-center justify-between mb-4 px-2">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-[#80c8f0]" />
-          <h2 className="text-xl font-bold text-[#1A1F2C]">Public RFX Examples</h2>
+          <Sparkles className="w-5 h-5 text-[#f4a9aa]" />
+          <h2 className="text-xl font-bold text-[#22183a]">Public RFX Examples</h2>
           <Badge variant="secondary" className="ml-2">
             {publicRfxs.length} examples
           </Badge>
@@ -122,7 +122,7 @@ const PublicRFXExamplesCarousel: React.FC = () => {
               className="pl-2 md:pl-4 basis-full sm:basis-1/2"
             >
               <Card
-                className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-[#80c8f0] h-full"
+                className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-[#f4a9aa] h-full"
                 onClick={() => handleClick(pr.rfx_id)}
               >
                 <CardContent className="p-5 h-full flex flex-col">
@@ -133,14 +133,14 @@ const PublicRFXExamplesCarousel: React.FC = () => {
                         alt={pr.title || pr.rfx?.name || 'RFX Example'}
                       />
                       {pr.is_featured && (
-                        <Badge className="bg-[#7de19a] text-[#1A1F2C] text-xs">
+                        <Badge className="bg-[#f4a9aa] text-[#22183a] text-xs">
                           Featured
                         </Badge>
                       )}
                     </div>
                   </div>
 
-                  <h3 className="font-semibold text-[#1A1F2C] mb-2 line-clamp-2">
+                  <h3 className="font-semibold text-[#22183a] mb-2 line-clamp-2">
                     {pr.title || pr.rfx?.name || 'RFX Example'}
                   </h3>
 
@@ -160,7 +160,7 @@ const PublicRFXExamplesCarousel: React.FC = () => {
                         )}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1 text-[#80c8f0] text-sm font-medium">
+                    <div className="flex items-center gap-1 text-[#f4a9aa] text-sm font-medium">
                       <span>View RFX</span>
                       <ArrowRight className="w-4 h-4" />
                     </div>

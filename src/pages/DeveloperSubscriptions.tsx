@@ -386,7 +386,7 @@ const DeveloperSubscriptions = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-black text-[#1A1F2C]">Developer Subscriptions & Seats</h1>
+            <h1 className="text-3xl font-black text-[#22183a]">Developer Subscriptions & Seats</h1>
             <p className="text-gray-600">Manage paid workspace subscriptions and assign premium users (seats).</p>
           </div>
           <div className="flex items-center gap-2">
@@ -435,11 +435,11 @@ const DeveloperSubscriptions = () => {
                     <button
                       key={sub.subscription_id}
                       onClick={() => setSelectedSubscriptionId(sub.subscription_id)}
-                      className={`w-full text-left rounded-lg border p-3 transition-colors ${selected ? "border-[#80c8f0] bg-[#80c8f0]/10" : "border-gray-200 hover:bg-gray-50"}`}
+                      className={`w-full text-left rounded-lg border p-3 transition-colors ${selected ? "border-[#f4a9aa] bg-[#f4a9aa]/10" : "border-gray-200 hover:bg-gray-50"}`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <div className="font-semibold text-[#1A1F2C]">{sub.tier_code?.toUpperCase()}</div>
+                          <div className="font-semibold text-[#22183a]">{sub.tier_code?.toUpperCase()}</div>
                           <div className="text-xs text-gray-600 break-all">{sub.stripe_subscription_id}</div>
                         </div>
                         <Badge className={sub.status === "active" || sub.status === "trialing" ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}>
@@ -488,7 +488,7 @@ const DeveloperSubscriptions = () => {
                   {members.map((m) => (
                     <div key={m.member_id} className="flex items-center justify-between rounded border p-3">
                       <div>
-                        <div className="font-medium text-[#1A1F2C]">
+                        <div className="font-medium text-[#22183a]">
                           {[m.name, m.surname].filter(Boolean).join(" ") || m.email || m.user_id}
                         </div>
                         <div className="text-xs text-gray-600">{m.email || m.user_id}</div>
@@ -548,7 +548,7 @@ const DeveloperSubscriptions = () => {
                   const displayEmail = row.email ?? row.user_id;
                   return (
                     <div key={row.user_id} className="flex items-center justify-between rounded border p-3">
-                      <span className="font-medium text-[#1A1F2C]">{displayEmail}</span>
+                      <span className="font-medium text-[#22183a]">{displayEmail}</span>
                       <Button
                         variant="outline"
                         size="sm"
@@ -596,7 +596,7 @@ const DeveloperSubscriptions = () => {
                 {sortedPricingRows.map((row, idx) => (
                   <div key={`${row.tier_code}-${row.billing_period_months}-${idx}`} className="grid grid-cols-12 gap-2 items-center">
                     <div className="col-span-2">
-                      <Badge className="bg-[#f1f1f1] text-[#1A1F2C]">{row.tier_code}</Badge>
+                      <Badge className="bg-[#f1f1f1] text-[#22183a]">{row.tier_code}</Badge>
                     </div>
                     <div className="col-span-2">
                       <Input
@@ -648,7 +648,7 @@ const DeveloperSubscriptions = () => {
             )}
 
             <div className="border-t pt-4 space-y-2">
-              <div className="text-sm font-semibold text-[#1A1F2C]">Add or update route</div>
+              <div className="text-sm font-semibold text-[#22183a]">Add or update route</div>
               <div className="grid grid-cols-12 gap-2 items-center">
                 <div className="col-span-2">
                   <select
@@ -691,7 +691,7 @@ const DeveloperSubscriptions = () => {
             <Button
               onClick={savePricingRows}
               disabled={savingPricingRows}
-              className="bg-[#1A1F2C] text-white hover:bg-[#1A1F2C]/90"
+              className="bg-[#22183a] text-white hover:bg-[#22183a]/90"
             >
               {savingPricingRows ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
               Save Routes

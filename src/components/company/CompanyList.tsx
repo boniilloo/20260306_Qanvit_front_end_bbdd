@@ -225,7 +225,7 @@ const CompanyList: React.FC = () => {
         </div>
         <Dialog open={isNewCompanyModalOpen} onOpenChange={setIsNewCompanyModalOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-[#1b2c4a] hover:bg-[#1b2c4a]/90 text-white">
+            <Button className="bg-[#22183a] hover:bg-[#22183a]/90 text-white">
               <Plus className="h-4 w-4 mr-2" />
               Request New Company
             </Button>

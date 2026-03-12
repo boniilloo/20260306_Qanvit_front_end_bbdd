@@ -20,9 +20,9 @@ const RadialGauge = ({ value, size, title }: RadialGaugeProps) => {
   }, [value]);
 
   const getColor = (val: number) => {
-    if (val >= 80) return '#7de19a'; // green
-    if (val >= 60) return '#80c8f0'; // blue
-    return '#1b2c4a'; // navy
+    if (val >= 80) return '#f4a9aa'; // green
+    if (val >= 60) return '#f4a9aa'; // blue
+    return '#22183a'; // navy
   };
 
   const radius = size / 2 - 10;
@@ -69,7 +69,7 @@ const RadialGauge = ({ value, size, title }: RadialGaugeProps) => {
       {/* Center content */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.div
-          className="text-3xl font-bold font-intro text-[#1b2c4a]"
+          className="text-3xl font-bold font-intro text-[#22183a]"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.8, type: "spring", stiffness: 200 }}

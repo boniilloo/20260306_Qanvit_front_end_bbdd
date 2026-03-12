@@ -931,7 +931,7 @@ const CompanyEditForm = () => {
                         className="gap-2 bg-sky text-navy hover:bg-sky-dark"
                       >
                         <Sparkles className="h-4 w-4" />
-                        Update info using FQ AI
+                        Update info using Qanvit AI
                       </Button>
                     </div>
                   </CardHeader>

@@ -29,7 +29,7 @@ export default function VerticalSelector({ showPromptLibrary = false }: Vertical
           {/* Hide label on mobile to maximize horizontal space */}
           {!isMobile && (
             <div className="flex items-center gap-3 shrink-0">
-              <h2 className="text-sm font-semibold text-[#1A1F2C]">Verticals</h2>
+              <h2 className="text-sm font-semibold text-[#22183a]">Verticals</h2>
               <div className="h-6 w-px bg-gray-200" />
             </div>
           )}
@@ -62,7 +62,7 @@ export default function VerticalSelector({ showPromptLibrary = false }: Vertical
                             <Icon className="w-4 h-4 text-gray-400" />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-xs sm:text-sm font-extrabold tracking-wide text-[#1A1F2C] uppercase leading-snug">
+                            <div className="text-xs sm:text-sm font-extrabold tracking-wide text-[#22183a] uppercase leading-snug">
                               {vertical.name}
                             </div>
                           </div>
@@ -82,14 +82,14 @@ export default function VerticalSelector({ showPromptLibrary = false }: Vertical
                 variant="outline"
                 size="sm"
                 onClick={() => setShowAllVerticals(true)}
-                className="text-[#1A1F2C] border-[#80c8f0] hover:bg-[#80c8f0]/10"
+                className="text-[#22183a] border-[#f4a9aa] hover:bg-[#f4a9aa]/10"
               >
                 View all verticals
               </Button>
 
               <DialogContent className="max-w-6xl w-[95vw] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="text-[#1A1F2C]">All verticals</DialogTitle>
+                  <DialogTitle className="text-[#22183a]">All verticals</DialogTitle>
                 </DialogHeader>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -110,13 +110,13 @@ export default function VerticalSelector({ showPromptLibrary = false }: Vertical
                             <Icon className="w-5 h-5 text-gray-400" />
                           </div>
                           <div className="min-w-0">
-                            <div className="text-sm sm:text-base font-extrabold tracking-wide text-[#1A1F2C] uppercase leading-snug">
+                            <div className="text-sm sm:text-base font-extrabold tracking-wide text-[#22183a] uppercase leading-snug">
                               {vertical.name}
                             </div>
                             <div className="mt-3 flex items-center gap-2 flex-wrap">
                               <span className="text-sm text-gray-500">{vertical.region}</span>
                               {vertical.focusTag && (
-                                <span className="inline-flex items-center rounded-full border border-[#80c8f0]/40 bg-[#80c8f0]/10 px-2 py-0.5 text-xs font-medium text-[#1A1F2C]">
+                                <span className="inline-flex items-center rounded-full border border-[#f4a9aa]/40 bg-[#f4a9aa]/10 px-2 py-0.5 text-xs font-medium text-[#22183a]">
                                   {vertical.focusTag}
                                 </span>
                               )}
@@ -135,7 +135,7 @@ export default function VerticalSelector({ showPromptLibrary = false }: Vertical
                 variant="outline"
                 size={isMobile ? "icon" : "sm"}
                 onClick={() => setShowPromptLibraryModal(true)}
-                className={`flex items-center gap-2 text-[#1b2c4a] border-[#80c8f0] hover:bg-[#80c8f0]/10 ${isMobile ? 'w-9 h-9' : ''}`}
+                className={`flex items-center gap-2 text-[#22183a] border-[#f4a9aa] hover:bg-[#f4a9aa]/10 ${isMobile ? 'w-9 h-9' : ''}`}
                 title={isMobile ? "Prompt Library" : ""}
               >
                 <BookOpen className="w-4 h-4" />

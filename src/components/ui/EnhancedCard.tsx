@@ -25,7 +25,7 @@ const EnhancedCard = ({
     "hover:shadow-xl",
     "hover:shadow-gray-200/50",
     "hover:-translate-y-1",
-    "hover:border-[#80c8f0]/30"
+    "hover:border-[#f4a9aa]/30"
   ].join(" ") : "";
   
   const clickableClasses = clickable ? [
@@ -33,7 +33,7 @@ const EnhancedCard = ({
     "active:scale-[0.98]",
     "focus:outline-none",
     "focus:ring-2",
-    "focus:ring-[#80c8f0]/50",
+    "focus:ring-[#f4a9aa]/50",
     "focus:ring-offset-2"
   ].join(" ") : "";
 

@@ -194,7 +194,7 @@ const ConversationViewer = () => {
     return (
       <div className="flex-1 bg-fqgrey-100 min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="text-lg font-medium text-[#1b2c4a] mb-2">Loading conversation...</div>
+          <div className="text-lg font-medium text-[#22183a] mb-2">Loading conversation...</div>
           <div className="text-sm text-gray-600">Please wait while we load the messages</div>
         </div>
       </div>
@@ -223,9 +223,9 @@ const ConversationViewer = () => {
             </Button>
             
             <div className="flex items-center space-x-2">
-              <MessageSquare className="h-5 w-5 text-[#80c8f0]" />
+              <MessageSquare className="h-5 w-5 text-[#f4a9aa]" />
               <div className="flex flex-col">
-                <div className="font-medium text-[#1b2c4a]">
+                <div className="font-medium text-[#22183a]">
                   {user ? `${user.name} ${user.surname}` : 'Anonymous User'}
                 </div>
                 {conversation && (
@@ -258,7 +258,7 @@ const ConversationViewer = () => {
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <div className="text-lg font-medium text-[#1b2c4a] mb-2">No messages found</div>
+                <div className="text-lg font-medium text-[#22183a] mb-2">No messages found</div>
                 <div className="text-sm text-gray-600">This conversation appears to be empty</div>
               </div>
             </div>

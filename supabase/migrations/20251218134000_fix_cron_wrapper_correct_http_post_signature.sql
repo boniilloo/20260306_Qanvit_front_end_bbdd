@@ -18,7 +18,7 @@ BEGIN
     -- Call net.http_post with CORRECT parameter order: url, headers, body
     SELECT status, content INTO v_status, v_content
     FROM net.http_post(
-      'https://fukzxedgbszcpakqkrjf.functions.supabase.co/chat-unread-email-notifier',
+      'https://bymbfjkezrwsuvbsaycg.functions.supabase.co/chat-unread-email-notifier',
       '{"Content-Type": "application/json"}'::jsonb,  -- headers (2nd param)
       '{}'::jsonb                                      -- body (3rd param)
     );

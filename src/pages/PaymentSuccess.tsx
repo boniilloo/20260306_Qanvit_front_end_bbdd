@@ -72,16 +72,16 @@ const PaymentSuccess = () => {
           </div>
         </div>
 
-        <h1 className="text-3xl font-black text-[#1A1F2C] mb-3 tracking-tight">
+        <h1 className="text-3xl font-black text-[#22183a] mb-3 tracking-tight">
           Payment confirmed
         </h1>
         <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-          Your company's FQ Source subscription is now active. The team that set this up will be able to start assigning seats and launching projects right away.
+          Your company's Qanvit subscription is now active. The team that set this up will be able to start assigning seats and launching projects right away.
         </p>
 
         {sessionId ? (
           <div className="rounded-xl border-2 border-amber-200 bg-amber-50/80 p-5 text-left mb-8 space-y-3">
-            <p className="text-sm font-semibold text-[#1A1F2C]">Subscription code</p>
+            <p className="text-sm font-semibold text-[#22183a]">Subscription code</p>
             {claimCodeLoading ? (
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -98,7 +98,7 @@ const PaymentSuccess = () => {
                   </Button>
                 </div>
                 <p className="text-sm text-gray-700">
-                  Share this code with your team. Users with an FQ Source account can enter it in <strong>My Subscription</strong> to join if there are seats available.
+                  Share this code with your team. Users with a Qanvit account can enter it in <strong>My Subscription</strong> to join if there are seats available.
                 </p>
               </>
             ) : null}
@@ -106,7 +106,7 @@ const PaymentSuccess = () => {
         ) : null}
 
         <div className="rounded-xl border border-blue-100 bg-blue-50/60 p-5 text-left mb-8 space-y-3">
-          <p className="text-sm font-semibold text-[#1A1F2C]">What happens next</p>
+          <p className="text-sm font-semibold text-[#22183a]">What happens next</p>
           <ul className="space-y-2 text-sm text-gray-700">
             <li className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
@@ -114,7 +114,7 @@ const PaymentSuccess = () => {
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-              The subscription is already linked to your organization's FQ Source account.
+              The subscription is already linked to your organization's Qanvit account.
             </li>
             <li className="flex items-start gap-2">
               <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
@@ -134,14 +134,14 @@ const PaymentSuccess = () => {
           </Button>
           <Button
             onClick={() => { window.location.href = "https://app.fqsource.com"; }}
-            className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white inline-flex items-center gap-2"
+            className="bg-[#22183a] hover:bg-[#22183a]/90 text-white inline-flex items-center gap-2"
           >
-            Go to FQ Source
+            Go to Qanvit
           </Button>
         </div>
 
         <p className="text-xs text-gray-400 mt-8">
-          FQ Source · Powered by Stripe
+          Qanvit · Powered by Stripe
         </p>
       </div>
     </div>

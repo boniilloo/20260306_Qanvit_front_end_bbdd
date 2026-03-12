@@ -42,9 +42,9 @@ export const SupplierInvitationProgressBar: React.FC<SupplierInvitationProgressB
       tooltip: 'After accepting the invitation, the supplier must sign a Non-Disclosure Agreement (NDA). This ensures confidentiality of the RFX details before they can access the full specifications.'
     },
     { 
-      label: 'FQ NDA Validation', 
+      label: 'Qanvit NDA Validation', 
       key: 'nda_validation',
-      tooltip: 'Once the supplier signs and uploads the NDA, FQ Source validates the signed document to ensure it meets all requirements. The supplier cannot proceed until the NDA is validated.'
+      tooltip: 'Once the supplier signs and uploads the NDA, Qanvit validates the signed document to ensure it meets all requirements. The supplier cannot proceed until the NDA is validated.'
     },
     { 
       label: 'Supplier Evaluating RFX', 
@@ -145,7 +145,7 @@ export const SupplierInvitationProgressBar: React.FC<SupplierInvitationProgressB
         {/* Progress bar fill - only show if not error state */}
         {!isErrorState && currentStepIndex >= 0 && (
           <div 
-            className="absolute top-[20px] left-6 h-1 bg-[#7de19a] transition-all duration-500 ease-in-out"
+            className="absolute top-[20px] left-6 h-1 bg-[#f4a9aa] transition-all duration-500 ease-in-out"
             style={{ 
               width: `calc(${(currentStepIndex / (steps.length - 1)) * 100}% - 48px)` 
             }}
@@ -168,8 +168,8 @@ export const SupplierInvitationProgressBar: React.FC<SupplierInvitationProgressB
                     <div
                       className={`
                         w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold z-10 transition-all duration-300
-                        ${isCompleted ? 'bg-[#7de19a] text-white' : ''}
-                        ${isInProgress ? 'bg-[#80c8f0] text-white' : ''}
+                        ${isCompleted ? 'bg-[#f4a9aa] text-white' : ''}
+                        ${isInProgress ? 'bg-[#f4a9aa] text-white' : ''}
                         ${isPending ? 'bg-gray-200 text-gray-400 border-2 border-gray-200' : ''}
                         ${isErrorState ? 'bg-gray-200 text-gray-400 border-2 border-gray-200' : ''}
                       `}
@@ -185,7 +185,7 @@ export const SupplierInvitationProgressBar: React.FC<SupplierInvitationProgressB
                     <div
                       className={`
                         mt-1.5 text-[10px] font-medium text-center whitespace-nowrap
-                        ${isCompleted || isInProgress ? 'text-[#1A1F2C]' : 'text-gray-400'}
+                        ${isCompleted || isInProgress ? 'text-[#22183a]' : 'text-gray-400'}
                       `}
                     >
                       {step.label}

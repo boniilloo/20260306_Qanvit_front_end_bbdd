@@ -152,8 +152,8 @@ supabase functions deploy send-company-invitation-email --no-verify-jwt
 - The notification system follows the established patterns in `.cursor/rules/notifications.mdc`
 
 ## Colors Used (from workspace rules)
-- #1A1F2C (navy blue - dark)
-- #80c8f0 (light blue)
+- #22183a (navy blue - dark)
+- #f4a9aa (light blue)
 - #f1f1f1 (gray)
 - #7de19a (green)
 

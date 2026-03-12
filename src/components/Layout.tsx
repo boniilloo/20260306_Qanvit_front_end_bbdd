@@ -65,7 +65,7 @@ const MobileHeader: React.FC = () => {
     if (path === '/conversations') return 'Conversations';
     if (path === '/embedding-analytics') return 'Analytics';
     if (path === '/user-profile') return 'Profile';
-    return 'FQ Source';
+    return 'Qanvit';
   };
 
   return (
@@ -79,12 +79,12 @@ const MobileHeader: React.FC = () => {
         >
           <div className="bg-white p-1.5 rounded-md">
             <img 
-              src="https://fukzxedgbszcpakqkrjf.supabase.co/storage/v1/object/public/fq-logos//logo_200x200.png" 
-              alt="FQ Logo" 
+              src="/branding/ISOTIPO_2-02.png" 
+              alt="Qanvit Logo" 
               className="w-5 h-5 object-contain" 
             />
           </div>
-          <span className="text-lg font-semibold text-[#1e293b]">FQ</span>
+          <span className="text-lg font-semibold text-[#22183a]">Qanvit</span>
         </button>
       </div>
 
@@ -103,7 +103,7 @@ const MobileHeader: React.FC = () => {
               <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full">
                 <Avatar className="w-8 h-8">
                   <AvatarImage src={userProfile?.avatar_url || ''} />
-                  <AvatarFallback className="bg-blue-600 text-white text-sm font-semibold">
+                  <AvatarFallback className="bg-[#f4a9aa] text-[#22183a] text-sm font-semibold">
                     {userProfile?.name?.charAt(0) || user.email?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>

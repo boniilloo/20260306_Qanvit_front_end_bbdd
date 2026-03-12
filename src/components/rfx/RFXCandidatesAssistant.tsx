@@ -17,7 +17,7 @@ const RFXCandidatesAssistant: React.FC<RFXCandidatesAssistantProps> = ({
     <>
       <p>Now it's time to find the best suppliers for your RFX!</p>
       
-      <p>First, click the <span className="font-semibold text-[#80c8f0]">"Ask FQ Agent"</span> button below to let FQ's AI analyze your specifications and recommend the most suitable candidates from our database.</p>
+      <p>First, click the <span className="font-semibold text-[#f4a9aa]">"Ask Qanvit Agent"</span> button below to let Qanvit's AI analyze your specifications and recommend the most suitable candidates from our database.</p>
       
       <p>The agent will evaluate suppliers based on your technical requirements, company needs, and project specifications to find the perfect matches.</p>
       
@@ -28,13 +28,13 @@ const RFXCandidatesAssistant: React.FC<RFXCandidatesAssistantProps> = ({
   // Content when there are candidates
   const hasCandidatesContent = (
     <>
-      <p>Great! FQ has found potential candidates for your RFX. 🎯</p>
+      <p>Great! Qanvit has found potential candidates for your RFX. 🎯</p>
       
       <p>Now you can:</p>
       <ul className="list-disc ml-5 space-y-1">
         <li>Review the recommended candidates and their details</li>
-        <li>Click <span className="font-semibold text-[#80c8f0]">"Select Candidates for RFX"</span> below to choose which suppliers will participate</li>
-        <li>Or click <span className="font-semibold text-[#80c8f0]">"Ask FQ Agent"</span> again to get new recommendations</li>
+        <li>Click <span className="font-semibold text-[#f4a9aa]">"Select Candidates for RFX"</span> below to choose which suppliers will participate</li>
+        <li>Or click <span className="font-semibold text-[#f4a9aa]">"Ask Qanvit Agent"</span> again to get new recommendations</li>
       </ul>
       
       <p>Select the candidates that best fit your project requirements!</p>
@@ -55,7 +55,7 @@ const RFXCandidatesAssistant: React.FC<RFXCandidatesAssistantProps> = ({
               onClick: onSelectCandidates
             }
           : {
-              label: 'Ask FQ Agent',
+              label: 'Ask Qanvit Agent',
               onClick: onAskAgent
             }
       }

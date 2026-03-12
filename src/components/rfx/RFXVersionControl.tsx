@@ -287,7 +287,7 @@ const RFXVersionControl: React.FC<Props> = ({
           {/* History button */}
           <button
             onClick={() => setIsHistoryOpen(true)}
-            className="h-14 w-14 rounded-full bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white shadow-lg flex items-center justify-center transition-colors"
+            className="h-14 w-14 rounded-full bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white shadow-lg flex items-center justify-center transition-colors"
             title="Version history"
             data-onboarding-target="rfx-versions-button"
           >
@@ -298,7 +298,7 @@ const RFXVersionControl: React.FC<Props> = ({
           {!isHelpOpen && (
             <button
               onClick={() => setIsHelpOpen(true)}
-              className="h-14 w-14 rounded-full bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white shadow-lg flex items-center justify-center transition-colors"
+              className="h-14 w-14 rounded-full bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white shadow-lg flex items-center justify-center transition-colors"
               title="Help"
             >
               <HelpCircle className="h-7 w-7" strokeWidth={2.5} />
@@ -311,35 +311,35 @@ const RFXVersionControl: React.FC<Props> = ({
       {isHelpOpen && (
         <div className={`fixed bottom-6 z-50 transition-[left] duration-200 ease-linear ${leftPosition}`}>
           <div className="relative max-w-md">
-            <div className="bg-[#1A1F2C] rounded-2xl shadow-xl border border-[#80c8f0]/20 p-4 pr-10">
+            <div className="bg-[#22183a] rounded-2xl shadow-xl border border-[#f4a9aa]/20 p-4 pr-10">
               <button
                 aria-label="Close assistant"
                 onClick={() => setIsHelpOpen(false)}
-                className="absolute top-2 right-2 text-[#80c8f0] hover:text-[#80c8f0]/80 transition-colors"
+                className="absolute top-2 right-2 text-[#f4a9aa] hover:text-[#f4a9aa]/80 transition-colors"
               >
                 <Eye className="h-4 w-4" />
               </button>
               <div className="flex items-start gap-3">
                 <div className="shrink-0 mt-0.5">
-                  <div className="h-8 w-8 rounded-full bg-[#80c8f0] text-[#1A1F2C] grid place-items-center">
+                  <div className="h-8 w-8 rounded-full bg-[#f4a9aa] text-[#22183a] grid place-items-center">
                     <HelpCircle className="h-5 w-5" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <p className="text-base text-white font-medium">Let's define your RFX specifications!</p>
-                  <div className="text-base text-[#80c8f0]/90 space-y-2">
+                  <div className="text-base text-[#f4a9aa]/90 space-y-2">
                     <p>Here you'll define the basic specifications of your RFX.</p>
-                    <p>We know filling out this document completely can be tedious, so we've programmed an <span className="font-semibold text-[#80c8f0]">RFX Assistant</span> on the right that will be happy to fill out the RFX for you! Just ask and it will help.</p>
+                    <p>We know filling out this document completely can be tedious, so we've programmed an <span className="font-semibold text-[#f4a9aa]">RFX Assistant</span> on the right that will be happy to fill out the RFX for you! Just ask and it will help.</p>
                     <p>Don't forget to add the project timeline and images to complete your RFQ - they make a big difference!</p>
-                    <p>At the bottom you'll find a button to generate a PDF with all the information provided. You can even customize it with your company's colors and logos in the <span className="font-semibold text-[#80c8f0]">PDF Customization</span> section.</p>
-                    <p><span className="font-semibold text-[#80c8f0]">Version Control:</span> Use the floating buttons on the left to manage your changes. Click the <span className="font-semibold text-[#80c8f0]">History</span> icon to view all versions, create new versions to save your work, and restore previous versions if needed. </p>
+                    <p>At the bottom you'll find a button to generate a PDF with all the information provided. You can even customize it with your company's colors and logos in the <span className="font-semibold text-[#f4a9aa]">PDF Customization</span> section.</p>
+                    <p><span className="font-semibold text-[#f4a9aa]">Version Control:</span> Use the floating buttons on the left to manage your changes. Click the <span className="font-semibold text-[#f4a9aa]">History</span> icon to view all versions, create new versions to save your work, and restore previous versions if needed. </p>
                   </div>
                   <div className="pt-2 flex gap-2">
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => setIsHelpOpen(false)}
-                      className="border-[#80c8f0] text-[#80c8f0] hover:bg-[#80c8f0]/10"
+                      className="border-[#f4a9aa] text-[#f4a9aa] hover:bg-[#f4a9aa]/10"
                     >
                       Got it, let's start!
                     </Button>
@@ -348,7 +348,7 @@ const RFXVersionControl: React.FC<Props> = ({
               </div>
             </div>
             {/* Tail for speech bubble */}
-            <div className="absolute -bottom-3 left-8 h-0 w-0 border-t-[12px] border-t-[#1A1F2C] border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent drop-shadow" />
+            <div className="absolute -bottom-3 left-8 h-0 w-0 border-t-[12px] border-t-[#22183a] border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent drop-shadow" />
           </div>
         </div>
       )}
@@ -384,7 +384,7 @@ const RFXVersionControl: React.FC<Props> = ({
             <Button
               onClick={handleCreateCommit}
               disabled={!commitMessage.trim() || isCreatingVersion}
-              className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+              className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
             >
               {isCreatingVersion && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               Create Version
@@ -412,7 +412,7 @@ const RFXVersionControl: React.FC<Props> = ({
                 setIsCommitDialogOpen(true);
               }}
               disabled={baseCommitInfo.baseCommit !== null && !baseCommitInfo.hasUncommittedChanges}
-              className="w-full bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#22183a] hover:bg-[#22183a]/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus className="h-4 w-4 mr-2" />
               {commits.length === 0 ? 'Create First Version' : 'Create Version'}
@@ -425,7 +425,7 @@ const RFXVersionControl: React.FC<Props> = ({
           <ScrollArea className="h-[60vh] pr-4">
             {loading ? (
               <div className="flex justify-center items-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1A1F2C]"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#22183a]"></div>
               </div>
             ) : commits.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
@@ -442,10 +442,10 @@ const RFXVersionControl: React.FC<Props> = ({
                       key={commit.id} 
                       className={`border-l-4 ${
                         isSentCommit 
-                          ? 'border-l-[#7de19a] bg-green-50/50' 
+                          ? 'border-l-[#f4a9aa] bg-green-50/50' 
                           : isBaseCommit 
                           ? 'border-l-blue-500 bg-blue-50/50' 
-                          : 'border-l-[#80c8f0]'
+                          : 'border-l-[#f4a9aa]'
                       }`}
                     >
                       <CardHeader>
@@ -454,7 +454,7 @@ const RFXVersionControl: React.FC<Props> = ({
                             <div className="flex items-center gap-2 mb-1">
                               <CardTitle className="text-lg">{commit.commit_message}</CardTitle>
                               {isSentCommit && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[#7de19a] text-black border border-[#7de19a]">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[#f4a9aa] text-black border border-[#f4a9aa]">
                                   📤 Sent to suppliers
                                 </span>
                               )}
@@ -481,7 +481,7 @@ const RFXVersionControl: React.FC<Props> = ({
                             <Button
                               size="sm"
                               onClick={() => handleRestoreCommit(commit.id)}
-                              className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                              className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                             >
                               <RotateCcw className="h-4 w-4 mr-1" />
                               Restore
@@ -539,7 +539,7 @@ const RFXVersionControl: React.FC<Props> = ({
             <div className="flex items-center gap-2">
               <DialogTitle>{selectedCommit?.commit_message}</DialogTitle>
               {selectedCommit && sentCommitId === selectedCommit.id && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[#7de19a] text-black border border-[#7de19a]">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[#f4a9aa] text-black border border-[#f4a9aa]">
                   📤 Sent to suppliers
                 </span>
               )}

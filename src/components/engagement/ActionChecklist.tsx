@@ -19,7 +19,7 @@ const ActionChecklist = ({ checklist }: ActionChecklistProps) => {
   return (
     <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold font-intro text-[#1b2c4a]">Action Checklist</h2>
+        <h2 className="text-2xl font-bold font-intro text-[#22183a]">Action Checklist</h2>
         <div className="text-sm font-medium text-gray-600 font-inter">
           {completedCount} of {totalCount} completed
         </div>
@@ -29,11 +29,11 @@ const ActionChecklist = ({ checklist }: ActionChecklistProps) => {
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-600 font-inter">Progress</span>
-          <span className="text-sm font-bold text-[#1b2c4a] font-inter">{Math.round(progressPercentage)}%</span>
+          <span className="text-sm font-bold text-[#22183a] font-inter">{Math.round(progressPercentage)}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-3">
           <motion.div
-            className="bg-gradient-to-r from-[#7de19a] to-[#80c8f0] h-3 rounded-full"
+            className="bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] h-3 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercentage}%` }}
             transition={{ duration: 1, ease: "easeOut" }}
@@ -57,7 +57,7 @@ const ActionChecklist = ({ checklist }: ActionChecklistProps) => {
               whileTap={{ scale: 0.95 }}
             >
               {item.completed ? (
-                <CheckCircle2 className="w-6 h-6 text-[#7de19a]" />
+                <CheckCircle2 className="w-6 h-6 text-[#f4a9aa]" />
               ) : (
                 <Circle className="w-6 h-6 text-gray-400" />
               )}
@@ -65,12 +65,12 @@ const ActionChecklist = ({ checklist }: ActionChecklistProps) => {
             
             <div className="flex-1">
               <span className={`font-medium font-inter ${
-                item.completed ? 'text-gray-500 line-through' : 'text-[#1b2c4a]'
+                item.completed ? 'text-gray-500 line-through' : 'text-[#22183a]'
               }`}>
                 {item.label}
               </span>
               {!item.completed && (
-                <div className="text-xs text-[#80c8f0] font-inter mt-1">
+                <div className="text-xs text-[#f4a9aa] font-inter mt-1">
                   +5 points to Global Score
                 </div>
               )}
@@ -85,12 +85,12 @@ const ActionChecklist = ({ checklist }: ActionChecklistProps) => {
       
       {/* Bottom CTA */}
       <motion.div
-        className="mt-6 p-4 bg-gradient-to-r from-[#80c8f0]/10 to-[#7de19a]/10 rounded-xl border border-[#80c8f0]/20"
+        className="mt-6 p-4 bg-gradient-to-r from-[#f4a9aa]/10 to-[#f4a9aa]/10 rounded-xl border border-[#f4a9aa]/20"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <div className="text-sm font-medium text-[#1b2c4a] font-inter mb-2">
+        <div className="text-sm font-medium text-[#22183a] font-inter mb-2">
           Complete all actions to unlock:
         </div>
         <ul className="text-xs text-gray-600 font-inter space-y-1">

@@ -31,8 +31,7 @@ import RFXEncryptedImage from './RFXEncryptedImage';
 import RFXEncryptedDocument from './RFXEncryptedDocument';
 
 // La línea sin comentar es la URL que se usa (producción = Vercel; local = dev).
-//const RFX_AGENT_WS_URL = 'ws://localhost:8000/ws-rfx-agent';
-const RFX_AGENT_WS_URL = 'wss://web-production-8e58.up.railway.app/ws-rfx-agent';
+const RFX_AGENT_WS_URL = 'ws://localhost:8000/ws-rfx-agent';
 
 // Toggle to enable extra console diagnostics for WS resume/debugging.
 // Keep it false for normal use to avoid spamming the console.
@@ -1919,8 +1918,8 @@ Let's begin building the projects specs, tell me briefly what are the key detail
       <div className="fixed right-6 top-6 z-50">
         <Button
           onClick={toggleExpanded}
-          className={`h-14 w-14 rounded-full shadow-lg bg-[#1e293b] hover:bg-[#1e293b]/90 text-white transition-all hover:scale-110 ${
-            isAnimating ? 'ring-4 ring-[#80c8f0] ring-opacity-75 shadow-2xl' : ''
+          className={`h-14 w-14 rounded-full shadow-lg bg-[#22183a] hover:bg-[#22183a]/90 text-white transition-all hover:scale-110 ${
+            isAnimating ? 'ring-4 ring-[#f4a9aa] ring-opacity-75 shadow-2xl' : ''
           }`}
           style={isAnimating ? { 
             animation: 'pulse 1.2s ease-in-out 1',
@@ -1938,7 +1937,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
         </Button>
         {isAnimating && (
           <div 
-            className="absolute inset-0 rounded-full bg-[#80c8f0] opacity-20"
+            className="absolute inset-0 rounded-full bg-[#f4a9aa] opacity-20"
             style={{
               animation: 'ping 1.2s ease-in-out 1',
               animationFillMode: 'forwards'
@@ -1952,7 +1951,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
   return (
     <div 
       className={`flex-shrink-0 h-screen flex bg-white shadow-xl relative ${
-        isAnimating ? 'ring-4 ring-[#80c8f0] ring-opacity-50' : ''
+        isAnimating ? 'ring-4 ring-[#f4a9aa] ring-opacity-50' : ''
       }`}
       style={{ 
         width: `${sidebarWidth}px`,
@@ -1981,14 +1980,14 @@ Let's begin building the projects specs, tell me briefly what are the key detail
             <div 
               className="p-2 rounded-lg"
               style={{
-                backgroundColor: '#80c8f0',
+                backgroundColor: '#f4a9aa',
                 ...(isAnimating ? {
                   animation: 'bounceUpDown 1.2s ease-in-out 1',
                   animationFillMode: 'forwards'
                 } : {})
               }}
             >
-              <MessageCircle className="h-5 w-5" style={{ color: '#1A1F2C' }} />
+              <MessageCircle className="h-5 w-5" style={{ color: '#22183a' }} />
             </div>
             <div>
               <CardTitle className="text-sm font-semibold" data-onboarding-target="rfx-agent-title">RFX Assistant</CardTitle>
@@ -2060,7 +2059,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                       className="flex justify-end" 
                       ref={index === messages.length - 1 && message.type === 'user' ? lastUserMessageRef : null}
                     >
-                      <div className="max-w-[80%] rounded-lg px-3 py-2 bg-[#1A1F2C] text-white space-y-2">
+                      <div className="max-w-[80%] rounded-lg px-3 py-2 bg-[#22183a] text-white space-y-2">
                         {message.content && (
                           <p className="text-sm whitespace-pre-wrap">
                             {normalizeMessageContent(typeof message.content === 'string' ? message.content : String(message.content))}
@@ -2415,7 +2414,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                   onClick={handleSendMessage}
                   disabled={(!inputValue.trim() && images.length === 0 && documents.length === 0) || isProcessingFiles}
                   size="sm"
-                  className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                  className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 >
                   {isProcessingFiles ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

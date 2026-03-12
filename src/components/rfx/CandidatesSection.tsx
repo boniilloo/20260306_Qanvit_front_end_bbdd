@@ -331,7 +331,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   // Auto-hide for initial progress messages
   const AUTO_HIDE_STEPS = new Set<string>([
     'Connection established successfully',
-    'RFX specifications are being analysed by FQ Agent...',
+    'RFX specifications are being analysed by Qanvit Agent...',
   ]);
   const [dismissedMessages, setDismissedMessages] = useState<Record<string, boolean>>({});
   // Timer for analysis phase
@@ -842,9 +842,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
 
         // Prefer env-configured WS URL, fallback to production hardcode.
 
-        const ws = new WebSocket('wss://web-production-8e58.up.railway.app/ws-rfx');
-        //const ws = new WebSocket('wss://agente-main-dev-2.up.railway.app/ws-rfx');
-        //const ws = new WebSocket('ws://localhost:8000/ws-rfx');
+        const ws = new WebSocket('ws://localhost:8000/ws-rfx');
         
         wsRef.current = ws;
 
@@ -2434,7 +2432,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-indigo-600" />
-              FQ recommended candidates{recommendedCandidates.length > 0 ? ` (${recommendedCandidates.length})` : ''}
+              Qanvit recommended candidates{recommendedCandidates.length > 0 ? ` (${recommendedCandidates.length})` : ''}
             </CardTitle>
             <div className="flex items-center gap-3">
               {databaseCandidates.length > 0 && !selectionMode && (
@@ -2475,7 +2473,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                         className="bg-navy hover:bg-navy/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Bot className="h-4 w-4 mr-2" />
-                        {isConnecting ? 'Connecting...' : 'Ask FQ Agent'}
+                        {isConnecting ? 'Connecting...' : 'Ask Qanvit Agent'}
                       </Button>
                     </div>
                   </TooltipTrigger>
@@ -2493,7 +2491,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           {(loadingCandidates || isCryptoLoading) && evaluationResults.length > 0 ? (
             <div className="flex items-center justify-center py-12">
               <div className="flex flex-col items-center gap-3">
-                <Loader2 className="h-8 w-8 animate-spin text-[#80c8f0]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#f4a9aa]" />
                 <p className="text-sm text-gray-600">Loading and decrypting candidates...</p>
               </div>
             </div>
@@ -2645,13 +2643,13 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                       <TabsList className="grid w-full grid-cols-2 h-11 bg-[#f1f1f1] rounded-xl p-1 border border-white/60 shadow-inner">
                         <TabsTrigger
                           value="global"
-                          className="rounded-lg px-4 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50"
+                          className="rounded-lg px-4 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
                         >
                           Global ({recommendedCandidates.length})
                         </TabsTrigger>
                         <TabsTrigger
                           value="nearby"
-                          className="rounded-lg px-4 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50"
+                          className="rounded-lg px-4 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
                         >
                           Close to selected location ({nearbyRecommendedCandidates.length})
                         </TabsTrigger>
@@ -2729,7 +2727,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                       <div className="flex-shrink-0 relative">
                         {(loadingInitialSelection || savingCandidates.has(candidateKey)) ? (
                           <div className="flex items-center justify-center h-5 w-5">
-                            <Loader2 className="h-4 w-4 animate-spin text-[#80c8f0]" />
+                            <Loader2 className="h-4 w-4 animate-spin text-[#f4a9aa]" />
                           </div>
                         ) : (
                           <TooltipProvider delayDuration={100}>
@@ -2834,7 +2832,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                           data-onboarding-target="see-fq-match-justification"
                           className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
                         >
-                          See FQ Match Reasoning
+                          See Qanvit Match Reasoning
                         </button>
                         
                         <button 
@@ -2884,7 +2882,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                   setRecommendedPage(1);
                                   setCurrentPage(1);
                                 }}
-                                className="h-8 rounded-md border border-gray-300 bg-white px-2 text-sm text-[#1A1F2C]"
+                                className="h-8 rounded-md border border-gray-300 bg-white px-2 text-sm text-[#22183a]"
                               >
                                 <option value={20}>20</option>
                                 <option value={50}>50</option>
@@ -3045,7 +3043,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                 data-onboarding-target="see-fq-match-justification"
                                 className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
                               >
-                                See FQ Match Justification
+                                See Qanvit Match Justification
                               </button>
                               
                               <button 
@@ -3095,7 +3093,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                 setRecommendedPage(1);
                                 setCurrentPage(1);
                               }}
-                              className="h-8 rounded-md border border-gray-300 bg-white px-2 text-sm text-[#1A1F2C]"
+                              className="h-8 rounded-md border border-gray-300 bg-white px-2 text-sm text-[#22183a]"
                             >
                               <option value={20}>20</option>
                               <option value={50}>50</option>
@@ -3164,7 +3162,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                   <Bot className="h-7 w-7" />
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">Ready to get tailored candidates?</h3>
-                <p className="text-sm text-gray-600">Ask FQ Agent to analyze your RFX and surface curated options.</p>
+                <p className="text-sm text-gray-600">Ask Qanvit Agent to analyze your RFX and surface curated options.</p>
                 <div>
                   <TooltipProvider delayDuration={100}>
                     <Tooltip>
@@ -3176,7 +3174,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                             className="bg-navy hover:bg-navy/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Bot className="h-4 w-4 mr-2" />
-                            {isConnecting ? 'Connecting...' : 'Ask FQ Agent'}
+                            {isConnecting ? 'Connecting...' : 'Ask Qanvit Agent'}
                           </Button>
                         </div>
                       </TooltipTrigger>
@@ -3213,7 +3211,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             Add Companies or Products
           </CardTitle>
           <CardDescription>
-            Search for specific companies or products in the FQ Source database and add them to your RFX candidates
+            Search for specific companies or products in the Qanvit database and add them to your RFX candidates
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -3235,7 +3233,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                         </div>
                         {/* Name: bounded so button is never pushed */}
                         <div className="flex-1 min-w-0 max-w-[60%] overflow-hidden">
-                          <p className="font-medium text-sm text-[#1A1F2C] truncate min-w-0" title={[candidate.empresa, candidate.producto].filter(Boolean).join(' — ')}>{candidate.empresa}{candidate.producto ? ` — 🎯 ${candidate.producto}` : ''}</p>
+                          <p className="font-medium text-sm text-[#22183a] truncate min-w-0" title={[candidate.empresa, candidate.producto].filter(Boolean).join(' — ')}>{candidate.empresa}{candidate.producto ? ` — 🎯 ${candidate.producto}` : ''}</p>
                         </div>
                         {/* Visit website */}
                         <button 
@@ -3251,7 +3249,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                               });
                             }
                           }}
-                          className="px-3 py-2 border border-gray-300 rounded-lg text-[#1A1F2C] hover:bg-gray-50 transition-colors flex items-center gap-2 text-xs"
+                          className="px-3 py-2 border border-gray-300 rounded-lg text-[#22183a] hover:bg-gray-50 transition-colors flex items-center gap-2 text-xs"
                         >
                           <ExternalLink size={14} />
                           Visit Website
@@ -3425,7 +3423,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
               <Button
                 onClick={performManualSearch}
                 disabled={isSearching || !manualSearchQuery.trim()}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 {isSearching ? (
                   <>
@@ -3483,7 +3481,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                 href={company.website}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="font-bold text-base text-[#1A1F2C] hover:text-[#80c8f0] transition-colors truncate min-w-0 block"
+                                className="font-bold text-base text-[#22183a] hover:text-[#f4a9aa] transition-colors truncate min-w-0 block"
                                 title={company.nombre_empresa}
                               >
                                 {company.nombre_empresa}
@@ -3512,7 +3510,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                           onClick={() => addManualCandidate(company, 'company')}
                                           size="sm"
                                           disabled={isAdding || rfxStatus === 'revision requested by buyer' || archived}
-                                          className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-[#1A1F2C] disabled:opacity-70"
+                                          className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a] disabled:opacity-70"
                                         >
                                   {isAdding ? (
                                     <>
@@ -3630,7 +3628,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                             {/* Product Info: bounded so Add button is never pushed */}
                             <div className="flex-1 min-w-0 max-w-[55%] overflow-hidden">
                               <div className="mb-1 min-w-0">
-                                <p className="font-bold text-base text-[#1A1F2C] truncate min-w-0" title={product.product_name}>
+                                <p className="font-bold text-base text-[#22183a] truncate min-w-0" title={product.product_name}>
                                   🎯 {product.product_name}
                                 </p>
                                 <p className="text-sm text-gray-600 truncate min-w-0" title={companyRevision?.nombre_empresa || undefined}>
@@ -3659,7 +3657,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                             onClick={() => addManualCandidate(product, 'product')}
                                             size="sm"
                                             disabled={isAdding || rfxStatus === 'revision requested by buyer' || archived}
-                                            className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-[#1A1F2C] disabled:opacity-70"
+                                            className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a] disabled:opacity-70"
                                           >
                                             {isAdding ? (
                                               <>
@@ -3765,7 +3763,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-sm text-indigo-600 mb-4">
                   <Search className="h-8 w-8" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Search the FQ Source Database</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Search the Qanvit Database</h3>
                 <p className="text-sm text-gray-600 mb-4 max-w-md mx-auto">
                   Find and add specific companies or products directly from our curated database to your RFX candidates
                 </p>
@@ -3813,8 +3811,8 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             <DialogDescription>Live status updates while the agent evaluates this RFX.</DialogDescription>
           </DialogHeader>
           {/* Header box */}
-          <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-md px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xl font-semibold text-[#1A1F2C]">
+          <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-md px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xl font-semibold text-[#22183a]">
               <Loader2 className={`h-5 w-5 ${isEvaluating ? 'animate-spin' : 'hidden'}`} />
               <CheckCircle className={`h-5 w-5 text-green-600 ${evaluationCompleted ? 'block' : 'hidden'}`} />
               <span>RFX Evaluation Progress</span>
@@ -3834,7 +3832,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
               {evaluationCompleted && (
                 <Button
                   onClick={() => setShowEvaluationModal(false)}
-                  className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-white"
+                  className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white"
                 >
                   Close and Review Candidates
                 </Button>
@@ -3891,7 +3889,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                 {!evaluationCompleted && evaluatedCandidates.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle className="h-5 w-5 text-[#80c8f0]" />
+                      <CheckCircle className="h-5 w-5 text-[#f4a9aa]" />
                       <h3 className="font-semibold text-gray-900">
                         Overall Match Distribution ({evaluatedCandidates.length} proposals)
                       </h3>
@@ -3904,9 +3902,9 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                           const [min, max] = range.split('-').map(Number);
                           
                           // Use different colors for different ranges
-                          let barColor = '#80c8f0'; // Default blue
-                          if (min >= 80) barColor = '#7de19a'; // Green for high matches
-                          else if (min >= 60) barColor = '#80c8f0'; // Blue for good matches
+                          let barColor = '#f4a9aa'; // Default blue
+                          if (min >= 80) barColor = '#f4a9aa'; // Green for high matches
+                          else if (min >= 60) barColor = '#f4a9aa'; // Blue for good matches
                           else if (min >= 40) barColor = '#f1f1f1'; // Gray for medium matches
                           else barColor = '#f1f1f1'; // Gray for low matches
                           
@@ -3915,7 +3913,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                               {/* Count label above bar */}
                               <div className="h-6 flex items-center justify-center">
                                 {count > 0 && (
-                                  <span className="text-sm font-semibold text-[#1A1F2C]">{count}</span>
+                                  <span className="text-sm font-semibold text-[#22183a]">{count}</span>
                                 )}
                               </div>
                               
@@ -3962,12 +3960,12 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                         key={index}
                         className={`flex items-center gap-2 p-2 rounded-md text-sm transition-colors ${
                           (evaluationCompleted || evaluatedCompanies.has(company))
-                            ? 'bg-[#7de19a]/15 border border-[#7de19a] text-[#1A1F2C]'
+                            ? 'bg-[#f4a9aa]/15 border border-[#f4a9aa] text-[#22183a]'
                             : 'bg-white border border-gray-200 text-gray-700'
                         }`}
                       >
                         {(evaluationCompleted || evaluatedCompanies.has(company)) && (
-                          <Check className="h-4 w-4 text-[#7de19a] flex-shrink-0" />
+                          <Check className="h-4 w-4 text-[#f4a9aa] flex-shrink-0" />
                         )}
                         <span className={evaluatedCompanies.has(company) ? 'font-medium' : ''}>
                           {company}
@@ -3996,12 +3994,12 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                         key={index}
                         className={`flex items-center gap-2 p-2 rounded-md text-sm transition-colors ${
                           (evaluationCompleted || evaluatedProducts.has(product))
-                            ? 'bg-[#7de19a]/15 border border-[#7de19a] text-[#1A1F2C]'
+                            ? 'bg-[#f4a9aa]/15 border border-[#f4a9aa] text-[#22183a]'
                             : 'bg-white border border-gray-200 text-gray-700'
                         }`}
                       >
                         {(evaluationCompleted || evaluatedProducts.has(product)) && (
-                          <Check className="h-4 w-4 text-[#7de19a] flex-shrink-0" />
+                          <Check className="h-4 w-4 text-[#f4a9aa] flex-shrink-0" />
                         )}
                         <span className={evaluatedProducts.has(product) ? 'font-medium' : ''}>
                           {product}
@@ -4017,16 +4015,16 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             {/* Completion Message and Close Button */}
             {evaluationCompleted && (
               <div className="space-y-4 pt-4 border-t">
-                <Alert className="bg-[#7de19a]/15 border-[#7de19a]">
-                  <CheckCircle className="h-4 w-4 text-[#7de19a]" />
-                  <AlertDescription className="text-[#1A1F2C]">
+                <Alert className="bg-[#f4a9aa]/15 border-[#f4a9aa]">
+                  <CheckCircle className="h-4 w-4 text-[#f4a9aa]" />
+                  <AlertDescription className="text-[#22183a]">
                     The evaluation has been completed. You can now close this modal and review the received candidates.
                   </AlertDescription>
                 </Alert>
                 
                 <Button
                   onClick={() => setShowEvaluationModal(false)}
-                  className="w-full bg-[#7de19a] hover:bg-[#7de19a]/90 text-white"
+                  className="w-full bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white"
                 >
                   Close and Review Candidates
                 </Button>
@@ -4097,7 +4095,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
               </div>
               <div>
                 <h4 className="text-base font-semibold text-gray-900">What happens next</h4>
-                <p className="text-gray-600">FQ Agent analyzes your RFX to craft recommendations.</p>
+                <p className="text-gray-600">Qanvit Agent analyzes your RFX to craft recommendations.</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -4107,7 +4105,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
               </div>
               <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200">
                 <Building2 className="h-4 w-4 text-blue-600 mt-0.5" />
-                <p>The agent looks for companies and products that best match at the curated FQ Source Database.</p>
+                <p>The agent looks for companies and products that best match at the curated Qanvit Database.</p>
               </div>
               <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200">
                 <Users className="h-4 w-4 text-indigo-600 mt-0.5" />

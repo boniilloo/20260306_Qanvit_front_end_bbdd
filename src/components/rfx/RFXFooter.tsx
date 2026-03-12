@@ -22,12 +22,13 @@ const RFXFooter = () => {
                     href="https://fqsource.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:opacity-90 transition-opacity"
+                    className="hover:opacity-90 transition-opacity flex items-center justify-center overflow-hidden rounded-sm"
+                    style={{ width: '110px', height: '60px' }}
                   >
                     <img
-                      src="/lovable-uploads/FQ_LOGO.png"
-                      alt="FQ Source"
-                      className="object-contain opacity-80"
+                      src="/branding/LOGOTIPO_1-02.png"
+                      alt="Qanvit"
+                      className="opacity-80 object-contain object-center shrink-0"
                       style={{ width: '110px', height: '80px' }}
                     />
                   </a>
@@ -39,7 +40,7 @@ const RFXFooter = () => {
                   <h3 className="text-sm font-bold text-gray-700">Legal</h3>
                   <button
                     onClick={() => setIsConfidentialityModalOpen(true)}
-                    className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors cursor-pointer bg-transparent border-0 p-0"
+                    className="text-sm text-gray-600 hover:text-[#22183a] transition-colors cursor-pointer bg-transparent border-0 p-0"
                   >
                     Confidentiality
                   </button>
@@ -47,7 +48,7 @@ const RFXFooter = () => {
                     href="https://fqsource.com/terms"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors"
+                    className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
                     Terms & Conditions
                   </a>
@@ -55,20 +56,20 @@ const RFXFooter = () => {
                     href="https://fqsource.com/privacy"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors"
+                    className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
                     Privacy Policy
                   </a>
                 </div>
 
-                {/* Columna 3 - About FQ Source */}
+                {/* Columna 3 - About Qanvit */}
                 <div className="flex flex-col gap-1.5 items-center text-center">
-                  <h3 className="text-sm font-bold text-gray-700">About FQ Source</h3>
+                  <h3 className="text-sm font-bold text-gray-700">About Qanvit</h3>
                   <a
                     href="https://github.com/boniilloo/FQ-Source-Cybersecurity-20251202"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors flex items-center gap-1"
+                    className="text-sm text-gray-600 hover:text-[#22183a] transition-colors flex items-center gap-1"
                   >
                     <Shield className="h-3 w-3" />
                     Cybersecurity Audit
@@ -77,7 +78,7 @@ const RFXFooter = () => {
                     href="https://fqsource.com/community"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors"
+                    className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
                     Community
                   </a>
@@ -85,7 +86,7 @@ const RFXFooter = () => {
                     href="https://fqsource.com/faq"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors"
+                    className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
                     FAQ
                   </a>
@@ -93,7 +94,7 @@ const RFXFooter = () => {
                     href="https://fqsource.com/faq"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors"
+                    className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
                     Help
                   </a>
@@ -131,7 +132,7 @@ const RFXFooter = () => {
                     </a>
                   </div>
                   <div className="text-xs text-gray-500 text-center">
-                    <p>© {currentYear} FQ source</p>
+                    <p>© {currentYear} Qanvit</p>
                   </div>
                 </div>
             </div>
@@ -144,7 +145,7 @@ const RFXFooter = () => {
                   href="https://fqsource.com/book-demo"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#1A1F2C] hover:underline transition-colors font-medium"
+                  className="text-[#22183a] hover:underline transition-colors font-medium"
                 >
                   Book a meeting with our experts!
                 </a>
@@ -160,7 +161,7 @@ const RFXFooter = () => {
       <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-[#1A1F2C]" />
+            <FileText className="h-5 w-5 text-[#22183a]" />
             Confidentiality Commitment
           </DialogTitle>
         </DialogHeader>

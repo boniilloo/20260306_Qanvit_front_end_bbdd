@@ -10,7 +10,7 @@ const MaintenancePage = () => {
             <Wrench className="w-10 h-10 text-blue-600" />
           </div>
           <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-2">
-            FQ Source
+            Qanvit
           </h1>
           <p className="text-lg text-gray-600">
             We're making improvements
@@ -58,7 +58,7 @@ const MaintenancePage = () => {
         {/* Footer */}
         <div className="mt-8 pt-6 border-t">
           <p className="text-sm text-gray-500">
-            © 2024 FQ Source. All rights reserved.
+            © 2024 Qanvit. All rights reserved.
           </p>
         </div>
       </div>

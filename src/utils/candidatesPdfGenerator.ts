@@ -203,7 +203,7 @@ export const generateCandidatesPDF = async (data: CandidatesPDFData): Promise<vo
       pdf.setTextColor(120, 120, 120);
       pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin - 24, y);
       pdf.setTextColor(26, 31, 44);
-      const linkText = 'Generated with FQ Source';
+      const linkText = 'Generated with Qanvit';
       const w = pdf.getTextWidth(linkText);
       pdf.text(linkText, margin, y);
       pdf.link(margin, y - 3, w, 4, { url: 'https://fqsource.com/' });

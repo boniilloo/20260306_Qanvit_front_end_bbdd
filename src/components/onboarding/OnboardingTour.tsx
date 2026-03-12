@@ -66,12 +66,12 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">1</span>
-            <h2 className="text-2xl font-bold" style={{ color: '#1A1F2C' }}>
-              Welcome to FQ Source! 🎉
+            <h2 className="text-2xl font-bold" style={{ color: '#22183a' }}>
+              Welcome to Qanvit! 🎉
             </h2>
           </div>
           <p className="text-base">
-            FQ Source helps <strong>buyers</strong> find the best specialized suppliers in specific industry verticals (currently open Machine Vision, more coming soon).
+            Qanvit helps <strong>buyers</strong> find the best specialized suppliers in specific industry verticals (currently open Machine Vision, more coming soon).
           </p>
           <p className="text-base">
             At the same time, we help <strong>suppliers</strong> to get discovered in a simple and intuitive way.
@@ -87,7 +87,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">8</span>
-            <h3 className="text-2xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-2xl font-bold" style={{ color: '#22183a' }}>
               Explore an RFX example 🚀
             </h3>
           </div>
@@ -106,23 +106,23 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">1</span>
-            <h2 className="text-2xl font-bold" style={{ color: '#1A1F2C' }}>
-              Welcome to FQ Source! 🎉
+            <h2 className="text-2xl font-bold" style={{ color: '#22183a' }}>
+              Welcome to Qanvit! 🎉
             </h2>
           </div>
           <p className="text-base">
-            FQ Source helps <strong>buyers</strong> find the best specialized suppliers in specific industry verticals (currently open Machine Vision, more coming soon).
+            Qanvit helps <strong>buyers</strong> find the best specialized suppliers in specific industry verticals (currently open Machine Vision, more coming soon).
           </p>
           <p className="text-base">
             At the same time, we help <strong>suppliers</strong> to get discovered in a simple and intuitive way.
           </p>
           <div className="mt-4 space-y-3">
             <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="font-semibold text-sm" style={{ color: '#1A1F2C' }}>🔍 Discovery Agent</p>
+              <p className="font-semibold text-sm" style={{ color: '#22183a' }}>🔍 Discovery Agent</p>
               <p className="text-sm text-gray-700">Quick preliminary search to find potential suppliers</p>
             </div>
             <div className="bg-blue-50 p-3 rounded-lg">
-              <p className="font-semibold text-sm" style={{ color: '#1A1F2C' }}>📋 RFX Agent</p>
+              <p className="font-semibold text-sm" style={{ color: '#22183a' }}>📋 RFX Agent</p>
               <p className="text-sm text-gray-700">Launch RFQs, RFPs, and RFIs to formalize your requirements</p>
             </div>
           </div>
@@ -137,7 +137,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">2</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               RFX Progress - Define Specifications 📋
             </h3>
           </div>
@@ -159,7 +159,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">3</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Go to RFX Specs 📝
             </h3>
           </div>
@@ -182,7 +182,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">4</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               RFX Agent Chat Sidebar 💬
             </h3>
           </div>
@@ -208,7 +208,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">5</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Editable RFX Specification Sections 📋
             </h3>
           </div>
@@ -237,7 +237,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">6</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Additional functionalities 📄
             </h3>
           </div>
@@ -262,12 +262,12 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">7</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
-              Candidates Section - Ask FQ Agent for Recommendations 🤖
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
+              Candidates Section - Ask Qanvit Agent for Recommendations 🤖
             </h3>
           </div>
           <p className="text-base">
-            This <strong>"Ask FQ Agent"</strong> button connects your RFX specifications with FQ database using AI so that you get generate a curated list of recommended candidates.
+            This <strong>"Ask Qanvit Agent"</strong> button connects your RFX specifications with the Qanvit database using AI so that you can generate a curated list of recommended candidates.
           </p>
           <p className="text-base">
             The agent uses your <strong>project description</strong>, <strong>technical requirements</strong> and <strong>company requirements</strong> to find the best matches in the database.
@@ -288,12 +288,12 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">8</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Review the Recommended Candidates 🎯
             </h3>
           </div>
           <p className="text-base">
-            Below you can see the <strong>list of candidates recommended by FQ</strong>, ordered by their overall match with your RFX.
+            Below you can see the <strong>list of candidates recommended by Qanvit</strong>, ordered by their overall match with your RFX.
           </p>
           <p className="text-base">
             Each card shows <strong>overall, technical and company match scores</strong>, so you can quickly understand why they are a good fit.
@@ -310,7 +310,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">9</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Manual Selection of Candidates 🧭
             </h3>
           </div>
@@ -334,7 +334,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">10</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Launching - Protect your RFX with an NDA 🔒
             </h3>
           </div>
@@ -342,7 +342,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
             You can upload an <strong>NDA (Non-Disclosure Agreement)</strong> that suppliers must sign before accessing your RFX details.
           </p>          
           <p className="text-base">
-            Suppliers will not be able to review the RFX untill NDA is signed and validated by FQ experts.
+            Suppliers will not be able to review the RFX untill NDA is signed and validated by Qanvit experts.
           </p>
           <p className="text-sm text-gray-600 mt-2">
             This ensures your sensitive information remains confidential throughout the sourcing process.
@@ -358,7 +358,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">11</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Validate & Send 🚀
             </h3>
           </div>
@@ -379,12 +379,12 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">12</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
-              FQ Source Validation 🛡️
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
+              Qanvit Validation 🛡️
             </h3>
           </div>
           <p className="text-base">
-            Once sent, all RFXs are <strong>validated by the FQ Source team</strong>.
+            Once sent, all RFXs are <strong>validated by the Qanvit team</strong>.
           </p>
           <p className="text-base">
             We ensure every RFX reaching suppliers is verified and backed by real intent, maintaining a high-quality marketplace.
@@ -400,7 +400,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">13</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Responses & AI Analysis 📊
             </h3>
           </div>
@@ -421,7 +421,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">14</span>
-            <h3 className="text-xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Supplier Database 🌍
             </h3>
           </div>
@@ -442,7 +442,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">15</span>
-            <h3 className="text-2xl font-bold" style={{ color: '#1A1F2C' }}>
+            <h3 className="text-2xl font-bold" style={{ color: '#22183a' }}>
               You're All Set! 🚀
             </h3>
           </div>
@@ -454,7 +454,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
           </p>
           <div className="mt-4 p-3 bg-blue-50 rounded-lg">
             <p className="text-sm text-gray-700 font-medium text-center">
-              <strong>Welcome to the future of industrial sourcing with FQ Source.</strong>
+              <strong>Welcome to the future of industrial sourcing with Qanvit.</strong>
             </p>
           </div>
         </div>
@@ -469,8 +469,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
   const isFirstStep = stepIndex === 0;
   const customStyles: Styles = {
     options: {
-      primaryColor: '#80c8f0', // azul claro
-      textColor: '#1A1F2C', // azul oscuro
+      primaryColor: '#f4a9aa', // azul claro
+      textColor: '#22183a', // azul oscuro
       backgroundColor: '#ffffff',
       arrowColor: '#ffffff',
       overlayColor: 'rgba(26, 31, 44, 0.5)', // More transparent to let modal stand out
@@ -487,8 +487,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
       padding: '12px 0',
     },
     buttonNext: {
-      backgroundColor: '#80c8f0',
-      color: '#1A1F2C',
+      backgroundColor: '#f4a9aa',
+      color: '#22183a',
       borderRadius: 6,
       padding: '10px 20px',
       fontSize: '14px',
@@ -497,7 +497,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
       position: 'relative',
     },
     buttonBack: {
-      color: '#1A1F2C',
+      color: '#22183a',
       marginRight: 10,
     },
     buttonClose: {

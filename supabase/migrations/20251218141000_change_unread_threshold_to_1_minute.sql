@@ -22,7 +22,7 @@ BEGIN
     IF v_candidates_count > 0 THEN
       -- Call edge function via net.http_post
       SELECT net.http_post(
-        url := 'https://fukzxedgbszcpakqkrjf.functions.supabase.co/chat-unread-email-notifier',
+        url := 'https://bymbfjkezrwsuvbsaycg.functions.supabase.co/chat-unread-email-notifier',
         body := '{}'::jsonb,
         params := '{}'::jsonb,
         headers := '{"Content-Type": "application/json"}'::jsonb,

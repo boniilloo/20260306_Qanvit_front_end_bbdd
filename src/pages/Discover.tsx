@@ -71,7 +71,7 @@ Sign up free today to access powerful tools that will transform how you work.</p
           
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button onClick={handleLoginClick} size="lg" className="px-8 py-3 text-lg font-semibold min-w-[200px] text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 bg-[#80c8f0]">
+            <Button onClick={handleLoginClick} size="lg" className="px-8 py-3 text-lg font-semibold min-w-[200px] text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 bg-[#f4a9aa]">
               Sign Up Now
             </Button>
             <Button onClick={handleLoginClick} variant="outline" size="lg" className="px-8 py-3 text-lg min-w-[200px] border-primary/20 hover:border-primary/40 hover:bg-primary/5">

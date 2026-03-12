@@ -29,7 +29,7 @@ const FQAvatar = ({ size = 'md', className = '', isThinking = false }: FQAvatarP
     `}>
       <img 
         src="/lovable-uploads/595aa055-b6f4-48f7-875d-e880cb4a7d97.png" 
-        alt="FQ Source" 
+        alt="Qanvit" 
         className={`${logoSizeClasses[size]} object-contain ${isThinking ? 'animate-bounce' : ''}`}
         style={isThinking ? { 
           animationDuration: '2s',

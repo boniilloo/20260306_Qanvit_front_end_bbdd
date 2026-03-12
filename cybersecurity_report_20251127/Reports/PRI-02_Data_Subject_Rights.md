@@ -297,7 +297,7 @@ The platform provides multiple contact channels, though none are explicitly desi
   href="https://fqsource.com/privacy"
   target="_blank"
   rel="noopener noreferrer"
-  className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors"
+  className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
 >
   Privacy Policy
 </a>
@@ -393,7 +393,7 @@ The platform provides a link to the privacy policy (`https://fqsource.com/privac
   href="https://fqsource.com/privacy"
   target="_blank"
   rel="noopener noreferrer"
-  className="text-sm text-gray-600 hover:text-[#1A1F2C] transition-colors"
+  className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
 >
   Privacy Policy
 </a>

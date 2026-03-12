@@ -275,7 +275,7 @@ const CompanyAutoFillModal: React.FC<CompanyAutoFillModalProps> = ({ isOpen, onC
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
             <CardTitle className="flex items-center gap-2">
-              Company Auto-fill with FQ AI
+              Company Auto-fill with Qanvit AI
               <TooltipProvider delayDuration={0}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -285,7 +285,7 @@ const CompanyAutoFillModal: React.FC<CompanyAutoFillModalProps> = ({ isOpen, onC
                   </TooltipTrigger>
                   <TooltipContent className="z-[10002] max-w-sm text-xs leading-relaxed">
                     <div className="space-y-1">
-                      <p><span className="font-medium">How it works:</span> Provide any of the sources below and FQ AI will extract and structure your company profile.</p>
+                      <p><span className="font-medium">How it works:</span> Provide any of the sources below and Qanvit AI will extract and structure your company profile.</p>
                       <p><span className="font-medium">Description</span>: Paste a short or long text describing the company.</p>
                       <p><span className="font-medium">URLs</span>: Add one or more HTTPS pages. We fetch the content.</p>
                       <p><span className="font-medium">PDFs</span>: Upload brochures or corporate docs (PDF only). Multiple files are supported.</p>

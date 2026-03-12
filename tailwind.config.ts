@@ -19,8 +19,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				sans: ['Inter', 'Helvetica Neue', 'Arial', 'sans-serif'],
-				inter: ['Inter', 'sans-serif'],
+				sans: ['Open Sans', 'Helvetica Neue', 'Arial', 'sans-serif'],
+				inter: ['Open Sans', 'sans-serif'],
 			},
 			spacing: {
 				18: '4.5rem'
@@ -32,28 +32,28 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#1BB3FF', // Electric Cyan/Blue
-					light: '#47C8FF',
-					dark: '#0092DB',
-					foreground: '#FFFFFF'
+					DEFAULT: '#22183A',
+					light: '#3A2D5C',
+					dark: '#170F2C',
+					foreground: '#F1E8F4'
 				},
 				navy: {
-					DEFAULT: '#1B2C4A', // Primary Navy from design spec
-					light: '#2A3F5F',
-					dark: '#0F1B2E',
+					DEFAULT: '#22183A',
+					light: '#3A2D5C',
+					dark: '#170F2C',
 				},
 				sky: {
-					DEFAULT: '#80C8F0', // Sky accent from design spec
-					light: '#A3D4F3',
-					dark: '#5DB8ED',
+					DEFAULT: '#F4A9AA',
+					light: '#F8C2C3',
+					dark: '#E78E90',
 				},
 				mint: {
-					DEFAULT: '#7DE19A', // Mint CTA primary from design spec
-					light: '#9EE8B1',
-					dark: '#5CD483',
+					DEFAULT: '#F1E8F4',
+					light: '#F7F1F8',
+					dark: '#E5D8EA',
 				},
 				charcoal: {
-					DEFAULT: '#242424', // Text color from design spec
+					DEFAULT: '#22183A',
 				},
 				teal: {
 					DEFAULT: '#00B3A4', // Keep existing teal for backward compatibility
@@ -62,7 +62,7 @@ export default {
 				canvas: '#F4F6F8', // Light grey from design spec
 				error: '#E94B3C', // Error red from design spec
 				accent: {
-					blue: '#109CF1', // Accent blue from design spec
+					blue: '#F4A9AA', // Accent blue from design spec
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',

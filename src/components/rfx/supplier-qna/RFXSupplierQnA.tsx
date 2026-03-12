@@ -388,7 +388,7 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
       <div className="px-4 py-3 border-b bg-[#f1f1f1]">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-[#1A1F2C] truncate">Questions &amp; Answers</div>
+            <div className="text-sm font-semibold text-[#22183a] truncate">Questions &amp; Answers</div>
             <div className="text-xs text-gray-600">{subtitle}</div>
           </div>
           {headerRight && <div className="shrink-0">{headerRight}</div>}
@@ -398,14 +398,14 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
         {!isCryptoReady && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Loader2 className="h-4 w-4 animate-spin text-[#80c8f0]" />
+            <Loader2 className="h-4 w-4 animate-spin text-[#f4a9aa]" />
             Loading encryption keys...
           </div>
         )}
 
         {isCryptoReady && (loading || isCryptoLoading) && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Loader2 className="h-4 w-4 animate-spin text-[#80c8f0]" />
+            <Loader2 className="h-4 w-4 animate-spin text-[#f4a9aa]" />
             Loading Q&amp;A...
           </div>
         )}
@@ -414,22 +414,22 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
 
         {isCryptoReady && canAsk && (
           <div className="rounded-xl border border-gray-200 bg-white p-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-[#1A1F2C] mb-2">
-              <MessageSquarePlus className="h-4 w-4 text-[#80c8f0]" />
+            <div className="flex items-center gap-2 text-sm font-semibold text-[#22183a] mb-2">
+              <MessageSquarePlus className="h-4 w-4 text-[#f4a9aa]" />
               New question
             </div>
             <Textarea
               value={questionDraft}
               onChange={(e) => setQuestionDraft(e.target.value)}
               placeholder="Write your question (only buyers can ask here)..."
-              className="min-h-[80px] max-h-[180px] focus-visible:ring-[#80c8f0]/60"
+              className="min-h-[80px] max-h-[180px] focus-visible:ring-[#f4a9aa]/60"
               disabled={sending === 'ask'}
             />
             <div className="mt-2 flex justify-end">
               <Button
                 onClick={onAsk}
                 disabled={sending === 'ask' || questionDraft.trim().length === 0}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 {sending === 'ask' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
                 Ask
@@ -453,10 +453,10 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
             let borderWidth = 'border';
             
             if (isHighlighted) {
-              borderClass = 'border-[#80c8f0]';
+              borderClass = 'border-[#f4a9aa]';
             } else if (isAnswered) {
               // Green border for all answered questions
-              borderClass = 'border-[#7de19a]';
+              borderClass = 'border-[#f4a9aa]';
               borderWidth = 'border-2';
             }
             
@@ -467,7 +467,7 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
                   itemRefs.current[q.id] = el;
                 }}
                 className={`rounded-2xl ${borderWidth} ${borderClass} px-4 py-3 transition-colors ${
-                  isHighlighted ? 'bg-[#80c8f0]/10' : 'bg-white'
+                  isHighlighted ? 'bg-[#f4a9aa]/10' : 'bg-white'
                 }`}
               >
                 <div className="flex items-start justify-between gap-3">
@@ -481,7 +481,7 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-8 border-gray-200 text-[#1A1F2C] hover:bg-[#f1f1f1]"
+                      className="h-8 border-gray-200 text-[#22183a] hover:bg-[#f1f1f1]"
                       onClick={async () => {
                         try {
                           setSending(`move:${q.id}`);
@@ -504,7 +504,7 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
                   )}
                 </div>
 
-                <div className="mt-2 text-sm text-[#1A1F2C]">
+                <div className="mt-2 text-sm text-[#22183a]">
                   <MarkdownText>{q.question}</MarkdownText>
                 </div>
 
@@ -519,7 +519,7 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
                           {q.answeredAt && <div className="text-[11px] text-gray-500">{formatDate(q.answeredAt)}</div>}
                         </div>
                       </div>
-                      <div className="mt-1 text-sm text-[#1A1F2C]">
+                      <div className="mt-1 text-sm text-[#22183a]">
                         <MarkdownText>{q.answer}</MarkdownText>
                       </div>
                     </>
@@ -529,14 +529,14 @@ const RFXSupplierQnA: React.FC<RFXSupplierQnAProps> = ({
                         value={answerDrafts[q.id] || ''}
                         onChange={(e) => setAnswerDrafts((prev) => ({ ...prev, [q.id]: e.target.value }))}
                         placeholder="Write an answer (only suppliers can answer here)..."
-                        className="min-h-[64px] max-h-[180px] focus-visible:ring-[#80c8f0]/60 bg-white"
+                        className="min-h-[64px] max-h-[180px] focus-visible:ring-[#f4a9aa]/60 bg-white"
                         disabled={sending === q.id}
                       />
                       <div className="mt-2 flex justify-end">
                         <Button
                           onClick={() => onAnswer(q.id)}
                           disabled={sending === q.id || (answerDrafts[q.id] || '').trim().length === 0}
-                          className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-[#1A1F2C]"
+                          className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a]"
                         >
                           {sending === q.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
                           Answer

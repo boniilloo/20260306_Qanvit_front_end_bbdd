@@ -22,7 +22,7 @@ export function useNavigationGuard({
       
       // Show confirmation dialog
       const confirmed = window.confirm(
-        `You are waiting for an FQ response (${thinkingMessage || 'processing...'}).\n\n` +
+        `You are waiting for a Qanvit response (${thinkingMessage || 'processing...'}).\n\n` +
         'If you leave now, the response will be automatically saved in the conversation and you can see it later.\n\n' +
         'Do you want to leave the conversation?'
       );
@@ -54,7 +54,7 @@ export function useNavigationGuard({
       isNavigatingRef.current = true;
       
       const confirmed = window.confirm(
-        `You are waiting for an FQ response (${thinkingMessage || 'processing...'}).\n\n` +
+        `You are waiting for a Qanvit response (${thinkingMessage || 'processing...'}).\n\n` +
         'If you leave now, the response will be automatically saved in the conversation and you can see it later.\n\n' +
         'Do you want to leave the conversation?'
       );

@@ -777,14 +777,14 @@ const Sidebar = () => {
     if (status === 'draft') {
       return {
         icon: Circle,
-        color: '#80c8f0',
+        color: '#f4a9aa',
         tooltip: 'Draft'
       };
     }
     // For all other statuses, use green CheckCircle
     return {
       icon: CheckCircle,
-      color: '#7de19a',
+      color: '#f4a9aa',
       tooltip: status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ')
     };
   };
@@ -794,49 +794,45 @@ const Sidebar = () => {
     <UISidebar 
       variant="sidebar" 
       collapsible={isMobile ? "offcanvas" : "icon"} 
-      className={`border-r border-gray-200 bg-[#1e293b] text-white ${isMobile ? 'sidebar-transition' : ''}`}
+      className={`border-r border-gray-200 bg-[#22183a] text-[#f1e8f4] ${isMobile ? 'sidebar-transition' : ''}`}
       style={{
         '--sidebar-width': '280px',
         '--sidebar-width-icon': '72px'
       } as React.CSSProperties}
     >
       {/* Header */}
-      <SidebarHeader className={`border-b border-white/10 p-4 relative group ${sidebarState === "collapsed" ? "h-28" : ""}`}>
-        <div className="flex items-center gap-3">
+      <SidebarHeader className={`border-b border-white/10 py-2 px-3 relative group min-h-0 ${sidebarState === "collapsed" ? "h-16" : ""}`}>
+        <div className="flex items-center gap-2">
           <button onClick={handleLogoClick} className="hover:opacity-80 transition-opacity flex-shrink-0">
-            <div className="bg-white p-2 rounded-md">
-              <img src="https://fukzxedgbszcpakqkrjf.supabase.co/storage/v1/object/public/fq-logos//logo_200x200.png" alt="FQ Logo" className="w-6 h-6 object-contain" />
-            </div>
+            <img src="/branding/LOGOTIPOH_2-02.png" alt="Qanvit Logo" className="w-28 h-16 object-contain object-left" />
           </button>
-          
-          {sidebarState === "expanded" && <span className="text-lg font-semibold text-white">FQ Source</span>}
         </div>
         
         {/* Notifications + Sidebar trigger - only show on desktop */}
         {!isMobile && (
           <div
-            className={`absolute flex items-center gap-2 ${sidebarState === "collapsed" ? "flex-col" : "flex-row"} ${sidebarState === "expanded" ? "top-1/2 right-2 -translate-y-1/2" : "bottom-2 left-1/2 -translate-x-1/2"}`}
+            className={`absolute flex items-center gap-2 ${sidebarState === "collapsed" ? "flex-col" : "flex-row"} ${sidebarState === "expanded" ? "top-1/2 right-1 -translate-y-1/2" : "bottom-1 left-1/2 -translate-x-1/2"}`}
           >
             {/* Notifications bell */}
             {user && sidebarState === "expanded" && (
               <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
                 <DropdownMenuTrigger asChild>
                   <button 
-                    className="text-white hover:bg-white/10 w-8 h-8 rounded-md flex items-center justify-center relative"
+                    className="text-[#f1e8f4] hover:bg-white/10 w-8 h-8 rounded-md flex items-center justify-center relative"
                     title="Notifications"
                   >
-                    <Bell className="w-5 h-5" />
+                    <Bell className="w-5 h-5 text-[#f1e8f4]" />
                     {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] leading-none px-1.5 py-0.5 rounded-full">
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-[#f1e8f4] text-[10px] leading-none px-1.5 py-0.5 rounded-full">
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-80 bg-[#1b2c4a] border border-white/10 text-white shadow-none">
+                <DropdownMenuContent align="end" className="w-80 bg-[#22183a] border border-white/10 text-[#f1e8f4] shadow-none">
                   <div className="px-3 py-2 border-b border-white/10">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-white/90">Notifications</span>
+                      <span className="text-sm font-semibold text-[#f1e8f4]/90">Notifications</span>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -845,7 +841,7 @@ const Sidebar = () => {
                                 e.stopPropagation();
                                 toggleNotificationSound();
                               }}
-                              className="text-white/70 hover:text-white hover:bg-white/10 w-7 h-7 rounded flex items-center justify-center transition-colors"
+                              className="text-[#f1e8f4]/70 hover:text-[#f1e8f4] hover:bg-white/10 w-7 h-7 rounded flex items-center justify-center transition-colors"
                               aria-label={notificationSoundEnabled ? "Disable notification sound" : "Enable notification sound"}
                             >
                               {notificationSoundEnabled ? (
@@ -855,7 +851,7 @@ const Sidebar = () => {
                               )}
                             </button>
                           </TooltipTrigger>
-                          <TooltipContent side="left" className="bg-[#1A1F2C] text-white border-white/10">
+                          <TooltipContent side="left" className="bg-[#22183a] text-[#f1e8f4] border-white/10">
                             <p className="text-xs">
                               {notificationSoundEnabled ? "Sound enabled" : "Sound disabled"}
                             </p>
@@ -866,12 +862,12 @@ const Sidebar = () => {
                   </div>
                   <div className="max-h-80 overflow-y-auto">
                     {notifications.length === 0 ? (
-                      <div className="px-3 py-4 text-sm text-white/60">No notifications</div>
+                      <div className="px-3 py-4 text-sm text-[#f1e8f4]/60">No notifications</div>
                     ) : (
                       notifications.map(n => (
                         <div key={n.id} className="px-3 py-3 border-t border-white/10 first:border-t-0">
-                          <div className="text-sm font-medium text-white">{n.title}</div>
-                          <div className="text-xs text-white/70 mt-1">{n.body}</div>
+                          <div className="text-sm font-medium text-[#f1e8f4]">{n.title}</div>
+                          <div className="text-xs text-[#f1e8f4]/70 mt-1">{n.body}</div>
                           <div className="mt-2 flex items-center gap-2">
                             {n.target_url && (
                               <button
@@ -879,12 +875,12 @@ const Sidebar = () => {
                                   setNotificationsOpen(false);
                                   navigate(n.target_url);
                                 }}
-                                className="text-xs px-2 py-1 bg-[#80c8f0] text-[#1A1F2C] rounded hover:opacity-90"
+                                className="text-xs px-2 py-1 bg-[#f4a9aa] text-[#22183a] rounded hover:opacity-90"
                               >
                                 Go to
                               </button>
                             )}
-                            <span className="text-[10px] text-white/50 ml-auto">
+                            <span className="text-[10px] text-[#f1e8f4]/50 ml-auto">
                               {new Date(n.created_at).toLocaleString()}
                             </span>
                           </div>
@@ -895,7 +891,7 @@ const Sidebar = () => {
                   <div className="border-t border-white/10">
                     <button
                       onClick={openNotificationsCenter}
-                      className="w-full text-left px-3 py-2 text-sm text-[#80c8f0] hover:bg-white/10"
+                      className="w-full text-left px-3 py-2 text-sm text-[#f4a9aa] hover:bg-white/10"
                     >
                       Open Notifications Center
                     </button>
@@ -903,7 +899,7 @@ const Sidebar = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <SidebarTrigger className="text-white hover:bg-white/10 w-8 h-8 rounded-md transition-colors" />
+            <SidebarTrigger className="text-[#f1e8f4] [&_svg]:text-[#f1e8f4] hover:bg-white/10 hover:text-[#f1e8f4] w-8 h-8 rounded-md transition-colors" />
           </div>
         )}
       </SidebarHeader>
@@ -911,7 +907,7 @@ const Sidebar = () => {
       <SidebarContent className="p-3 flex flex-col h-full overflow-hidden">
         {/* Navigation Menu */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-blue-300 text-xs uppercase tracking-wider">
+          <SidebarGroupLabel className="text-[#f4a9aa] text-xs uppercase tracking-wider">
             {sidebarState === "expanded" ? "Buyers" : ""}
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -928,7 +924,7 @@ const Sidebar = () => {
                             <SidebarMenuButton
                               isActive={isActivePath(rfxItem.path)}
                               onClick={() => handleMenuItemClick(rfxItem.path)}
-                              className={`flex items-center transition-colors cursor-pointer ${sidebarState === "collapsed" ? 'w-full' : 'flex-1'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(rfxItem.path) ? 'bg-[#80c8f0]/80 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                              className={`flex items-center transition-colors cursor-pointer ${sidebarState === "collapsed" ? 'w-full' : 'flex-1'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(rfxItem.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'}`}
                               title={sidebarState === "collapsed" ? rfxItem.tooltip : ""}
                             >
                               <div className="flex items-center w-full">
@@ -950,7 +946,7 @@ const Sidebar = () => {
                             {sidebarState === "expanded" && (
                               <button
                                 onClick={handleRfxToggle}
-                                className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors ${isActivePath(rfxItem.path) ? 'bg-[#80c8f0]/80 text-white hover:bg-[#80c8f0]/90' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                                className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors ${isActivePath(rfxItem.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4] hover:bg-[#f4a9aa]/90' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'}`}
                                 title={rfxExpanded ? "Collapse RFX list" : "Expand RFX list"}
                                 aria-label={rfxExpanded ? "Collapse RFX list" : "Expand RFX list"}
                               >
@@ -972,12 +968,12 @@ const Sidebar = () => {
                                 }}
                               >
                                 {loadingRfxSidebar && rfxSidebarItems.length === 0 && (
-                                  <div className="text-white/50 text-xs px-1 py-1">
+                                  <div className="text-[#f1e8f4]/50 text-xs px-1 py-1">
                                     Loading RFXs...
                                   </div>
                                 )}
                                 {!loadingRfxSidebar && rfxSidebarItems.length === 0 && (
-                                  <div className="text-white/50 text-xs px-1 py-1">
+                                  <div className="text-[#f1e8f4]/50 text-xs px-1 py-1">
                                     No RFXs yet
                                   </div>
                                 )}
@@ -988,7 +984,7 @@ const Sidebar = () => {
                                   <button
                                     key={rfx.id}
                                     onClick={() => handleMenuItemClick(`/rfxs/${rfx.id}`)}
-                                    className="w-full text-left text-xs text-white/80 hover:text-white hover:bg-white/10 rounded-md px-2 py-1 flex items-center justify-between gap-2"
+                                    className="w-full text-left text-xs text-[#f1e8f4]/80 hover:text-[#f1e8f4] hover:bg-white/10 rounded-md px-2 py-1 flex items-center justify-between gap-2"
                                   >
                                     <span className="truncate">{rfx.name}</span>
                                     <TooltipProvider delayDuration={50}>
@@ -1013,7 +1009,7 @@ const Sidebar = () => {
                                 <button
                                   onClick={loadMoreRfxSidebar}
                                   disabled={loadingMoreRfxSidebar}
-                                  className="w-full text-center text-[11px] text-[#80c8f0] hover:text-white hover:bg-white/10 rounded-md px-2 py-1"
+                                  className="w-full text-center text-[11px] text-[#f4a9aa] hover:text-[#f1e8f4] hover:bg-white/10 rounded-md px-2 py-1"
                                 >
                                   {loadingMoreRfxSidebar ? 'Loading more...' : 'Load more RFXs'}
                                 </button>
@@ -1041,7 +1037,7 @@ const Sidebar = () => {
                               isActive={isActivePath(item.path)}
                               disabled={item.disabled}
                               onClick={() => handleMenuItemClick(item.path, item.disabled)}
-                              className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#80c8f0]/80 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
+                              className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
                               title={sidebarState === "collapsed" ? item.tooltip : ""}
                             >
                               <div className="flex items-center w-full">
@@ -1070,7 +1066,7 @@ const Sidebar = () => {
 
               {/* Suppliers section */}
               {sidebarState === "expanded" && (
-                <div className="px-3 pt-2 pb-1 text-blue-300 text-xs uppercase tracking-wider">
+                <div className="px-3 pt-2 pb-1 text-[#f4a9aa] text-xs uppercase tracking-wider">
                   Suppliers
                 </div>
               )}
@@ -1084,7 +1080,7 @@ const Sidebar = () => {
                             isActive={isActivePath(item.path)}
                             disabled={item.disabled}
                             onClick={() => handleMenuItemClick(item.path, item.disabled)}
-                            className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#80c8f0]/80 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
+                            className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
                             title={sidebarState === "collapsed" ? item.tooltip : ""}
                           >
                             <div className="flex items-center w-full">
@@ -1113,7 +1109,7 @@ const Sidebar = () => {
 
               {/* General section */}
               {sidebarState === "expanded" && (
-                <div className="px-3 pt-2 pb-1 text-blue-300 text-xs uppercase tracking-wider">
+                <div className="px-3 pt-2 pb-1 text-[#f4a9aa] text-xs uppercase tracking-wider">
                   General
                 </div>
               )}
@@ -1127,7 +1123,7 @@ const Sidebar = () => {
                             isActive={isActivePath(item.path)}
                             disabled={item.disabled}
                             onClick={() => handleMenuItemClick(item.path, item.disabled)}
-                            className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#80c8f0]/80 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
+                            className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
                             title={sidebarState === "collapsed" ? item.tooltip : ""}
                           >
                             <div className="flex items-center w-full">
@@ -1158,7 +1154,7 @@ const Sidebar = () => {
                     <DropdownMenuTrigger asChild>
                       <SidebarMenuButton 
                         isActive={isAnyDeveloperItemActive()}
-                        className={`flex items-center transition-colors cursor-pointer ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg justify-between'} ${isAnyDeveloperItemActive() ? 'bg-[#80c8f0]/80 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'}`}
+                        className={`flex items-center transition-colors cursor-pointer ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg justify-between'} ${isAnyDeveloperItemActive() ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'}`}
                         title={sidebarState === "collapsed" ? "Developer tools" : ""}
                       >
                         <div className="flex items-center w-full">
@@ -1167,7 +1163,7 @@ const Sidebar = () => {
                                <Code className={sidebarState === "collapsed" ? "w-5 h-5" : "w-5 h-5"} />
                                  {(pendingCount > 0 || pendingFeedbackCount > 0 || pendingErrorReportsCount > 0 || pendingCompanyRequestsCount > 0 || pendingRfxValidation > 0 || pendingNDAValidation > 0) && (
                                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center">
-                                     <span className="text-xs text-white font-medium">
+                                     <span className="text-xs text-[#f1e8f4] font-medium">
                                        {(pendingCount + pendingFeedbackCount + pendingErrorReportsCount + pendingCompanyRequestsCount + pendingRfxValidation + pendingNDAValidation) > 9 ? '9+' : (pendingCount + pendingFeedbackCount + pendingErrorReportsCount + pendingCompanyRequestsCount + pendingRfxValidation + pendingNDAValidation)}
                                      </span>
                                    </div>
@@ -1190,14 +1186,14 @@ const Sidebar = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                       align="start" 
-                      className="w-56 bg-[#1b2c4a] border border-white/10 text-white shadow-none"
+                      className="w-56 bg-[#22183a] border border-white/10 text-[#f1e8f4] shadow-none"
                       side={isMobile ? "bottom" : "right"}
                     >
                       {developerItems.map(item => (
                         <DropdownMenuItem
                           key={item.name}
                           onClick={() => handleDeveloperItemClick(item.path)}
-                          className={`flex items-center justify-between px-3 py-2 cursor-pointer transition-colors hover:bg-white/10 ${isActivePath(item.path) ? 'bg-[#80c8f0]/20 text-[#80c8f0]' : 'text-white/80 hover:text-white'}`}
+                          className={`flex items-center justify-between px-3 py-2 cursor-pointer transition-colors hover:bg-white/10 ${isActivePath(item.path) ? 'bg-[#f4a9aa]/20 text-[#f4a9aa]' : 'text-[#f1e8f4]/80 hover:text-[#f1e8f4]'}`}
                         >
                           <div className="flex items-center gap-3">
                             <div className="relative">
@@ -1236,7 +1232,7 @@ const Sidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* FQ Platform Onboarding Button - At the bottom before footer */}
+      {/* Qanvit Platform Onboarding Button - At the bottom before footer */}
       <div className="border-t border-white/10 px-3 py-2">
         <TooltipProvider>
           <Tooltip>
@@ -1244,16 +1240,16 @@ const Sidebar = () => {
               <Button
                 variant="ghost"
                 onClick={handleRestartOnboarding}
-                className={`w-full flex items-center transition-colors cursor-pointer ${sidebarState === "collapsed" ? 'justify-center p-2' : 'justify-start gap-3 px-3 py-2'} text-white/80 hover:bg-white/10 hover:text-white`}
-                title={sidebarState === "collapsed" ? "FQ Platform Onboarding" : ""}
+                className={`w-full flex items-center transition-colors cursor-pointer ${sidebarState === "collapsed" ? 'justify-center p-2' : 'justify-start gap-3 px-3 py-2'} text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]`}
+                title={sidebarState === "collapsed" ? "Qanvit Platform Onboarding" : ""}
               >
                 <GraduationCap className={sidebarState === "collapsed" ? "w-5 h-5" : "w-4 h-4"} />
-                {sidebarState === "expanded" && <span className="text-sm font-medium">FQ Platform Onboarding</span>}
+                {sidebarState === "expanded" && <span className="text-sm font-medium">Qanvit Platform Onboarding</span>}
               </Button>
             </TooltipTrigger>
             {sidebarState === "collapsed" && (
               <TooltipContent>
-                <p>FQ Platform Onboarding</p>
+                <p>Qanvit Platform Onboarding</p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -1267,27 +1263,27 @@ const Sidebar = () => {
             <div className="w-full flex flex-col gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="flex-1 flex justify-start p-3 hover:bg-white/10 text-white rounded-md cursor-pointer">
+                  <div className="flex-1 flex justify-start p-3 hover:bg-white/10 text-[#f1e8f4] rounded-md cursor-pointer">
                     <Avatar className="w-8 h-8 mr-3">
                       <AvatarImage src={userProfile?.avatar_url || ''} />
-                      <AvatarFallback className="bg-blue-600 text-white text-sm font-semibold">
+                      <AvatarFallback className="bg-[#f4a9aa] text-[#22183a] text-sm font-semibold">
                         {userProfile?.name?.charAt(0) || user.email?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0 text-left">
-                      <div className="text-sm font-medium text-white truncate">
+                      <div className="text-sm font-medium text-[#f1e8f4] truncate">
                         {userProfile?.name && userProfile?.surname ? `${userProfile.name} ${userProfile.surname}` : user?.email || 'User'}
                       </div>
-                      <div className="text-xs text-white/60 truncate">
+                      <div className="text-xs text-[#f1e8f4]/60 truncate">
                         {planLabel}
                       </div>
                     </div>
                   </div>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-[#1b2c4a] border border-white/10 text-white shadow-none">
+                <DropdownMenuContent align="end" className="w-56 bg-[#22183a] border border-white/10 text-[#f1e8f4] shadow-none">
                   <DropdownMenuItem 
                     onClick={() => handleMenuItemClick('/user-profile')} 
-                    className="flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors text-white/80 hover:text-white hover:bg-white/10"
+                    className="flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors text-[#f1e8f4]/80 hover:text-[#f1e8f4] hover:bg-white/10"
                   >
                     <User className="w-4 h-4" />
                     Configure Profile
@@ -1313,7 +1309,7 @@ const Sidebar = () => {
             <div className="flex flex-col items-center gap-2">
               <Avatar className="w-8 h-8">
                 <AvatarImage src={userProfile?.avatar_url || ''} />
-                <AvatarFallback className="bg-blue-600 text-white text-sm font-semibold">
+                <AvatarFallback className="bg-[#f4a9aa] text-[#22183a] text-sm font-semibold">
                   {userProfile?.name?.charAt(0) || user.email?.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
@@ -1322,7 +1318,7 @@ const Sidebar = () => {
                 size="icon" 
                 onClick={isLoggingOut ? undefined : handleLogout} 
                 disabled={isLoggingOut}
-                className="text-white/60 hover:text-white hover:bg-white/10 disabled:opacity-60 disabled:cursor-not-allowed" 
+                className="text-[#f1e8f4]/60 hover:text-[#f1e8f4] hover:bg-white/10 disabled:opacity-60 disabled:cursor-not-allowed" 
                 title="Sign out"
               >
                 {isLoggingOut ? (
@@ -1337,7 +1333,7 @@ const Sidebar = () => {
           <div className="space-y-2">
             <Button 
               variant="ghost" 
-              className="w-full justify-start text-white/70 hover:bg-white/10 hover:text-white" 
+              className="w-full justify-start text-[#f1e8f4]/70 hover:bg-white/10 hover:text-[#f1e8f4]" 
               size={sidebarState === "collapsed" ? "icon" : "default"} 
               onClick={() => handleMenuItemClick('/auth')}
             >
@@ -1349,7 +1345,7 @@ const Sidebar = () => {
             
             <Button 
               variant="ghost" 
-              className="w-full justify-start text-white/70 hover:bg-white/10 hover:text-white" 
+              className="w-full justify-start text-[#f1e8f4]/70 hover:bg-white/10 hover:text-[#f1e8f4]" 
               size={sidebarState === "collapsed" ? "icon" : "default"} 
               onClick={() => handleMenuItemClick('/auth?tab=signup')}
             >

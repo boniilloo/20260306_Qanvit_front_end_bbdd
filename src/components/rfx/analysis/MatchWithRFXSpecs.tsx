@@ -38,8 +38,8 @@ const MatchWithRFXSpecs: React.FC<MatchWithRFXSpecsProps> = ({ fitToRfx, risks }
 
   // Determine color based on percentage
   const getPercentageColor = (percentage: number) => {
-    if (percentage >= 85) return '#7de19a'; // verde (85+)
-    if (percentage >= 75) return '#80c8f0'; // azul claro (75-84)
+    if (percentage >= 85) return '#f4a9aa'; // verde (85+)
+    if (percentage >= 75) return '#f4a9aa'; // azul claro (75-84)
     if (percentage >= 65) return '#fbbf24'; // amarillo (65-74)
     if (percentage >= 50) return '#fb923c'; // naranja (50-64)
     return '#ef4444'; // rojo (<50)
@@ -99,7 +99,7 @@ const MatchWithRFXSpecs: React.FC<MatchWithRFXSpecsProps> = ({ fitToRfx, risks }
             {/* Overall metric */}
             <div className="text-center">
               <div className="text-xs text-gray-500 mb-1 font-medium">Overall Match</div>
-              <div className="text-2xl font-bold text-[#1A1F2C]">
+              <div className="text-2xl font-bold text-[#22183a]">
                 {match_percentage_overall}%
               </div>
             </div>
@@ -108,7 +108,7 @@ const MatchWithRFXSpecs: React.FC<MatchWithRFXSpecsProps> = ({ fitToRfx, risks }
           {/* Right Column - Match Comment (3/4 width) */}
           <div className="col-span-3 flex flex-col justify-center">
             <div className="bg-[#f1f1f1] rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-[#1A1F2C] mb-2">Reasoning</h4>
+              <h4 className="text-sm font-semibold text-[#22183a] mb-2">Reasoning</h4>
               <div className="text-sm text-gray-700 leading-relaxed">
                 <MarkdownText>{match_comment}</MarkdownText>
               </div>
@@ -119,7 +119,7 @@ const MatchWithRFXSpecs: React.FC<MatchWithRFXSpecsProps> = ({ fitToRfx, risks }
         {/* Risks Section */}
         {risks && risks.length > 0 && (
           <div className="mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-lg font-semibold mb-3 text-[#1A1F2C]">Risks</h3>
+            <h3 className="text-lg font-semibold mb-3 text-[#22183a]">Risks</h3>
             <ul className="space-y-2">
               {risks.map((risk, idx) => (
                 <li key={idx} className="text-sm text-gray-700">
@@ -146,7 +146,7 @@ const MatchWithRFXSpecs: React.FC<MatchWithRFXSpecsProps> = ({ fitToRfx, risks }
         <div className="mt-6 pt-6 border-t border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-[#1A1F2C]">Gaps & Highlights</h3>
+              <h3 className="text-lg font-semibold text-[#22183a]">Gaps & Highlights</h3>
               <p className="text-sm text-gray-500">AI-generated analysis points</p>
             </div>
             {/* View Mode Selector */}
@@ -175,7 +175,7 @@ const MatchWithRFXSpecs: React.FC<MatchWithRFXSpecsProps> = ({ fitToRfx, risks }
                 onClick={() => setViewMode('both')}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   viewMode === 'both'
-                    ? 'bg-[#80c8f0] text-white shadow-sm'
+                    ? 'bg-[#f4a9aa] text-white shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >

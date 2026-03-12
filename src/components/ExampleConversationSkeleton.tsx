@@ -41,7 +41,7 @@ const ExampleConversationSkeleton: React.FC<ExampleConversationSkeletonProps> = 
       {/* Content Skeleton */}
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-lg font-medium text-[#1b2c4a] mb-2">Loading example conversation...</div>
+          <div className="text-lg font-medium text-[#22183a] mb-2">Loading example conversation...</div>
           <div className="text-sm text-gray-600 mb-4">{loadingStep}</div>
           <div className="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
         </div>

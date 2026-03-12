@@ -416,7 +416,7 @@ export default function ProjectTimelineEditor({ milestones, onChange, rfqLaunchD
         {selectedDates.length > 0 && (
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white border-[#80c8f0]">
+              <Button variant="outline" size="sm" className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white border-[#f4a9aa]">
                 <Eye className="w-4 h-4 mr-2" />
                 View as calendar
               </Button>
@@ -450,7 +450,7 @@ export default function ProjectTimelineEditor({ milestones, onChange, rfqLaunchD
                 className="border border-gray-200 rounded-lg shadow-sm bg-white px-4 py-3"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#80c8f0] text-white flex items-center justify-center text-xs font-semibold">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#f4a9aa] text-white flex items-center justify-center text-xs font-semibold">
                     {idx + 1}
                   </div>
                   <div className="flex-1">

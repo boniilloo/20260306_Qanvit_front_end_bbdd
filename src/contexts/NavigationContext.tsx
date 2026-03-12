@@ -77,7 +77,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const navigateWithHighlight = useCallback((to: string) => {
     if (isThinking) {
       const confirmed = window.confirm(
-        `You are waiting for an FQ response (${thinkingMessage || 'processing...'}).\n\n` +
+        `You are waiting for a Qanvit response (${thinkingMessage || 'processing...'}).\n\n` +
         'If you leave now, the response will be automatically saved in the conversation and you can see it later.\n\n' +
         'Do you want to leave the conversation?'
       );
@@ -128,7 +128,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     
     if (isThinking) {
       const confirmed = window.confirm(
-        `You are waiting for an FQ response (${thinkingMessage || 'processing...'}).\n\n` +
+        `You are waiting for a Qanvit response (${thinkingMessage || 'processing...'}).\n\n` +
         'If you leave now, the response will be automatically saved in the conversation and you can see it later.\n\n' +
         'Do you want to leave the conversation?'
       );
@@ -157,7 +157,7 @@ export const NavigationProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const goBackWithConfirmation = useCallback(() => {
     if (isThinking) {
       const confirmed = window.confirm(
-        `You are waiting for an FQ response (${thinkingMessage || 'processing...'}).\n\n` +
+        `You are waiting for a Qanvit response (${thinkingMessage || 'processing...'}).\n\n` +
         'If you leave now, the response will be automatically saved in the conversation and you can see it later.\n\n' +
         'Do you want to leave the conversation?'
       );

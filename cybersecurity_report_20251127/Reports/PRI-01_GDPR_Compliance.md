@@ -40,7 +40,7 @@ The privacy policy is publicly accessible at `https://fqsource.com/privacy` and 
     href="https://fqsource.com/privacy"
     target="_blank"
     rel="noopener noreferrer"
-    className="text-[#80c8f0] hover:text-[#1A1F2C] hover:underline inline-flex items-center gap-1"
+    className="text-[#f4a9aa] hover:text-[#22183a] hover:underline inline-flex items-center gap-1"
   >
     Privacy Policy
     <ExternalLink className="h-3 w-3" />
@@ -60,7 +60,7 @@ The terms of service are publicly accessible at `https://fqsource.com/terms` and
     href="https://fqsource.com/terms"
     target="_blank"
     rel="noopener noreferrer"
-    className="text-[#80c8f0] hover:text-[#1A1F2C] hover:underline inline-flex items-center gap-1"
+    className="text-[#f4a9aa] hover:text-[#22183a] hover:underline inline-flex items-center gap-1"
   >
     Terms & Conditions
     <ExternalLink className="h-3 w-3" />
@@ -82,7 +82,7 @@ Before users can subscribe to the platform, they must explicitly accept both the
 <Label
   htmlFor="terms-acceptance"
   className="text-sm font-normal leading-relaxed cursor-pointer"
-  style={{ color: '#1A1F2C' }}
+  style={{ color: '#22183a' }}
 >
   I have read and agree to the Terms & Conditions and Privacy Policy
 </Label>

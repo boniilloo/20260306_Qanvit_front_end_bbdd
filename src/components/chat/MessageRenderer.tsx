@@ -207,7 +207,7 @@ const MessageRenderer = ({ message, loading, isLatest, suppliers = [], conversat
     return (
       <div id={message.id ? `message-${message.id}` : undefined} className="w-full max-w-[1200px] mx-auto px-4 sm:px-6 mb-6">
         <div className="flex justify-end">
-          <div className="max-w-[75%] bg-[#1b2c4a] text-white rounded-2xl px-5 py-4 shadow-sm border border-[#2d3748]">
+          <div className="max-w-[75%] bg-[#22183a] text-white rounded-2xl px-5 py-4 shadow-sm border border-[#2d3748]">
             {/* Text content - don't show if it's just the _USER_IMAGE_ or _USER_DOCUMENT_ placeholder */}
             {message.content && message.content !== '_USER_IMAGE_' && message.content !== '_USER_DOCUMENT_' && (
               <p className="font-inter text-sm leading-relaxed whitespace-pre-wrap">
@@ -650,7 +650,7 @@ const MessageRenderer = ({ message, loading, isLatest, suppliers = [], conversat
               >
                 <div className="flex items-center justify-between">
                   <h4 className="text-xl font-bold text-gray-900 flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-[#80c8f0] to-[#7de19a] rounded-lg flex items-center justify-center text-white text-sm font-bold">
+                    <div className="w-8 h-8 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] rounded-lg flex items-center justify-center text-white text-sm font-bold">
                       {suppliers.length}
                     </div>
                     Machine Vision Suppliers Found

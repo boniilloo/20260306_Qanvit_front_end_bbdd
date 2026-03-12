@@ -51,7 +51,7 @@ const GapsAndHighlights: React.FC<GapsAndHighlightsProps> = ({ fitToRfx }) => {
               onClick={() => setViewMode('both')}
               className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'both'
-                  ? 'bg-[#80c8f0] text-white shadow-sm'
+                  ? 'bg-[#f4a9aa] text-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >

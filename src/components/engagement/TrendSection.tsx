@@ -21,8 +21,8 @@ const TrendSection = ({ trendData }: TrendSectionProps) => {
   ];
 
   const metrics = [
-    { value: 'profileViews', label: 'Profile Views', color: '#80c8f0' },
-    { value: 'searchAppearances', label: 'Search Appearances', color: '#7de19a' }
+    { value: 'profileViews', label: 'Profile Views', color: '#f4a9aa' },
+    { value: 'searchAppearances', label: 'Search Appearances', color: '#f4a9aa' }
   ];
 
   // Convert array data to chart format
@@ -36,7 +36,7 @@ const TrendSection = ({ trendData }: TrendSectionProps) => {
   return (
     <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold font-intro text-[#1b2c4a]">Trends</h2>
+        <h2 className="text-2xl font-bold font-intro text-[#22183a]">Trends</h2>
         
         <div className="flex gap-2">
           {periods.map((period) => (
@@ -45,7 +45,7 @@ const TrendSection = ({ trendData }: TrendSectionProps) => {
               onClick={() => setSelectedPeriod(period.value)}
               className={`px-3 py-1 rounded-lg text-sm font-medium font-inter transition-colors ${
                 selectedPeriod === period.value
-                  ? 'bg-[#80c8f0] text-white'
+                  ? 'bg-[#f4a9aa] text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -63,7 +63,7 @@ const TrendSection = ({ trendData }: TrendSectionProps) => {
             onClick={() => setSelectedMetric(metric.value)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
               selectedMetric === metric.value
-                ? 'border-[#80c8f0] bg-[#80c8f0]/10'
+                ? 'border-[#f4a9aa] bg-[#f4a9aa]/10'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
           >

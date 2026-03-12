@@ -42,7 +42,7 @@ const SaveToListModal = ({
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
   const [newListName, setNewListName] = useState('');
   const [newListDescription, setNewListDescription] = useState('');
-  const [newListColor, setNewListColor] = useState('#80c8f0');
+  const [newListColor, setNewListColor] = useState('#f4a9aa');
   const [currentSavedLists, setCurrentSavedLists] = useState<Array<{id: string | null, name: string, color?: string}>>(currentLists);
 
   const predefinedColors = [

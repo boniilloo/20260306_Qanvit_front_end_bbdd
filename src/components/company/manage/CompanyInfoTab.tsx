@@ -108,7 +108,7 @@ export const CompanyInfoTab: React.FC<CompanyInfoTabProps> = ({
               <div className="flex items-center gap-2">
                 <Button onClick={onAutoFillCompany} variant="default" size="sm" className="flex items-center gap-2 bg-sky text-navy hover:bg-sky-dark">
                   <Sparkles className="w-4 h-4" />
-                  Update info using FQ AI
+                  Update info using Qanvit AI
                 </Button>
                 <Button onClick={onEditCompany} variant="outline" className="gap-2 bg-white text-black hover:bg-gray-50">
                   <Edit className="w-4 h-4" />

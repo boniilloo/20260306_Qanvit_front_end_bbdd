@@ -22,7 +22,7 @@ BEGIN
     -- Call net.http_post from pg_net extension
     -- Signature: net.http_post(url text, body jsonb DEFAULT '{}', params jsonb DEFAULT '{}', headers jsonb DEFAULT '{}', timeout_milliseconds integer DEFAULT 1000)
     SELECT net.http_post(
-      url := 'https://fukzxedgbszcpakqkrjf.functions.supabase.co/chat-unread-email-notifier',
+      url := 'https://bymbfjkezrwsuvbsaycg.functions.supabase.co/chat-unread-email-notifier',
       body := '{}'::jsonb,
       headers := '{"Content-Type": "application/json"}'::jsonb,
       timeout_milliseconds := 30000

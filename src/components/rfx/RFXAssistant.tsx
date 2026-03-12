@@ -25,7 +25,7 @@ const RFXAssistant: React.FC<RFXAssistantProps> = ({ title, content, primaryActi
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="h-14 w-14 rounded-full bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white shadow-lg flex items-center justify-center transition-colors"
+          className="h-14 w-14 rounded-full bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white shadow-lg flex items-center justify-center transition-colors"
         >
           <HelpCircle className="h-7 w-7" strokeWidth={2.5} />
         </button>
@@ -34,23 +34,23 @@ const RFXAssistant: React.FC<RFXAssistantProps> = ({ title, content, primaryActi
       {/* Speech-bubble panel */}
       {isOpen && (
         <div className="relative max-w-md">
-          <div className="bg-[#1A1F2C] rounded-2xl shadow-xl border border-[#80c8f0]/20 p-4 pr-10">
+          <div className="bg-[#22183a] rounded-2xl shadow-xl border border-[#f4a9aa]/20 p-4 pr-10">
             <button
               aria-label="Close assistant"
               onClick={() => setIsOpen(false)}
-              className="absolute top-2 right-2 text-[#80c8f0] hover:text-[#80c8f0]/80 transition-colors"
+              className="absolute top-2 right-2 text-[#f4a9aa] hover:text-[#f4a9aa]/80 transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
             <div className="flex items-start gap-3">
               <div className="shrink-0 mt-0.5">
-                <div className="h-8 w-8 rounded-full bg-[#80c8f0] text-[#1A1F2C] grid place-items-center">
+                <div className="h-8 w-8 rounded-full bg-[#f4a9aa] text-[#22183a] grid place-items-center">
                   <HelpCircle className="h-5 w-5" />
                 </div>
               </div>
               <div className="space-y-2">
                 <p className="text-base text-white font-medium">{title}</p>
-                <div className="text-base text-[#80c8f0]/90 space-y-2">
+                <div className="text-base text-[#f4a9aa]/90 space-y-2">
                   {content}
                 </div>
                 <div className="pt-2 flex gap-2">
@@ -58,7 +58,7 @@ const RFXAssistant: React.FC<RFXAssistantProps> = ({ title, content, primaryActi
                     <Button
                       size="sm"
                       onClick={primaryAction.onClick}
-                      className="bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-[#1A1F2C] font-medium"
+                      className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a] font-medium"
                     >
                       {primaryAction.label}
                     </Button>
@@ -67,7 +67,7 @@ const RFXAssistant: React.FC<RFXAssistantProps> = ({ title, content, primaryActi
                     size="sm"
                     variant="outline"
                     onClick={() => setIsOpen(false)}
-                    className="border-[#80c8f0] text-[#80c8f0] hover:bg-[#80c8f0]/10"
+                    className="border-[#f4a9aa] text-[#f4a9aa] hover:bg-[#f4a9aa]/10"
                   >
                     {primaryAction ? 'Got it' : 'Got it, let\'s start!'}
                   </Button>
@@ -76,7 +76,7 @@ const RFXAssistant: React.FC<RFXAssistantProps> = ({ title, content, primaryActi
             </div>
           </div>
           {/* Tail for speech bubble */}
-          <div className="absolute -bottom-3 left-8 h-0 w-0 border-t-[12px] border-t-[#1A1F2C] border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent drop-shadow" />
+          <div className="absolute -bottom-3 left-8 h-0 w-0 border-t-[12px] border-t-[#22183a] border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent drop-shadow" />
         </div>
       )}
     </div>

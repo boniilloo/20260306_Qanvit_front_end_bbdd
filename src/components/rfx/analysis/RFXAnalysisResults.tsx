@@ -48,8 +48,8 @@ const QualityGradeSidebar: React.FC<{ supplier: EnrichedSupplierAnalysis }> = ({
   // Determine color based on letter grade (ignoring +/-)
   const getGradeColor = (grade: string) => {
     const baseLetter = grade.charAt(0).toUpperCase();
-    if (baseLetter === 'A') return '#7de19a'; // verde
-    if (baseLetter === 'B') return '#80c8f0'; // azul claro
+    if (baseLetter === 'A') return '#f4a9aa'; // verde
+    if (baseLetter === 'B') return '#f4a9aa'; // azul claro
     if (baseLetter === 'C') return '#fbbf24'; // amarillo
     if (baseLetter === 'D') return '#fb923c'; // naranja
     return '#ef4444'; // rojo para E, F
@@ -64,7 +64,7 @@ const QualityGradeSidebar: React.FC<{ supplier: EnrichedSupplierAnalysis }> = ({
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="text-center w-full">
               <div className="flex items-center justify-center gap-1 mb-3">
-                <h3 className="text-sm font-semibold text-[#1A1F2C]">Proposal Quality</h3>
+                <h3 className="text-sm font-semibold text-[#22183a]">Proposal Quality</h3>
                 <TooltipProvider delayDuration={50}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -88,7 +88,7 @@ const QualityGradeSidebar: React.FC<{ supplier: EnrichedSupplierAnalysis }> = ({
               variant="outline"
               size="sm"
               onClick={() => setIsModalOpen(true)}
-              className="border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C] hover:text-white w-full"
+              className="border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white w-full"
             >
               <Info className="w-4 h-4 mr-2" />
               View Details
@@ -101,7 +101,7 @@ const QualityGradeSidebar: React.FC<{ supplier: EnrichedSupplierAnalysis }> = ({
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-[#1A1F2C]">Quality of Proposal</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-[#22183a]">Quality of Proposal</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
@@ -125,7 +125,7 @@ const QualityGradeSidebar: React.FC<{ supplier: EnrichedSupplierAnalysis }> = ({
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-[#80c8f0] h-2 rounded-full"
+                      className="bg-[#f4a9aa] h-2 rounded-full"
                       style={{
                         width: `${
                           (quality_of_proposal.technical_explanation_score_0_to_10.score / 10) *
@@ -145,7 +145,7 @@ const QualityGradeSidebar: React.FC<{ supplier: EnrichedSupplierAnalysis }> = ({
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-[#80c8f0] h-2 rounded-full"
+                      className="bg-[#f4a9aa] h-2 rounded-full"
                       style={{
                         width: `${
                           (quality_of_proposal.risk_and_mitigation_score_0_to_10.score / 10) * 100
@@ -161,7 +161,7 @@ const QualityGradeSidebar: React.FC<{ supplier: EnrichedSupplierAnalysis }> = ({
                     <span className="text-sm font-medium">8/10</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-[#80c8f0] h-2 rounded-full" style={{ width: '80%' }} />
+                    <div className="bg-[#f4a9aa] h-2 rounded-full" style={{ width: '80%' }} />
                   </div>
                 </div>
               </div>
@@ -388,7 +388,7 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
       <Card>
         <CardContent className="py-12">
           <div className="flex flex-col items-center justify-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-[#80c8f0]" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#f4a9aa]" />
             <p className="text-sm text-gray-600">
               {loading ? 'Loading analysis results...' : 'Loading company data...'}
             </p>
@@ -421,16 +421,16 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
     const estimatedEndTime = new Date(createdAt + estimatedAnalysisMs);
 
     return (
-      <Card className="border border-[#80c8f0]/30 bg-gradient-to-br from-white to-[#80c8f0]/5">
+      <Card className="border border-[#f4a9aa]/30 bg-gradient-to-br from-white to-[#f4a9aa]/5">
         <CardContent className="py-12 px-8">
           <div className="max-w-3xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-center gap-3 mb-6">
               <div className="relative">
-                <Loader2 className="h-10 w-10 text-[#80c8f0] animate-spin" />
+                <Loader2 className="h-10 w-10 text-[#f4a9aa] animate-spin" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-[#1A1F2C]">
+                <h3 className="text-2xl font-bold text-[#22183a]">
                   AI Analysis in Progress
                 </h3>
                 <p className="text-sm text-gray-600">
@@ -443,21 +443,21 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="rounded-lg border border-gray-200 bg-white p-4">
                 <p className="text-xs text-gray-500 mb-1">Start Time</p>
-                <p className="font-semibold text-[#1A1F2C]">
+                <p className="font-semibold text-[#22183a]">
                   {new Date(createdAt).toLocaleTimeString()}
                 </p>
               </div>
 
               <div className="rounded-lg border border-gray-200 bg-white p-4">
                 <p className="text-xs text-gray-500 mb-1">Estimated End Time</p>
-                <p className="font-semibold text-[#1A1F2C]">
+                <p className="font-semibold text-[#22183a]">
                   {estimatedEndTime.toLocaleTimeString()}
                 </p>
               </div>
 
               <div className="rounded-lg border border-gray-200 bg-white p-4">
                 <p className="text-xs text-gray-500 mb-1">Time Elapsed</p>
-                <p className="font-semibold text-[#1A1F2C]">
+                <p className="font-semibold text-[#22183a]">
                   {formatDurationShort(elapsed)}
                 </p>
               </div>
@@ -466,7 +466,7 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
             {/* Progress message */}
             <div className="text-center">
               <p className="text-gray-600 mb-2">
-                Estimated remaining: <span className="font-semibold text-[#1A1F2C]">{formatDurationShort(remaining)}</span>
+                Estimated remaining: <span className="font-semibold text-[#22183a]">{formatDurationShort(remaining)}</span>
               </p>
 
               {isLate && (
@@ -489,7 +489,7 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
         <CardContent className="py-16 px-8">
           <div className="max-w-3xl mx-auto">
             {/* Main heading */}
-            <h3 className="text-3xl font-bold text-[#1A1F2C] text-center mb-4">
+            <h3 className="text-3xl font-bold text-[#22183a] text-center mb-4">
               Unlock AI-Powered Proposal Insights
             </h3>
             
@@ -501,56 +501,56 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
 
             {/* Benefits grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-              <div className="flex gap-4 p-4 rounded-xl bg-white/80 border border-[#80c8f0]/20 hover:border-[#80c8f0]/40 transition-all">
+              <div className="flex gap-4 p-4 rounded-xl bg-white/80 border border-[#f4a9aa]/20 hover:border-[#f4a9aa]/40 transition-all">
                 <div className="flex-shrink-0">
-                  <div className="bg-[#7de19a]/10 p-3 rounded-lg">
-                    <CheckCircle className="h-6 w-6 text-[#7de19a]" />
+                  <div className="bg-[#f4a9aa]/10 p-3 rounded-lg">
+                    <CheckCircle className="h-6 w-6 text-[#f4a9aa]" />
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-[#1A1F2C] mb-1">Compliance Check</h4>
+                  <h4 className="font-semibold text-[#22183a] mb-1">Compliance Check</h4>
                   <p className="text-sm text-gray-600">
                     Automatically verify each proposal against your RFX requirements
                   </p>
                 </div>
               </div>
 
-              <div className="flex gap-4 p-4 rounded-xl bg-white/80 border border-[#80c8f0]/20 hover:border-[#80c8f0]/40 transition-all">
+              <div className="flex gap-4 p-4 rounded-xl bg-white/80 border border-[#f4a9aa]/20 hover:border-[#f4a9aa]/40 transition-all">
                 <div className="flex-shrink-0">
-                  <div className="bg-[#80c8f0]/10 p-3 rounded-lg">
-                    <BarChart3 className="h-6 w-6 text-[#80c8f0]" />
+                  <div className="bg-[#f4a9aa]/10 p-3 rounded-lg">
+                    <BarChart3 className="h-6 w-6 text-[#f4a9aa]" />
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-[#1A1F2C] mb-1">Side-by-Side Comparison</h4>
+                  <h4 className="font-semibold text-[#22183a] mb-1">Side-by-Side Comparison</h4>
                   <p className="text-sm text-gray-600">
                     View all suppliers in an interactive comparison matrix
                   </p>
                 </div>
               </div>
 
-              <div className="flex gap-4 p-4 rounded-xl bg-white/80 border border-[#80c8f0]/20 hover:border-[#80c8f0]/40 transition-all">
+              <div className="flex gap-4 p-4 rounded-xl bg-white/80 border border-[#f4a9aa]/20 hover:border-[#f4a9aa]/40 transition-all">
                 <div className="flex-shrink-0">
-                  <div className="bg-[#1A1F2C]/10 p-3 rounded-lg">
-                    <Lightbulb className="h-6 w-6 text-[#1A1F2C]" />
+                  <div className="bg-[#22183a]/10 p-3 rounded-lg">
+                    <Lightbulb className="h-6 w-6 text-[#22183a]" />
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-[#1A1F2C] mb-1">Smart Insights</h4>
+                  <h4 className="font-semibold text-[#22183a] mb-1">Smart Insights</h4>
                   <p className="text-sm text-gray-600">
                     Identify gaps, highlights, and key differentiators at a glance
                   </p>
                 </div>
               </div>
 
-              <div className="flex gap-4 p-4 rounded-xl bg-white/80 border border-[#80c8f0]/20 hover:border-[#80c8f0]/40 transition-all">
+              <div className="flex gap-4 p-4 rounded-xl bg-white/80 border border-[#f4a9aa]/20 hover:border-[#f4a9aa]/40 transition-all">
                 <div className="flex-shrink-0">
                   <div className="bg-purple-100 p-3 rounded-lg">
                     <TrendingUp className="h-6 w-6 text-purple-600" />
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-[#1A1F2C] mb-1">Scoring & Ranking</h4>
+                  <h4 className="font-semibold text-[#22183a] mb-1">Scoring & Ranking</h4>
                   <p className="text-sm text-gray-600">
                     Get objective scoring based on fit, experience, and technical capabilities
                   </p>
@@ -564,7 +564,7 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
                 onClick={onCreateAnalysisJob}
                 disabled={isCreatingJob || isGeneratingPDF || !!analysisPendingStartedAt || readOnly || !onCreateAnalysisJob}
                 size="lg"
-                className="relative bg-gradient-to-r from-[#80c8f0] via-[#80c8f0] to-[#1A1F2C] hover:from-[#80c8f0]/90 hover:via-[#80c8f0]/90 hover:to-[#1A1F2C]/90 text-white font-bold text-lg px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100"
+                className="relative bg-gradient-to-r from-[#f4a9aa] via-[#f4a9aa] to-[#22183a] hover:from-[#f4a9aa]/90 hover:via-[#f4a9aa]/90 hover:to-[#22183a]/90 text-white font-bold text-lg px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:hover:scale-100"
               >
                 {isCreatingJob || isGeneratingPDF || analysisPendingStartedAt ? (
                   <>
@@ -600,7 +600,7 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
             onClick={() => setViewMode('per-supplier')}
             className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
               viewMode === 'per-supplier'
-                ? 'bg-[#80c8f0] text-white shadow-sm'
+                ? 'bg-[#f4a9aa] text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >
@@ -610,7 +610,7 @@ const RFXAnalysisResults: React.FC<RFXAnalysisResultsProps> = ({
             onClick={() => setViewMode('comparison')}
             className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
               viewMode === 'comparison'
-                ? 'bg-[#80c8f0] text-white shadow-sm'
+                ? 'bg-[#f4a9aa] text-white shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
             }`}
           >

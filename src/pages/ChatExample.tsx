@@ -234,7 +234,7 @@ const ChatExample = () => {
             <div className="flex items-center space-x-2">
               <Sparkles className="h-5 w-5 text-yellow-500" />
               <div className="flex flex-col">
-                <div className="font-medium text-[#1b2c4a] flex items-center gap-2">
+                <div className="font-medium text-[#22183a] flex items-center gap-2">
                   {publicMetadata?.title || conversation?.preview || 'Example Conversation'}
                   {publicMetadata?.is_featured && (
                     <Badge variant="secondary" className="text-xs">Featured</Badge>
@@ -280,7 +280,7 @@ const ChatExample = () => {
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <div className="text-lg font-medium text-[#1b2c4a] mb-2">No messages found</div>
+                <div className="text-lg font-medium text-[#22183a] mb-2">No messages found</div>
                 <div className="text-sm text-gray-600">This conversation appears to be empty</div>
               </div>
             </div>

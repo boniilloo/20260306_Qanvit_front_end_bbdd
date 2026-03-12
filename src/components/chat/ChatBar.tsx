@@ -327,13 +327,13 @@ export default function ChatBar({
   });
   const getPlaceholderText = () => {
     if (disabled && pendingMessage) {
-      return "Message ready to send when FQ finishes...";
+      return "Message ready to send when Qanvit finishes...";
     }
     if (isThinking) {
-      return "FQ is thinking... (you can write your next message)";
+      return "Qanvit is thinking... (you can write your next message)";
     }
     if (disabled) {
-      return "FQ is working... (you can write your next message)";
+      return "Qanvit is working... (you can write your next message)";
     }
     return placeholder;
   };
@@ -342,15 +342,15 @@ export default function ChatBar({
       return "border-blue-400 bg-blue-50/70 shadow-lg shadow-blue-200/50 border-2 border-dashed";
     }
     if (disabled && pendingMessage) {
-      return "border-[#7de19a] bg-green-50/50 shadow-lg shadow-green-200/50";
+      return "border-[#f4a9aa] bg-green-50/50 shadow-lg shadow-green-200/50";
     }
     if (isThinking) {
       return "border-yellow-400 bg-yellow-50/50 shadow-lg shadow-yellow-200/50";
     }
     if (disabled) {
-      return "border-[#80c8f0] bg-blue-50/50 shadow-lg shadow-blue-200/50";
+      return "border-[#f4a9aa] bg-blue-50/50 shadow-lg shadow-blue-200/50";
     }
-    return "border-slate-200 hover:border-[#80c8f0]/50 focus-within:border-[#80c8f0] focus-within:shadow-lg focus-within:shadow-[#80c8f0]/20";
+    return "border-slate-200 hover:border-[#f4a9aa]/50 focus-within:border-[#f4a9aa] focus-within:shadow-lg focus-within:shadow-[#f4a9aa]/20";
   };
   return <div className="space-y-2">
       {/* Hidden file input for image selection */}

@@ -141,13 +141,13 @@ export const CompanyRevisionPreviewModal = ({ revision, isOpen, onClose }: Compa
                       <TooltipTrigger asChild>
                         <span className="inline-flex items-center justify-center w-[41px] h-[41px] cursor-help" aria-label="Verified" role="img">
                           <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 2L19 5V11C19 15.97 16.11 20.44 12 22C7.89 20.44 5 15.97 5 11V5L12 2Z" fill="#80c8f0"/>
+                            <path d="M12 2L19 5V11C19 15.97 16.11 20.44 12 22C7.89 20.44 5 15.97 5 11V5L12 2Z" fill="#f4a9aa"/>
                             <path d="M16.59 8.58L10.25 14.92L7.41 12.08" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         </span>
                       </TooltipTrigger>
                       <TooltipContent className="max-w-xs">
-                        Company information was completed by the company and verified by FQ Source
+                        Company information was completed by the company and verified by Qanvit
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

@@ -788,7 +788,7 @@ const RFXViewer: React.FC = () => {
       <div className="flex-1 flex flex-col bg-background">
         <div className="container mx-auto px-4 py-8 max-w-2xl w-full flex-1 flex items-center justify-center min-h-[calc(100vh-300px)]">
           <div className="flex flex-col justify-center items-center">
-            <Loader2 className="h-12 w-12 animate-spin text-[#1A1F2C] mb-4" />
+            <Loader2 className="h-12 w-12 animate-spin text-[#22183a] mb-4" />
             <p className="text-gray-600">Loading RFX...</p>
           </div>
         </div>
@@ -815,7 +815,7 @@ const RFXViewer: React.FC = () => {
       <div className="container mx-auto px-4 py-8 max-w-6xl flex-1">
         {/* Header Card */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
+          <div className="bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
             <div className="flex items-start md:items-center justify-between gap-3">
               <div className="min-w-0">
                 <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight truncate">
@@ -845,7 +845,7 @@ const RFXViewer: React.FC = () => {
                       navigate('/my-company');
                     }
                   }}
-                  className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+                  className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
@@ -858,23 +858,23 @@ const RFXViewer: React.FC = () => {
         {/* Tabs Navigation */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-5 h-14 bg-[#f1f1f1] rounded-2xl p-1.5 mb-8 border border-white/60 shadow-inner">
-            <TabsTrigger value="info" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="info" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <FileText className="w-4 h-4" />
               RFX Specifications
             </TabsTrigger>
-            <TabsTrigger value="documents" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="documents" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <UploadIcon className="w-4 h-4" />
               Generate Proposal
             </TabsTrigger>
-            <TabsTrigger value="announcements" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="announcements" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <MessageSquare className="w-4 h-4" />
               Announcements
             </TabsTrigger>
-            <TabsTrigger value="chat" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="chat" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <MessagesSquare className="w-4 h-4" />
               Chat
             </TabsTrigger>
-            <TabsTrigger value="details" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="details" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <Info className="w-4 h-4" />
               RFX Details
             </TabsTrigger>
@@ -887,7 +887,7 @@ const RFXViewer: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-semibold text-[#1A1F2C]">
+                      <h3 className="text-lg font-semibold text-[#22183a]">
                         Submit Proposal
                       </h3>
                       <TooltipProvider delayDuration={50}>
@@ -895,7 +895,7 @@ const RFXViewer: React.FC = () => {
                           <TooltipTrigger asChild>
                             <button
                               type="button"
-                              className="text-[#80c8f0] hover:text-[#1A1F2C] transition-colors cursor-help"
+                              className="text-[#f4a9aa] hover:text-[#22183a] transition-colors cursor-help"
                               aria-label="What happens after you submit?"
                             >
                               <HelpCircle className="h-5 w-5" />
@@ -908,7 +908,7 @@ const RFXViewer: React.FC = () => {
                                 The buyer will be notified that your company has submitted documents for review and will have direct access to them.
                               </p>
                               <p className="text-sm">
-                                In the future, an FQ agent will help evaluate proposals before sending them to ensure they meet all the conditions specified in the RFX.
+                                In the future, a Qanvit agent will help evaluate proposals before sending them to ensure they meet all the conditions specified in the RFX.
                               </p>
                             </div>
                           </TooltipContent>
@@ -924,7 +924,7 @@ const RFXViewer: React.FC = () => {
                   <Button
                     onClick={submitButtonProps.onOpenSubmitModal}
                     disabled={!submitButtonProps.canSubmit || submitButtonProps.isSubmitting}
-                    className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-[#1A1F2C]"
+                    className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a]"
                   >
                     {submitButtonProps.isSubmitting ? (
                       <>
@@ -944,12 +944,12 @@ const RFXViewer: React.FC = () => {
           )}
 
           {activeTab === "documents" && submitButtonProps && submitButtonProps.isSubmitted && (
-            <Card className="border border-[#7de19a] rounded-xl shadow-sm bg-[#7de19a]/10 mb-6">
+            <Card className="border border-[#f4a9aa] rounded-xl shadow-sm bg-[#f4a9aa]/10 mb-6">
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-[#7de19a]" />
+                  <CheckCircle2 className="h-5 w-5 text-[#f4a9aa]" />
                   <div>
-                    <h3 className="text-lg font-semibold text-[#1A1F2C] mb-1">
+                    <h3 className="text-lg font-semibold text-[#22183a] mb-1">
                       Proposal Submitted
                     </h3>
                     <p className="text-sm text-gray-600">
@@ -966,13 +966,13 @@ const RFXViewer: React.FC = () => {
             {/* RFX Details Card */}
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle className="text-xl text-[#1A1F2C]">RFX Details</CardTitle>
+                <CardTitle className="text-xl text-[#22183a]">RFX Details</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Creator */}
                 {invitation.creator && (
                   <div className="p-4 bg-muted/50 rounded-lg">
-                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-2 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-[#22183a] mb-2 flex items-center gap-2">
                       <Users className="h-4 w-4" />
                       Creator
                     </h4>
@@ -995,7 +995,7 @@ const RFXViewer: React.FC = () => {
                 {/* Members */}
                 {members.length > 0 && (
                   <div className="p-4 bg-muted/50 rounded-lg">
-                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-2 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-[#22183a] mb-2 flex items-center gap-2">
                       <Users className="h-4 w-4" />
                       Members ({members.length})
                     </h4>
@@ -1022,7 +1022,7 @@ const RFXViewer: React.FC = () => {
                 {/* Timeline */}
                 {timeline.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                       <Calendar className="h-4 w-4" />
                       Project Timeline
                     </h4>
@@ -1063,7 +1063,7 @@ const RFXViewer: React.FC = () => {
                           size="sm"
                           onClick={() => viewDocument('rfx-ndas', originalNda.file_path, 'Original NDA')}
                           disabled={loadingFile?.bucket === 'rfx-ndas' && loadingFile?.filePath === originalNda.file_path}
-                          className="flex-1 bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                          className="flex-1 bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                         >
                           {loadingFile?.type === 'view' && loadingFile?.bucket === 'rfx-ndas' && loadingFile?.filePath === originalNda.file_path ? (
                             <>
@@ -1132,7 +1132,7 @@ const RFXViewer: React.FC = () => {
                           size="sm"
                           onClick={() => viewDocument('rfx-signed-ndas', signedNda.file_path, 'Signed NDA')}
                           disabled={loadingFile?.bucket === 'rfx-signed-ndas' && loadingFile?.filePath === signedNda.file_path}
-                          className="flex-1 bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                          className="flex-1 bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                         >
                           {loadingFile?.type === 'view' && loadingFile?.bucket === 'rfx-signed-ndas' && loadingFile?.filePath === signedNda.file_path ? (
                             <>
@@ -1225,7 +1225,7 @@ const RFXViewer: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center gap-2 text-xl">
-                      <FileText className="h-5 w-5 text-[#1A1F2C]" />
+                      <FileText className="h-5 w-5 text-[#22183a]" />
                       Specifications
                     </CardTitle>
                     <CardDescription>
@@ -1235,7 +1235,7 @@ const RFXViewer: React.FC = () => {
                   <Button
                     onClick={viewSpecsPDF}
                     disabled={isGeneratingSpecsPdf}
-                    className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                    className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                   >
                     {isGeneratingSpecsPdf ? (
                       <>
@@ -1417,7 +1417,7 @@ const RFXViewer: React.FC = () => {
                                 className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
                               >
                                 <div className="flex items-center gap-3 min-w-0">
-                                  <FileText className="h-5 w-5 text-[#1A1F2C] flex-shrink-0" />
+                                  <FileText className="h-5 w-5 text-[#22183a] flex-shrink-0" />
                                   <div className="min-w-0">
                                     <p className="text-sm font-medium text-gray-900 truncate">{file.originalName}</p>
                                     <p className="text-xs text-gray-500">
@@ -1479,7 +1479,7 @@ const RFXViewer: React.FC = () => {
                           <div className="space-y-6">
                             {imageCategories.map((category) => (
                               <div key={category.id} className="space-y-3">
-                                <h4 className="text-sm font-semibold text-[#1A1F2C]">
+                                <h4 className="text-sm font-semibold text-[#22183a]">
                                   {category.name} ({category.images.length} {category.images.length === 1 ? 'image' : 'images'})
                                 </h4>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -1556,7 +1556,7 @@ const RFXViewer: React.FC = () => {
         <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#1A1F2C]" />
+              <FileText className="h-5 w-5 text-[#22183a]" />
               {viewingPdf?.title}
             </DialogTitle>
           </DialogHeader>
@@ -1569,7 +1569,7 @@ const RFXViewer: React.FC = () => {
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>
@@ -1589,7 +1589,7 @@ const RFXViewer: React.FC = () => {
         <DialogContent className="max-w-[90vw] w-[90vw] h-[90vh] max-h-[90vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <ImageIcon className="h-5 w-5 text-[#1A1F2C]" />
+              <ImageIcon className="h-5 w-5 text-[#22183a]" />
               Image Preview
             </DialogTitle>
           </DialogHeader>
@@ -1604,7 +1604,7 @@ const RFXViewer: React.FC = () => {
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>

@@ -46,7 +46,7 @@ const RFXFloatingAssistant: React.FC<RFXFloatingAssistantProps> = ({
   const partialContent = (
     <>
       <p>Great progress! You've started filling out your RFX specifications.</p>
-      <p className="font-semibold text-[#80c8f0]">You're still missing:</p>
+      <p className="font-semibold text-[#f4a9aa]">You're still missing:</p>
       <ul className="list-disc ml-5 space-y-1">
         {missingFields.map(field => (
           <li key={field}>{field}</li>
@@ -62,7 +62,7 @@ const RFXFloatingAssistant: React.FC<RFXFloatingAssistantProps> = ({
       <p>Here's the flow to complete an RFX:</p>
       <ol className="list-decimal ml-5 space-y-1">
         <li>Fill in the RFX specifications (with help from the RFX Agent).</li>
-        <li>Select candidate suppliers manually or using FQ's database.</li>
+        <li>Select candidate suppliers manually or using Qanvit's database.</li>
         <li>Generate the documentation automatically and send the RFX in-platform.</li>
       </ol>
       <p>Let's start by filling in the RFX specifications!</p>
@@ -74,7 +74,7 @@ const RFXFloatingAssistant: React.FC<RFXFloatingAssistantProps> = ({
     <>
       <p>Excellent! Your RFX specifications are complete. 🎉</p>
       <p>Now it's time to select the candidate suppliers for your RFX.</p>
-      <p>Don't worry, <span className="font-semibold text-[#80c8f0]">FQ will help you</span> select the best candidates from our extensive database. You can also add candidates manually if you prefer.</p>
+      <p>Don't worry, <span className="font-semibold text-[#f4a9aa]">Qanvit will help you</span> select the best candidates from our extensive database. You can also add candidates manually if you prefer.</p>
       <p>Let's find the perfect suppliers for your project!</p>
     </>
   );

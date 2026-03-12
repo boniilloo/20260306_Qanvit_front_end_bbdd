@@ -246,13 +246,13 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
               />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#1A1F2C]">{supplier.supplier_name}</h2>
+              <h2 className="text-2xl font-bold text-[#22183a]">{supplier.supplier_name}</h2>
               {supplier.company_website && (
                 <a
                   href={supplier.company_website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-[#80c8f0] hover:underline"
+                  className="text-sm text-[#f4a9aa] hover:underline"
                 >
                   {supplier.company_website}
                 </a>
@@ -284,7 +284,7 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
           <TabsContent value="summary" className="space-y-6">
             {/* Executive Summary */}
             <div className="bg-[#f1f1f1] rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-3 text-[#1A1F2C]">Executive summary (AI)</h3>
+              <h3 className="text-lg font-semibold mb-3 text-[#22183a]">Executive summary (AI)</h3>
               
               {/* Scope */}
               <div className="mb-4">
@@ -307,12 +307,12 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
           {/* Commercial Tab */}
           <TabsContent value="commercial">
             <div className="bg-[#f1f1f1] rounded-lg p-4">
-              <h3 className="text-lg font-semibold mb-3 text-[#1A1F2C]">Commercial Summary</h3>
+              <h3 className="text-lg font-semibold mb-3 text-[#22183a]">Commercial Summary</h3>
               
               {commercial_summary.total_price_main && (
                 <div className="mb-3">
                   <span className="font-semibold text-sm">Total Price:</span>
-                  <p className="text-2xl font-bold text-[#1A1F2C]">
+                  <p className="text-2xl font-bold text-[#22183a]">
                     {commercial_summary.currency || '$'}{commercial_summary.total_price_main.toLocaleString()}
                   </p>
                 </div>
@@ -331,7 +331,7 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
           <TabsContent value="attachments">
             {loadingDocuments ? (
               <div className="flex justify-center items-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-[#80c8f0]" />
+                <Loader2 className="h-6 w-6 animate-spin text-[#f4a9aa]" />
               </div>
             ) : documents.length === 0 ? (
               <div className="bg-[#f1f1f1] rounded-lg p-8 text-center">
@@ -343,7 +343,7 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
                 {/* Proposal Documents */}
                 {documentsByCategory.proposal.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       Proposal ({documentsByCategory.proposal.length})
                     </h4>
@@ -354,7 +354,7 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
                           className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <FileText className="h-5 w-5 text-[#1A1F2C] flex-shrink-0" />
+                            <FileText className="h-5 w-5 text-[#22183a] flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 truncate">
                                 {doc.file_name.replace('.enc', '')}
@@ -391,7 +391,7 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
                 {/* Offer Documents */}
                 {documentsByCategory.offer.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       Offer ({documentsByCategory.offer.length})
                     </h4>
@@ -402,7 +402,7 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
                           className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <FileText className="h-5 w-5 text-[#1A1F2C] flex-shrink-0" />
+                            <FileText className="h-5 w-5 text-[#22183a] flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 truncate">
                                 {doc.file_name.replace('.enc', '')}
@@ -439,7 +439,7 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
                 {/* Other Documents */}
                 {documentsByCategory.other.length > 0 && (
                   <div>
-                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                       <FileText className="h-4 w-4" />
                       Other Documents ({documentsByCategory.other.length})
                     </h4>
@@ -450,7 +450,7 @@ const ProposalView: React.FC<ProposalViewProps> = ({ supplier, rfxId }) => {
                           className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <FileText className="h-5 w-5 text-[#1A1F2C] flex-shrink-0" />
+                            <FileText className="h-5 w-5 text-[#22183a] flex-shrink-0" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-gray-900 truncate">
                                 {doc.file_name.replace('.enc', '')}

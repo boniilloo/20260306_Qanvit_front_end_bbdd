@@ -166,7 +166,7 @@ const {
 | Rango | Color | Hex |
 |-------|-------|-----|
 | ≥85% | Verde | `#7de19a` |
-| ≥70% | Azul claro | `#80c8f0` |
+| ≥70% | Azul claro | `#f4a9aa` |
 | ≥50% | Amarillo | `#f5d547` |
 | <50% | Rojo | `#ff6b6b` |
 
@@ -179,8 +179,8 @@ const {
 | D o menor | Rojo | `#ff6b6b` |
 
 ### Plataforma
-- **Azul oscuro:** `#1A1F2C`
-- **Azul claro:** `#80c8f0`
+- **Azul oscuro:** `#22183a`
+- **Azul claro:** `#f4a9aa`
 - **Gris:** `#f1f1f1`
 - **Verde:** `#7de19a`
 

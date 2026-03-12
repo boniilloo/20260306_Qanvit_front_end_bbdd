@@ -32,11 +32,20 @@ const getFunctionsUrl = (functionName: string) => {
   // Check if we are using local Supabase
   const USE_LOCAL = import.meta.env.VITE_USE_LOCAL_SUPABASE === 'true';
   const LOCAL_URL = import.meta.env.VITE_SUPABASE_LOCAL_URL || 'http://127.0.0.1:54321';
-  const REMOTE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://fukzxedgbszcpakqkrjf.supabase.co';
+  const REMOTE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://bymbfjkezrwsuvbsaycg.supabase.co';
   
   const baseUrl = USE_LOCAL ? LOCAL_URL : REMOTE_URL;
   
   return `${baseUrl}/functions/v1/${functionName}`;
+};
+
+const getSupabasePublishableKey = () => {
+  const USE_LOCAL = import.meta.env.VITE_USE_LOCAL_SUPABASE === 'true';
+  const LOCAL_ANON_KEY =
+    import.meta.env.VITE_SUPABASE_LOCAL_ANON_KEY || 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH';
+  const REMOTE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+
+  return USE_LOCAL ? LOCAL_ANON_KEY : REMOTE_ANON_KEY;
 };
 
 // Track pending initializations to prevent concurrent calls for the same user
@@ -87,6 +96,7 @@ export const userCrypto = {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${session.access_token}`,
+        "apikey": getSupabasePublishableKey(),
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -309,6 +319,7 @@ export const userCrypto = {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${session.access_token}`,
+        "apikey": getSupabasePublishableKey(),
         "Content-Type": "application/json"
       },
       body: JSON.stringify({

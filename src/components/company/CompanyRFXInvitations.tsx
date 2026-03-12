@@ -379,11 +379,11 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
     
     let badgeClassName = '';
     if (displayStatus === 'New invitation') {
-      badgeClassName = 'bg-[#7de19a] text-white border-[#7de19a] hover:bg-[#7de19a] hover:opacity-100';
+      badgeClassName = 'bg-[#f4a9aa] text-white border-[#f4a9aa] hover:bg-[#f4a9aa] hover:opacity-100';
     } else if (displayStatus === 'Under review') {
-      badgeClassName = 'bg-[#80c8f0] text-white border-[#80c8f0] hover:bg-[#80c8f0] hover:opacity-100';
+      badgeClassName = 'bg-[#f4a9aa] text-white border-[#f4a9aa] hover:bg-[#f4a9aa] hover:opacity-100';
     } else if (displayStatus === 'Submitted') {
-      badgeClassName = 'bg-[#1A1F2C] text-white border-[#1A1F2C] hover:bg-[#1A1F2C] hover:opacity-100';
+      badgeClassName = 'bg-[#22183a] text-white border-[#22183a] hover:bg-[#22183a] hover:opacity-100';
     } else {
       badgeClassName = 'bg-gray-100 text-gray-800 border-gray-300 hover:bg-gray-100';
     }
@@ -506,7 +506,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
       {/* Global loading indicator */}
       {loading && (
         <div className="flex items-center gap-2 text-sm mt-2 text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin text-[#80c8f0]" />
+          <Loader2 className="h-4 w-4 animate-spin text-[#f4a9aa]" />
           Loading invitations...
         </div>
       )}
@@ -519,12 +519,12 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                 {!searchQuery && statusFilter === 'all' ? (
                   <>
                     <div className="flex justify-center">
-                      <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: '#80c8f0', color: '#1A1F2C' }}>
+                      <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f4a9aa', color: '#22183a' }}>
                         <FileText className="w-8 h-8" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-semibold" style={{ color: '#1A1F2C' }}>
+                      <h3 className="text-xl font-semibold" style={{ color: '#22183a' }}>
                         No new invitations yet
                       </h3>
                       <p className="text-gray-600 text-base">
@@ -535,7 +535,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                       <Button
                         onClick={handleNavigateToCompanyInfo}
                         className="font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-                        style={{ backgroundColor: '#1A1F2C', color: '#ffffff' }}
+                        style={{ backgroundColor: '#22183a', color: '#ffffff' }}
                       >
                         <Building2 className="w-4 h-4 mr-2" />
                         Update company info
@@ -544,7 +544,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                         onClick={handleNavigateToProductsInfo}
                         variant="outline"
                         className="font-semibold border-2 shadow-md hover:shadow-lg transition-all duration-300"
-                        style={{ borderColor: '#80c8f0', color: '#1A1F2C' }}
+                        style={{ borderColor: '#f4a9aa', color: '#22183a' }}
                       >
                         <Package className="w-4 h-4 mr-2" />
                         Update products info
@@ -579,7 +579,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
               {/* First row: Title, Description (80% width) and Status Badge (20% width) */}
               <div className="flex items-start justify-between mb-4 gap-4">
                 <div className="flex-1" style={{ maxWidth: '80%' }}>
-                  <div className="bg-gray-100 border-l-4 p-3 rounded" style={{ borderLeftColor: '#80c8f0' }}>
+                  <div className="bg-gray-100 border-l-4 p-3 rounded" style={{ borderLeftColor: '#f4a9aa' }}>
                     <h4 className="font-medium text-lg truncate">{invitation.rfx_name || 'RFX'}</h4>
                     <p className="text-sm text-muted-foreground truncate mt-1">
                       {invitation.rfx_description || 'No description available'}
@@ -608,7 +608,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                   )}
                   <div className="flex items-center gap-1 text-xs text-green-600">
                     <CheckCircle className="h-3 w-3 flex-shrink-0" />
-                    <span>Validated by FQ Source</span>
+                    <span>Validated by Qanvit</span>
                   </div>
                   {(invitation.status === 'supplier evaluating RFX' || invitation.status === 'submitted') && (
                     <div className="text-xs text-muted-foreground">
@@ -629,13 +629,13 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                     return (
                       <div className="space-y-1">
                         <div className="text-xs font-medium text-muted-foreground">Next milestone</div>
-                        <div className="flex items-center gap-2 p-2 rounded-lg border" style={{ borderColor: '#80c8f0', backgroundColor: 'rgba(128, 200, 240, 0.1)' }}>
-                          <Calendar className="h-4 w-4 flex-shrink-0" style={{ color: '#1A1F2C' }} />
+                        <div className="flex items-center gap-2 p-2 rounded-lg border" style={{ borderColor: '#f4a9aa', backgroundColor: 'rgba(128, 200, 240, 0.1)' }}>
+                          <Calendar className="h-4 w-4 flex-shrink-0" style={{ color: '#22183a' }} />
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm font-medium truncate" style={{ color: '#1A1F2C' }}>
+                            <div className="text-sm font-medium truncate" style={{ color: '#22183a' }}>
                               {invitation.nextDeadline.label}
                             </div>
-                            <div className="text-xs" style={{ color: '#1A1F2C' }}>
+                            <div className="text-xs" style={{ color: '#22183a' }}>
                               {deadlineDate.toLocaleDateString('en-US', { 
                                 year: 'numeric', 
                                 month: 'short', 
@@ -659,7 +659,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                     <>
                       <Button 
                         size="sm" 
-                        className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white whitespace-nowrap"
+                        className="bg-[#22183a] hover:bg-[#22183a]/90 text-white whitespace-nowrap"
                         onClick={() => navigate(`/rfx-viewer/${invitation.id}`)}
                       >
                         <ExternalLink className="h-3 w-3 mr-1" />
@@ -706,7 +706,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                 <div className="flex gap-2 mt-4">
                   <Button 
                     size="sm" 
-                    className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white" 
+                    className="bg-[#22183a] hover:bg-[#22183a]/90 text-white" 
                     onClick={() => handleAcceptInvitation(invitation.id)}
                     disabled={loading || processingInvitation[invitation.id]}
                   >
@@ -750,9 +750,9 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
               {invitation.status === 'waiting NDA signing' && (
                 <div className="mt-4 space-y-4">
                   {/* Info message spanning both columns */}
-                  <div className="flex items-start gap-3 p-3 rounded-lg border-2" style={{ borderColor: '#80c8f0', backgroundColor: 'rgba(128, 200, 240, 0.15)' }}>
-                    <Info className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: '#1A1F2C' }} />
-                    <p className="text-sm font-medium" style={{ color: '#1A1F2C' }}>
+                  <div className="flex items-start gap-3 p-3 rounded-lg border-2" style={{ borderColor: '#f4a9aa', backgroundColor: 'rgba(128, 200, 240, 0.15)' }}>
+                    <Info className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: '#22183a' }} />
+                    <p className="text-sm font-medium" style={{ color: '#22183a' }}>
                       The buyer has uploaded an NDA to protect their information before sharing RFX details. You must upload a signed copy before accessing the RFX data.
                     </p>
                   </div>
@@ -859,7 +859,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                           <div className="flex flex-col items-center gap-2">
                             {(uploadingSignedNda[invitation.id] || uploadingNDAWithCheck[invitation.id]) ? (
                               <>
-                                <Loader2 className="h-8 w-8 text-[#80c8f0] animate-spin" />
+                                <Loader2 className="h-8 w-8 text-[#f4a9aa] animate-spin" />
                                 <p className="text-sm font-medium text-gray-700">Uploading...</p>
                               </>
                             ) : (
@@ -882,10 +882,10 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                   </div>
                   </div>
                   {signedNdaMetadata[invitation.id] && (
-                    <div className="mt-4 p-3 rounded-lg border-2" style={{ borderColor: '#7de19a', backgroundColor: 'rgba(125, 225, 154, 0.15)' }}>
-                      <p className="text-sm font-medium" style={{ color: '#1A1F2C' }}>
-                        The NDA has been sent to FQ reviewers for validation before you can access the RFX content. This process should not take more than a few hours. Please contact us at{' '}
-                        <a href="mailto:contact@fqsource.com" className="underline hover:no-underline" style={{ color: '#1A1F2C' }}>
+                    <div className="mt-4 p-3 rounded-lg border-2" style={{ borderColor: '#f4a9aa', backgroundColor: 'rgba(244, 169, 170, 0.15)' }}>
+                      <p className="text-sm font-medium" style={{ color: '#22183a' }}>
+                        The NDA has been sent to Qanvit reviewers for validation before you can access the RFX content. This process should not take more than a few hours. Please contact us at{' '}
+                        <a href="mailto:contact@fqsource.com" className="underline hover:no-underline" style={{ color: '#22183a' }}>
                           contact@fqsource.com
                         </a>
                         {' '}if you have any questions.
@@ -898,9 +898,9 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
               {invitation.status === 'NDA signed by supplier' && (
                 <div className="mt-4 space-y-4">
                   {/* Info message spanning both columns */}
-                  <div className="flex items-start gap-3 p-3 rounded-lg border-2" style={{ borderColor: '#80c8f0', backgroundColor: 'rgba(128, 200, 240, 0.15)' }}>
-                    <Info className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: '#1A1F2C' }} />
-                    <p className="text-sm font-medium" style={{ color: '#1A1F2C' }}>
+                  <div className="flex items-start gap-3 p-3 rounded-lg border-2" style={{ borderColor: '#f4a9aa', backgroundColor: 'rgba(128, 200, 240, 0.15)' }}>
+                    <Info className="h-4 w-4 flex-shrink-0 mt-0.5" style={{ color: '#22183a' }} />
+                    <p className="text-sm font-medium" style={{ color: '#22183a' }}>
                       The buyer has uploaded an NDA to protect their information before sharing RFX details. You must upload a signed copy before accessing the RFX data.
                     </p>
                   </div>
@@ -1007,7 +1007,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                           <div className="flex flex-col items-center gap-2">
                             {(uploadingSignedNda[invitation.id] || uploadingNDAWithCheck[invitation.id]) ? (
                               <>
-                                <Loader2 className="h-8 w-8 text-[#80c8f0] animate-spin" />
+                                <Loader2 className="h-8 w-8 text-[#f4a9aa] animate-spin" />
                                 <p className="text-sm font-medium text-gray-700">Uploading...</p>
                               </>
                             ) : (
@@ -1030,10 +1030,10 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                   </div>
                   </div>
                   {signedNdaMetadata[invitation.id] && (
-                    <div className="mt-4 p-3 rounded-lg border-2" style={{ borderColor: '#7de19a', backgroundColor: 'rgba(125, 225, 154, 0.15)' }}>
-                      <p className="text-sm font-medium" style={{ color: '#1A1F2C' }}>
-                        The NDA has been sent to FQ reviewers for validation before you can access the RFX content. This process should not take more than a few hours. Please contact us at{' '}
-                        <a href="mailto:contact@fqsource.com" className="underline hover:no-underline" style={{ color: '#1A1F2C' }}>
+                    <div className="mt-4 p-3 rounded-lg border-2" style={{ borderColor: '#f4a9aa', backgroundColor: 'rgba(244, 169, 170, 0.15)' }}>
+                      <p className="text-sm font-medium" style={{ color: '#22183a' }}>
+                        The NDA has been sent to Qanvit reviewers for validation before you can access the RFX content. This process should not take more than a few hours. Please contact us at{' '}
+                        <a href="mailto:contact@fqsource.com" className="underline hover:no-underline" style={{ color: '#22183a' }}>
                           contact@fqsource.com
                         </a>
                         {' '}if you have any questions.
@@ -1103,7 +1103,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                 Your signed NDA has been uploaded successfully. The next steps in the process are:
               </p>
               <ol className="list-decimal list-inside space-y-1 ml-2">
-                <li>FQ Source will validate that the uploaded document is correct</li>
+                <li>Qanvit will validate that the uploaded document is correct</li>
                 <li>You will be notified when the validation process is complete</li>
                 <li>Once validated, the RFX information will be displayed</li>
               </ol>
@@ -1156,7 +1156,7 @@ const CompanyRFXInvitations: React.FC<CompanyRFXInvitationsProps> = ({ companyId
                   archiveInvitation(invitationId);
                   setArchiveDialogOpen(prev => ({ ...prev, [invitationId]: false }));
                 }}
-                className="bg-[#1A1F2C] text-white hover:bg-[#1A1F2C]/90"
+                className="bg-[#22183a] text-white hover:bg-[#22183a]/90"
               >
                 Archive
               </AlertDialogAction>

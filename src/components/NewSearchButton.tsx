@@ -53,7 +53,7 @@ const NewSearchButton: React.FC<NewSearchButtonProps> = ({ onClick }) => {
   return (
     <>
       <button 
-        className="flex items-center gap-2 text-white font-medium px-5 py-2.5 rounded-[20px] transition-colors shadow-md" style={{backgroundColor: '#80c8f0'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5DB8ED'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#80c8f0'}
+        className="flex items-center gap-2 text-white font-medium px-5 py-2.5 rounded-[20px] transition-colors shadow-md" style={{backgroundColor: '#f4a9aa'}} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5DB8ED'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f4a9aa'}
         onClick={handleClick}
       >
         <History size={16} />

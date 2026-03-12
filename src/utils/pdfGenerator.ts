@@ -734,7 +734,7 @@ export const generateRFXSpecsPDF = async (
           img.crossOrigin = 'anonymous'; // Enable CORS
           img.onload = () => resolve(img);
           img.onerror = () => reject(new Error('Failed to load logo'));
-          img.src = 'https://fukzxedgbszcpakqkrjf.supabase.co/storage/v1/object/public/fq-logos//logo_200x200.png';
+          img.src = 'https://bymbfjkezrwsuvbsaycg.supabase.co/storage/v1/object/public/fq-logos/logo_200x200.png';
         });
       };
       
@@ -855,12 +855,12 @@ export const generateRFXSpecsPDF = async (
         }
       }
       
-      // Footer text - "Generated using FQ Source" (next to logo)
-      pdf.setTextColor(26, 31, 44); // FQ Source brand color
+      // Footer text - "Generated using Qanvit" (next to logo)
+      pdf.setTextColor(26, 31, 44); // Qanvit brand color
       pdf.setFontSize(8);
       pdf.setFont('helvetica', 'italic');
       
-      const linkText = 'Generated using FQ Source';
+      const linkText = 'Generated using Qanvit';
       const linkWidth = pdf.getTextWidth(linkText);
       pdf.text(linkText, currentX, footerY);
       
@@ -1157,8 +1157,8 @@ export const generateRFXCandidatesReport = async (data: RFXCandidatesReportData,
     const contentHeight = pageHeight - 2 * margin - 15; // Reserve space for footer
 
     // Brand colors
-    const darkBlue = [26, 31, 44]; // #1A1F2C
-    const lightBlue = [128, 200, 240]; // #80c8f0
+    const darkBlue = [26, 31, 44]; // #22183a
+    const lightBlue = [128, 200, 240]; // #f4a9aa
 
     // Helper to extract justification data
     const getJustificationData = (propuesta: Propuesta) => {
@@ -1202,7 +1202,7 @@ export const generateRFXCandidatesReport = async (data: RFXCandidatesReportData,
           img.crossOrigin = 'anonymous';
           img.onload = () => resolve(img);
           img.onerror = () => reject(new Error('Failed to load logo'));
-          img.src = 'https://fukzxedgbszcpakqkrjf.supabase.co/storage/v1/object/public/fq-logos//logo_200x200.png';
+          img.src = 'https://bymbfjkezrwsuvbsaycg.supabase.co/storage/v1/object/public/fq-logos/logo_200x200.png';
         });
       };
       logoImage = await loadLogo();
@@ -1219,7 +1219,7 @@ export const generateRFXCandidatesReport = async (data: RFXCandidatesReportData,
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(36);
     pdf.setFont('helvetica', 'bold');
-    const titleText = 'FQ Candidates Report';
+    const titleText = 'Qanvit Candidates Report';
     const titleWidth = pdf.getTextWidth(titleText);
     pdf.text(titleText, (pageWidth - titleWidth) / 2, 60);
 
@@ -1901,7 +1901,7 @@ export const generateRFXCandidatesReport = async (data: RFXCandidatesReportData,
       // Footer text
       pdf.setFontSize(7);
       pdf.setFont('helvetica', 'italic');
-      const linkText = 'Generated using FQ Source';
+      const linkText = 'Generated using Qanvit';
       const linkWidth = pdf.getTextWidth(linkText);
       
       // Add white background on first page (cover page) so logo and text are visible
@@ -1970,7 +1970,7 @@ export const generateRFXCandidatesReport = async (data: RFXCandidatesReportData,
         newWindow.document.write(`
           <html>
             <head>
-              <title>FQ Candidates Report - ${data.rfxName}</title>
+              <title>Qanvit Candidates Report - ${data.rfxName}</title>
               <style>
                 body { 
                   margin: 0; 
@@ -1987,7 +1987,7 @@ export const generateRFXCandidatesReport = async (data: RFXCandidatesReportData,
               </style>
             </head>
             <body>
-              <iframe src="${url}" title="FQ Candidates Report PDF"></iframe>
+              <iframe src="${url}" title="Qanvit Candidates Report PDF"></iframe>
               
               <script>
                 setTimeout(() => {

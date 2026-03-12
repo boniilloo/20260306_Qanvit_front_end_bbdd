@@ -39,7 +39,7 @@ const AgentHelperDialog: React.FC<AgentHelperDialogProps> = ({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg">
-            <Lightbulb className="h-5 w-5 text-[#80c8f0]" />
+            <Lightbulb className="h-5 w-5 text-[#f4a9aa]" />
             Save Time with AI Assistant
           </DialogTitle>
           <DialogDescription className="text-sm leading-relaxed">
@@ -50,7 +50,7 @@ const AgentHelperDialog: React.FC<AgentHelperDialogProps> = ({
         </DialogHeader>
         
         <div className="py-4">
-          <div className="bg-[#80c8f0]/10 border border-[#80c8f0]/20 rounded-lg p-4">
+          <div className="bg-[#f4a9aa]/10 border border-[#f4a9aa]/20 rounded-lg p-4">
             <p className="text-sm text-gray-700 leading-relaxed">
               The AI assistant can help you create comprehensive and professional content 
               for your RFX specifications. Simply describe what you need in the chat, 
@@ -62,7 +62,7 @@ const AgentHelperDialog: React.FC<AgentHelperDialogProps> = ({
         <DialogFooter>
           <Button
             onClick={onClose}
-            className="w-full bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+            className="w-full bg-[#22183a] hover:bg-[#22183a]/90 text-white"
           >
             Got it, thanks!
           </Button>

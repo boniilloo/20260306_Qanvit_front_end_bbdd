@@ -44,7 +44,7 @@ export const FeedbackThankYouModal: React.FC<FeedbackThankYouModalProps> = ({
             onClick={handleBackToHome}
             className="w-full"
           >
-            Back to FQ Source
+            Back to Qanvit
           </Button>
         </div>
       </DialogContent>

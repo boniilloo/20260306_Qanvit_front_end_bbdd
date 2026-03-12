@@ -908,7 +908,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
       <Card>
         <CardContent className="py-12">
           <div className="flex justify-center items-center">
-            <Loader2 className="h-6 w-6 animate-spin text-[#1A1F2C]" />
+            <Loader2 className="h-6 w-6 animate-spin text-[#22183a]" />
           </div>
         </CardContent>
       </Card>
@@ -1000,7 +1000,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
                       className="flex items-center justify-between p-2 bg-white border border-gray-200 rounded"
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <FileText className="h-4 w-4 text-[#1A1F2C] flex-shrink-0" />
+                        <FileText className="h-4 w-4 text-[#22183a] flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {file.name}
@@ -1029,7 +1029,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
               <Button
                 onClick={handleSave}
                 disabled={!subject.trim() || !message.trim() || saving || uploadingFiles}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 {saving || uploadingFiles ? (
                   <>
@@ -1125,7 +1125,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
                         <Button
                           onClick={handleEdit}
                           disabled={!editSubject.trim() || !editMessage.trim() || saving}
-                          className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                          className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                         >
                           {saving ? (
                             <>
@@ -1147,7 +1147,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
                       {/* Header with creator info and actions */}
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <p className="font-semibold text-[#1A1F2C]">
+                          <p className="font-semibold text-[#22183a]">
                             {getCreatorName(announcement)}
                           </p>
                           <p className="text-xs text-gray-500">
@@ -1203,7 +1203,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
                       <div className="mb-4 pb-3 border-b border-gray-200">
                         <div className="flex items-start gap-2">
                           <span className="text-sm font-semibold text-gray-600 mt-1">Subject:</span>
-                          <h3 className="text-lg font-bold text-[#1A1F2C] flex-1">
+                          <h3 className="text-lg font-bold text-[#22183a] flex-1">
                             {announcement.subject}
                           </h3>
                         </div>
@@ -1230,7 +1230,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
                                 className="flex items-center justify-between p-2 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
                               >
                                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                                  <FileText className="h-4 w-4 text-[#1A1F2C] flex-shrink-0" />
+                                  <FileText className="h-4 w-4 text-[#22183a] flex-shrink-0" />
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium text-gray-900 truncate">
                                       {attachment.file_name}
@@ -1325,7 +1325,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
         <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#1A1F2C]" />
+              <FileText className="h-5 w-5 text-[#22183a]" />
               {viewingPdf?.title}
             </DialogTitle>
           </DialogHeader>
@@ -1338,7 +1338,7 @@ const AnnouncementsBoard: React.FC<AnnouncementsBoardProps> = ({
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>

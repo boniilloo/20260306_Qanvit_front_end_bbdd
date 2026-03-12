@@ -75,7 +75,7 @@ const extractCidRefs = (html: string): string[] => {
   return Array.from(refs);
 };
 
-const defaultBodyHtml = `<h1 style="margin:0 0 16px;">Hello from FQ Source</h1>
+const defaultBodyHtml = `<h1 style="margin:0 0 16px;">Hello from Qanvit</h1>
 <p style="margin:0 0 12px;">Write your HTML message here.</p>`;
 
 const DeveloperMailAllMembers = () => {
@@ -691,7 +691,7 @@ const DeveloperMailAllMembers = () => {
                       className="min-h-[140px] font-mono text-sm"
                       value={signatureHtml}
                       onChange={(e) => setSignatureHtml(e.target.value)}
-                      placeholder="<p>FQ Source Team</p>"
+                      placeholder="<p>Qanvit Team</p>"
                     />
                     <div className="flex items-center gap-2">
                       <input

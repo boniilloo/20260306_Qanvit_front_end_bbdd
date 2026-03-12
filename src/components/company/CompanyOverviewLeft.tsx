@@ -151,7 +151,7 @@ const CompanyOverviewLeft: React.FC<CompanyOverviewLeftProps> = ({ data }) => {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-sm">
-                  Economic data has not yet been verified by FQ Source. This feature is under development.
+                  Economic data has not yet been verified by Qanvit. This feature is under development.
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

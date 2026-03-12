@@ -500,14 +500,14 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
                 <button
                   key={`${m.id}_qna_${idx}`}
                   type="button"
-                  className="w-full text-left rounded-lg border border-[#80c8f0]/40 bg-[#80c8f0]/10 px-3 py-2 hover:bg-[#80c8f0]/15 transition-colors"
+                  className="w-full text-left rounded-lg border border-[#f4a9aa]/40 bg-[#f4a9aa]/10 px-3 py-2 hover:bg-[#f4a9aa]/15 transition-colors"
                   onClick={() => {
                     if (!qnaId) return;
                     setActiveView('qna');
                     setFocusQnaId(qnaId);
                   }}
                 >
-                  <div className="text-xs font-semibold text-[#1A1F2C]">Q&amp;A reference</div>
+                  <div className="text-xs font-semibold text-[#22183a]">Q&amp;A reference</div>
                   <div className="text-[11px] text-gray-600">Click to open this question in the Q&amp;A view</div>
                 </button>
               );
@@ -534,14 +534,14 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
             return (
               <div key={`${m.id}_${idx}`} className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2">
                 <div className="min-w-0">
-                  <div className="text-xs font-medium text-[#1A1F2C] truncate">{filename}</div>
+                  <div className="text-xs font-medium text-[#22183a] truncate">{filename}</div>
                   <div className="text-[11px] text-gray-500">Encrypted attachment</div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {isImage && decryptFile && encryptedUrl && (
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1 text-xs text-[#1A1F2C] hover:underline"
+                      className="inline-flex items-center gap-1 text-xs text-[#22183a] hover:underline"
                       onClick={async () => {
                         try {
                           const url = await decryptImage(encryptedUrl, decryptFile);
@@ -606,7 +606,7 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
                       return (
                         <button
                           type="button"
-                          className="inline-flex items-center gap-1 text-xs text-[#1A1F2C] hover:underline"
+                          className="inline-flex items-center gap-1 text-xs text-[#22183a] hover:underline"
                           onClick={async () => {
                             try {
                               const blob = await decryptDocument(encryptedUrl, decryptFile);
@@ -631,7 +631,7 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
                   {decryptFile && encryptedUrl && (
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1 text-xs text-[#1A1F2C] hover:underline"
+                      className="inline-flex items-center gap-1 text-xs text-[#22183a] hover:underline"
                       onClick={async () => {
                         try {
                           await downloadDecryptedDocument(encryptedUrl, filename, decryptFile);
@@ -757,13 +757,13 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
       >
         <ToggleGroupItem
           value="chat"
-          className="h-8 px-3 rounded-md data-[state=on]:bg-[#80c8f0]/25 data-[state=on]:text-[#1A1F2C]"
+          className="h-8 px-3 rounded-md data-[state=on]:bg-[#f4a9aa]/25 data-[state=on]:text-[#22183a]"
         >
           Chat
         </ToggleGroupItem>
         <ToggleGroupItem
           value="qna"
-          className="h-8 px-3 rounded-md data-[state=on]:bg-[#80c8f0]/25 data-[state=on]:text-[#1A1F2C] relative"
+          className="h-8 px-3 rounded-md data-[state=on]:bg-[#f4a9aa]/25 data-[state=on]:text-[#22183a] relative"
         >
           Q&amp;A
           {qnaUnreadCount > 0 && (
@@ -903,7 +903,7 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
             <Card className="h-[70vh] overflow-hidden">
               <CardContent className="p-0">
                 <div className="px-4 py-3 border-b bg-[#f1f1f1]">
-                  <div className="text-sm font-semibold text-[#1A1F2C]">Supplier chats</div>
+                  <div className="text-sm font-semibold text-[#22183a]">Supplier chats</div>
                   <div className="text-xs text-gray-600">Select a supplier to message</div>
                 </div>
                 <div className="overflow-y-auto h-[calc(70vh-52px)]">
@@ -918,7 +918,7 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
                         key={s.companyId}
                         onClick={() => setSelectedCompanyId(s.companyId)}
                         className={`w-full px-4 py-3 flex items-center gap-3 border-b text-left hover:bg-gray-50 transition-colors ${
-                          isSelected ? 'bg-[#80c8f0]/10' : ''
+                          isSelected ? 'bg-[#f4a9aa]/10' : ''
                         }`}
                       >
                         <div className="relative">
@@ -938,19 +938,19 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between">
-                             <div className="text-sm font-medium text-[#1A1F2C] truncate">{s.companyName}</div>
+                             <div className="text-sm font-medium text-[#22183a] truncate">{s.companyName}</div>
                              {hasAnyUnread && (
                                 <span className="h-2 w-2 rounded-full bg-red-500 shrink-0"></span>
                              )}
                           </div>
                           <div className="flex items-center gap-2 text-xs truncate">
                             {unread > 0 && (
-                              <span className={`${hasAnyUnread ? 'text-[#1A1F2C] font-medium' : 'text-gray-600'}`}>
+                              <span className={`${hasAnyUnread ? 'text-[#22183a] font-medium' : 'text-gray-600'}`}>
                                 {unread} new message{unread > 1 ? 's' : ''}
                               </span>
                             )}
                             {qnaUnread > 0 && (
-                              <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-[#7de19a] text-[#1A1F2C] hover:bg-[#7de19a]">
+                              <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-[#f4a9aa] text-[#22183a] hover:bg-[#f4a9aa]">
                                 {qnaUnread} Q&A
                               </Badge>
                             )}
@@ -973,13 +973,13 @@ const RFXSupplierChat: React.FC<RFXSupplierChatProps> = ({
         {!isCryptoReady && (
           <div className="h-[70vh] flex flex-col rounded-xl border border-gray-200 bg-white overflow-hidden">
             <div className="px-4 py-3 border-b bg-[#f1f1f1] flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold text-[#1A1F2C]">
+              <div className="text-sm font-semibold text-[#22183a]">
                 {activeView === 'chat' ? 'Chat' : 'Questions & Answers'}
               </div>
               {viewToggle}
             </div>
             <div className="flex-1 flex items-center justify-center gap-3 text-sm text-gray-600">
-              <Loader2 className="h-5 w-5 animate-spin text-[#80c8f0]" />
+              <Loader2 className="h-5 w-5 animate-spin text-[#f4a9aa]" />
               Loading encryption keys...
             </div>
           </div>

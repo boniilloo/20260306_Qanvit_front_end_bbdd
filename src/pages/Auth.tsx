@@ -265,7 +265,7 @@ const Auth = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      {/* Back to FQ Link */}
+      {/* Back to Qanvit Link */}
       <div className="absolute top-6 left-6">
         <Button
           variant="ghost"
@@ -274,7 +274,7 @@ const Auth = () => {
           className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to FQ
+          Back to Qanvit
         </Button>
       </div>
       <Card className="w-full max-w-md">
@@ -282,13 +282,13 @@ const Auth = () => {
           <div className="flex justify-center mb-4">
             <div className="bg-white p-3 rounded-lg">
               <img 
-                src="/lovable-uploads/3662f278-506a-4f24-b806-5a4ef9b755a6.png" 
-                alt="FQ Logo" 
+                src="/branding/ISOTIPO_2-02.png" 
+                alt="Qanvit Logo" 
                 className="w-16 h-16 object-contain"
               />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Welcome to FQSource</CardTitle>
+          <CardTitle className="text-2xl font-bold">Welcome to Qanvit</CardTitle>
           <CardDescription>
             Sign in to your account or create a new one
           </CardDescription>

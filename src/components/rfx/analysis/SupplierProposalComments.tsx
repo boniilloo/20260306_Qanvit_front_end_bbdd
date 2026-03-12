@@ -221,11 +221,11 @@ const SupplierProposalComments: React.FC<SupplierProposalCommentsProps> = ({
   if (!supplierCompanyId) return null;
 
   return (
-    <Card className="border-[#80c8f0]/30">
+    <Card className="border-[#f4a9aa]/30">
       <CardContent className="pt-6 space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-[#1A1F2C]">Comments</h3>
+            <h3 className="text-sm font-semibold text-[#22183a]">Comments</h3>
             <p className="text-xs text-gray-500">
               Visible to RFX members. Stored encrypted with the RFX symmetric key.
             </p>
@@ -237,7 +237,7 @@ const SupplierProposalComments: React.FC<SupplierProposalCommentsProps> = ({
 
         {loading && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Loader2 className="h-4 w-4 animate-spin text-[#80c8f0]" />
+            <Loader2 className="h-4 w-4 animate-spin text-[#f4a9aa]" />
             Loading comments...
           </div>
         )}
@@ -255,7 +255,7 @@ const SupplierProposalComments: React.FC<SupplierProposalCommentsProps> = ({
             {comments.map((c) => (
               <div key={c.id} className="rounded-lg border border-gray-200 bg-white p-3">
                 <div className="flex items-center justify-between gap-3 mb-1">
-                  <div className="text-sm font-medium text-[#1A1F2C]">
+                  <div className="text-sm font-medium text-[#22183a]">
                     {formatName(c.author)} ({formatEmail(c.author)})
                   </div>
                   <div className="text-xs text-gray-500">{formatDate(c.createdAt)}</div>
@@ -274,14 +274,14 @@ const SupplierProposalComments: React.FC<SupplierProposalCommentsProps> = ({
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
               placeholder="Write a comment for this supplier proposal..."
-              className="focus-visible:ring-[#80c8f0]/60"
+              className="focus-visible:ring-[#f4a9aa]/60"
               disabled={sending}
             />
             <div className="flex justify-end">
               <Button
                 onClick={onSend}
                 disabled={sending || draft.trim().length === 0}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 {sending ? (
                   <>

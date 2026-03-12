@@ -175,8 +175,8 @@ const ResetPassword = () => {
           <div className="flex justify-center mb-4">
             <div className="bg-white p-3 rounded-lg">
               <img 
-                src="/lovable-uploads/3662f278-506a-4f24-b806-5a4ef9b755a6.png" 
-                alt="FQ Logo" 
+                src="/branding/ISOTIPO_2-02.png" 
+                alt="Qanvit Logo" 
                 className="w-16 h-16 object-contain"
               />
             </div>

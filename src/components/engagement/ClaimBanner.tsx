@@ -7,7 +7,7 @@ import { TrendingUp, Crown } from 'lucide-react';
 const ClaimBanner = () => {
   return (
     <motion.div
-      className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#80c8f0] to-[#1bb3ff] p-8 text-white"
+      className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#f4a9aa] to-[#1bb3ff] p-8 text-white"
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}

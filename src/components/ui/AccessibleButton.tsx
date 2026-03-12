@@ -21,13 +21,13 @@ const AccessibleButton = React.forwardRef<HTMLButtonElement, AccessibleButtonPro
   asChild = false,
   ...props 
 }, ref) => {
-  const baseClasses = "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#80c8f0] disabled:opacity-50 disabled:cursor-not-allowed active:scale-95";
+  const baseClasses = "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#f4a9aa] disabled:opacity-50 disabled:cursor-not-allowed active:scale-95";
   
   const variants = {
-    primary: "bg-gradient-to-r from-[#80c8f0] to-[#7de19a] text-white hover:shadow-lg hover:shadow-[#80c8f0]/25 hover:-translate-y-0.5",
-    secondary: "bg-[#1b2c4a] text-white hover:bg-[#2d3748] hover:shadow-lg hover:-translate-y-0.5",
-    outline: "border-2 border-[#80c8f0] text-[#80c8f0] bg-white hover:bg-[#80c8f0] hover:text-white hover:shadow-lg hover:-translate-y-0.5",
-    ghost: "text-[#1b2c4a] hover:bg-gray-100 hover:text-[#80c8f0]"
+    primary: "bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] text-white hover:shadow-lg hover:shadow-[#f4a9aa]/25 hover:-translate-y-0.5",
+    secondary: "bg-[#22183a] text-white hover:bg-[#2d3748] hover:shadow-lg hover:-translate-y-0.5",
+    outline: "border-2 border-[#f4a9aa] text-[#f4a9aa] bg-white hover:bg-[#f4a9aa] hover:text-white hover:shadow-lg hover:-translate-y-0.5",
+    ghost: "text-[#22183a] hover:bg-gray-100 hover:text-[#f4a9aa]"
   };
   
   const sizes = {

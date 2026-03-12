@@ -148,7 +148,7 @@ const Feedback = () => {
           {/* Additional Info */}
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground">
-              Thank you for taking the time to help us improve FQ Source. 
+              Thank you for taking the time to help us improve Qanvit. 
             </p>
           </div>
         </div>

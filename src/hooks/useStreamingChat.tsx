@@ -736,7 +736,7 @@ export const useStreamingChat = (onUserMessageAdded?: () => void) => {
       isProcessingRef.current = false;
       toast({
         title: 'Error de Chat',
-        description: 'No se pudo conectar con el asistente de FQ. Por favor, inténtalo de nuevo.',
+        description: 'No se pudo conectar con el asistente de Qanvit. Por favor, inténtalo de nuevo.',
         variant: 'destructive',
       });
       return null;

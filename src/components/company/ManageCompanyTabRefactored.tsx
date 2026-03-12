@@ -278,7 +278,7 @@ const ManageCompanyTabRefactored: React.FC<ManageCompanyTabProps> = ({ companyId
                   variant={showArchived ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowArchived(!showArchived)}
-                  className={showArchived ? "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white" : ""}
+                  className={showArchived ? "bg-[#22183a] hover:bg-[#22183a]/90 text-white" : ""}
                 >
                   {showArchived ? (
                     <>

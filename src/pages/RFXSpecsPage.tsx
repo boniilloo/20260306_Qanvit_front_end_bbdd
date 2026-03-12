@@ -838,9 +838,9 @@ const RFXSpecsPage = () => {
       return false;
     }
     const defaults = {
-      pdf_header_bg_color: '#1A1F2C',
+      pdf_header_bg_color: '#22183a',
       pdf_header_text_color: '#FFFFFF',
-      pdf_section_header_bg_color: '#80c8f0',
+      pdf_section_header_bg_color: '#f4a9aa',
       pdf_section_header_text_color: '#FFFFFF',
       pdf_logo_url: null,
       pdf_logo_bg_color: '#FFFFFF',
@@ -872,7 +872,7 @@ const RFXSpecsPage = () => {
       return value;
     };
 
-    // Normalize section header bg color: treat old default #3B82F6 as equivalent to new default #80c8f0
+    // Normalize section header bg color: treat old default #3B82F6 as equivalent to new default #f4a9aa
     const normalizedSectionHeaderBg = normalizeValue(
       custom.pdf_section_header_bg_color,
       defaults.pdf_section_header_bg_color,
@@ -954,7 +954,7 @@ const RFXSpecsPage = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col justify-center items-center py-12 space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
           {isDecrypting && (
             <p className="text-sm text-gray-600 font-medium">Decrypting RFX info...</p>
           )}
@@ -989,7 +989,7 @@ const RFXSpecsPage = () => {
         <div className="container mx-auto px-4 py-6 md:py-8 flex-1">
           <div className="max-w-4xl mx-auto">
             {/* Header with Back Button */}
-            <div className="mb-6 md:mb-8 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
+            <div className="mb-6 md:mb-8 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
               <div className="flex items-start md:items-center justify-between gap-3">
                 <div className="min-w-0">
                   <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight truncate">
@@ -1006,7 +1006,7 @@ const RFXSpecsPage = () => {
                     {canProceedToCandidates ? (
                       <Button
                         onClick={() => navigate(`/rfxs/candidates/${rfxId}`)}
-                        className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-black"
+                        className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-black"
                       >
                         Go to Candidates
                       </Button>
@@ -1017,7 +1017,7 @@ const RFXSpecsPage = () => {
                             <span className="inline-flex" tabIndex={0}>
                               <Button
                                 disabled
-                                className="bg-[#7de19a] text-black opacity-70 cursor-not-allowed"
+                                className="bg-[#f4a9aa] text-black opacity-70 cursor-not-allowed"
                                 aria-disabled="true"
                               >
                                 Go to Candidates
@@ -1033,7 +1033,7 @@ const RFXSpecsPage = () => {
                     <Button
                       variant="outline"
                       onClick={handleBackToOverview}
-                      className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+                      className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                     >
                       <ArrowLeft className="h-4 w-4 mr-2" />
                       Back
@@ -1045,7 +1045,7 @@ const RFXSpecsPage = () => {
                       disabled={isGeneratingPDF}
                       variant="outline"
                       data-onboarding-target="download-pdf-button"
-                      className="bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white border-[#80c8f0]"
+                      className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white border-[#f4a9aa]"
                     >
                       {isGeneratingPDF ? (
                         <>
@@ -1062,7 +1062,7 @@ const RFXSpecsPage = () => {
                     <Button
                       onClick={handleSaveFromHeader}
                       disabled={isSaving}
-                      className="bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white"
+                      className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white"
                     >
                       {isSaving ? (
                         <>
@@ -1159,9 +1159,9 @@ const RFXSpecsPage = () => {
                 company_requirements: specs.company_requirements,
                 project_timeline: specs.timeline || null,
                 image_categories: specs.images || null,
-                pdf_header_bg_color: pdfCustomization.pdf_header_bg_color || '#1A1F2C',
+                pdf_header_bg_color: pdfCustomization.pdf_header_bg_color || '#22183a',
                 pdf_header_text_color: pdfCustomization.pdf_header_text_color || '#FFFFFF',
-                pdf_section_header_bg_color: pdfCustomization.pdf_section_header_bg_color || '#80c8f0',
+                pdf_section_header_bg_color: pdfCustomization.pdf_section_header_bg_color || '#f4a9aa',
                 pdf_section_header_text_color: pdfCustomization.pdf_section_header_text_color || '#FFFFFF',
                 pdf_logo_url: pdfCustomization.pdf_logo_url || null,
                 pdf_logo_bg_color: pdfCustomization.pdf_logo_bg_color || '#FFFFFF',
@@ -1260,7 +1260,7 @@ const RFXSpecsPage = () => {
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleProceedWithPDF}
-              className="w-full sm:w-auto bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+              className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
             >
               Proceed with PDF Generation
             </AlertDialogAction>
@@ -1292,7 +1292,7 @@ const RFXSpecsPage = () => {
                    </AlertDialogAction>
                    <AlertDialogAction
                      onClick={handleOpenCommitDialog}
-                     className="w-full sm:w-auto bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+                     className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
                    >
                      Create Version
                    </AlertDialogAction>
@@ -1320,7 +1320,7 @@ const RFXSpecsPage = () => {
         <AlertDialogContent className="max-w-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-[#80c8f0]" />
+              <AlertCircle className="h-5 w-5 text-[#f4a9aa]" />
               RFX Already Sent
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
@@ -1328,8 +1328,8 @@ const RFXSpecsPage = () => {
                 <p>
                   This RFX has already been sent. You can modify the specifications freely, but please note the following:
                 </p>
-                <div className="bg-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-lg p-4 space-y-2">
-                  <p className="font-medium text-[#1A1F2C]">
+                <div className="bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-lg p-4 space-y-2">
+                  <p className="font-medium text-[#22183a]">
                     For suppliers to receive the updates:
                   </p>
                   <ol className="list-decimal list-inside space-y-1 text-sm text-gray-700 ml-2">
@@ -1345,7 +1345,7 @@ const RFXSpecsPage = () => {
           <AlertDialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
             <AlertDialogAction
               onClick={() => setShowRFXSentModal(false)}
-              className="w-full sm:w-auto bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+              className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
             >
               Understood
             </AlertDialogAction>
@@ -1367,7 +1367,7 @@ const RFXSpecsPage = () => {
                   This RFX has been archived by the project creator.
                 </p>
                 <div className="bg-[#f1f1f1] border-l-4 border-l-gray-400 rounded-lg p-4 space-y-2">
-                  <p className="font-medium text-[#1A1F2C]">
+                  <p className="font-medium text-[#22183a]">
                     While archived:
                   </p>
                   <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-2">
@@ -1398,7 +1398,7 @@ const RFXSpecsPage = () => {
                   await rfxSpecsRef.current.handleDownloadPDF();
                 }
               }}
-              className="w-full sm:w-auto bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+              className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
             >
               <Download className="h-4 w-4 mr-2" />
               View PDF

@@ -10,7 +10,7 @@ interface TypingIndicatorProps {
 }
 
 const industrialMessages = [
-  "FQ is analyzing your industrial requirements...",
+  "Qanvit is analyzing your industrial requirements...",
   "Searching for specialized suppliers...",
   "Evaluating technical capabilities...",
   "Preparing personalized recommendations..."
@@ -26,7 +26,7 @@ const searchSteps = [
 
 const TypingIndicator = ({ message, showProgress = false, isSearching = false }: TypingIndicatorProps) => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [displayMessage, setDisplayMessage] = useState(message || "FQ is working on your query...");
+  const [displayMessage, setDisplayMessage] = useState(message || "Qanvit is working on your query...");
   const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const TypingIndicator = ({ message, showProgress = false, isSearching = false }:
       if (isSearching) {
         setDisplayMessage(industrialMessages[currentMessageIndex]);
       } else {
-        setDisplayMessage("FQ is working on your query...");
+        setDisplayMessage("Qanvit is working on your query...");
       }
     }
   }, [currentMessageIndex, message, isSearching]);
@@ -59,14 +59,14 @@ const TypingIndicator = ({ message, showProgress = false, isSearching = false }:
           <div className="inline-block bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 animate-pulse">
             <div className="flex items-center space-x-2 ml-2">
               {message && (
-                <span className="text-sm text-[#1b2c4a] font-medium">{message}</span>
+                <span className="text-sm text-[#22183a] font-medium">{message}</span>
               )}
               <div className="flex items-center space-x-2">
                 <span className="text-sm text-gray-500 italic">Reasoning</span>
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gradient-to-r from-[#80c8f0] to-[#7de19a] rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gradient-to-r from-[#80c8f0] to-[#7de19a] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-gradient-to-r from-[#80c8f0] to-[#7de19a] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
               </div>
             </div>

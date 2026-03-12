@@ -39,7 +39,7 @@ const FileUpload = ({ onFileSelect }: FileUploadProps) => {
         variant="ghost"
         size="sm"
         onClick={triggerFileSelect}
-        className="p-3 text-gray-400 hover:text-[#80c8f0] transition-colors duration-200"
+        className="p-3 text-gray-400 hover:text-[#f4a9aa] transition-colors duration-200"
         aria-label="Attach file"
       >
         <Paperclip className="w-5 h-5" />

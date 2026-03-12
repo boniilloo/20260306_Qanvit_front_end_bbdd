@@ -196,7 +196,7 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
                 >
                   <CollapsibleTrigger className="w-full">
                     <div className="flex items-center justify-between p-3 bg-[#f1f1f1] hover:bg-[#e5e7eb] rounded-lg transition-colors">
-                      <span className="font-medium text-sm text-[#1A1F2C]">
+                      <span className="font-medium text-sm text-[#22183a]">
                         {theme} ({themeQuestions.length})
                       </span>
                       <ChevronDown
@@ -212,7 +212,7 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
                         <div
                           key={q.id}
                           className={`text-sm py-2 border-l-2 pl-3 ${
-                            q.enabled ? 'text-gray-700 border-[#80c8f0]' : 'text-gray-400 border-gray-300 line-through'
+                            q.enabled ? 'text-gray-700 border-[#f4a9aa]' : 'text-gray-400 border-gray-300 line-through'
                           }`}
                         >
                           <MarkdownText>{q.text}</MarkdownText>
@@ -236,23 +236,23 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
           <div className="pt-4 border-t border-gray-200">
             <div className="flex items-center justify-between gap-3 mb-3">
               <div className="text-xs text-gray-600">
-                <span className="font-medium text-[#1A1F2C]">{enabledCount}</span> enabled
+                <span className="font-medium text-[#22183a]">{enabledCount}</span> enabled
                 {disabledCount > 0 && (
                   <>
                     {' '}
-                    • <span className="font-medium text-[#1A1F2C]">{disabledCount}</span> disabled
+                    • <span className="font-medium text-[#22183a]">{disabledCount}</span> disabled
                   </>
                 )}
               </div>
               {(isCryptoLoading || (!isCryptoReady && !readOnly)) && (
                 <div className="flex items-center gap-2 text-xs text-gray-600">
-                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#80c8f0]" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#f4a9aa]" />
                   Loading keys...
                 </div>
               )}
             </div>
             <Button
-              className="w-full bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+              className="w-full bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               onClick={() => setIsModalOpen(true)}
               disabled={readOnly}
             >
@@ -272,7 +272,7 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="h-8 border-[#7de19a] text-[#1A1F2C] hover:bg-[#7de19a]/10"
+                    className="h-8 border-[#f4a9aa] text-[#22183a] hover:bg-[#f4a9aa]/10"
                     onClick={() => {
                       setItems((prev) => prev.map((it) => ({ ...it, enabled: true })));
                     }}
@@ -283,7 +283,7 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="h-8 border-gray-300 text-[#1A1F2C] hover:bg-[#f1f1f1]"
+                    className="h-8 border-gray-300 text-[#22183a] hover:bg-[#f1f1f1]"
                     onClick={() => {
                       setItems((prev) => prev.map((it) => ({ ...it, enabled: false })));
                     }}
@@ -298,7 +298,7 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
               {/* Add question */}
               <div className="rounded-xl border border-gray-200 bg-white p-4">
                 <div className="flex items-center justify-between gap-3 mb-3">
-                  <div className="text-sm font-semibold text-[#1A1F2C]">Add a question</div>
+                  <div className="text-sm font-semibold text-[#22183a]">Add a question</div>
                 </div>
                 <div className="space-y-3">
                   <div>
@@ -323,7 +323,7 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
                 <div className="mt-3 flex justify-end">
                   <Button
                     variant="outline"
-                    className="border-gray-200 text-[#1A1F2C] hover:bg-[#f1f1f1]"
+                    className="border-gray-200 text-[#22183a] hover:bg-[#f1f1f1]"
                     onClick={() => {
                       const parsed = questionSchema.safeParse(newQuestionText);
                       if (!parsed.success) {
@@ -368,10 +368,10 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="min-w-0">
-                        <div className="text-sm font-semibold text-[#1A1F2C]">
+                        <div className="text-sm font-semibold text-[#22183a]">
                           Question {idx + 1} <span className="text-gray-600 font-medium">(category: {q.category})</span>{' '}
                           {!q.enabled && <Badge variant="outline" className="ml-2 text-[10px]">Disabled</Badge>}
-                          {isEdited && <Badge className="ml-2 bg-[#80c8f0]/20 text-[#1A1F2C] border border-[#80c8f0]/40">Edited</Badge>}
+                          {isEdited && <Badge className="ml-2 bg-[#f4a9aa]/20 text-[#22183a] border border-[#f4a9aa]/40">Edited</Badge>}
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
@@ -406,7 +406,7 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-8 border-gray-200 text-[#1A1F2C] hover:bg-[#f1f1f1]"
+                          className="h-8 border-gray-200 text-[#22183a] hover:bg-[#f1f1f1]"
                           onClick={() => {
                             setItems((prev) => prev.map((it) => (it.id === q.id ? { ...it, text: it.original } : it)));
                           }}
@@ -424,14 +424,14 @@ const QuestionsToSupplier: React.FC<QuestionsToSupplierProps> = ({
             <DialogFooter className="pt-4 border-t border-gray-200">
               <Button
                 variant="outline"
-                className="border-gray-200 text-[#1A1F2C] hover:bg-[#f1f1f1]"
+                className="border-gray-200 text-[#22183a] hover:bg-[#f1f1f1]"
                 onClick={() => setIsModalOpen(false)}
                 disabled={sending}
               >
                 Cancel
               </Button>
               <Button
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 disabled={readOnly || sending || enabledCount === 0 || !encrypt || !isCryptoReady}
                 onClick={async () => {
                   if (!encrypt) return;

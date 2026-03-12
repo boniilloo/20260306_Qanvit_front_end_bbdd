@@ -69,8 +69,8 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
         },
         {
           id: 'fq_validation',
-          title: 'Validating by FQ Source',
-          description: 'Our FQ team is carefully reviewing all details to ensure everything is correct. You will be notified once validation is complete.',
+          title: 'Validating by Qanvit',
+          description: 'Our Qanvit team is carefully reviewing all details to ensure everything is correct. You will be notified once validation is complete.',
           status: 'completed',
           icon: <Send className="h-5 w-5" />
         },
@@ -119,7 +119,7 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
       return 'pending';
     };
 
-    // Calculate FQ Source validation status (after Launch RFX)
+    // Calculate Qanvit validation status (after Launch RFX)
     const getFQValidationStatus = (): TodoStatus => {
       if (rfxStatus === 'waiting for supplier proposals') {
         return 'completed';
@@ -206,8 +206,8 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
       },
       {
         id: 'fq_validation',
-        title: 'Validating by FQ Source',
-        description: 'Our FQ team is carefully reviewing all details to ensure everything is correct. You will be notified once validation is complete.',
+        title: 'Validating by Qanvit',
+        description: 'Our Qanvit team is carefully reviewing all details to ensure everything is correct. You will be notified once validation is complete.',
         status: getItemStatus('fq_validation'),
         icon: <Send className="h-5 w-5" />
       },
@@ -224,9 +224,9 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
   const getStatusIcon = (status: TodoStatus) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="h-5 w-5 text-[#7de19a]" />;
+        return <CheckCircle className="h-5 w-5 text-[#f4a9aa]" />;
       case 'in_progress':
-        return <Clock className="h-5 w-5 text-[#80c8f0]" />;
+        return <Clock className="h-5 w-5 text-[#f4a9aa]" />;
       case 'warning':
         return <AlertTriangle className="h-5 w-5 text-orange-500" />;
       case 'coming_soon':
@@ -239,15 +239,15 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
   const getStatusBadge = (status: TodoStatus) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-[#7de19a]/20 text-[#1A1F2C] border-[#7de19a]">Completed</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">Completed</Badge>;
       case 'in_progress':
-        return <Badge className="bg-[#80c8f0]/20 text-[#1A1F2C] border-[#80c8f0]">In Progress</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">In Progress</Badge>;
       case 'warning':
         return <Badge className="bg-orange-100 text-orange-800 border-orange-300">Warning</Badge>;
       case 'coming_soon':
-        return <Badge className="bg-[#f1f1f1] text-[#1A1F2C] border-gray-300">Coming Soon</Badge>;
+        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">Coming Soon</Badge>;
       default:
-        return <Badge className="bg-[#f1f1f1] text-[#1A1F2C] border-gray-300">Pending</Badge>;
+        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">Pending</Badge>;
     }
   };
 
@@ -261,7 +261,7 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
         <div className="space-y-4">
           {todoItems.map((item, index) => (
             <div key={item.id} className="flex items-center gap-3">
-              <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-[#1A1F2C] text-white font-semibold text-sm">
+              <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-[#22183a] text-white font-semibold text-sm">
                 {index + 1}
               </div>
               <div
@@ -274,21 +274,21 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
                 }
                 className={`flex-1 flex items-start gap-3 p-3 rounded-lg border transition-all duration-200 cursor-pointer hover:shadow-md ${
                   activeItem === item.id
-                    ? 'ring-2 ring-[#80c8f0] shadow-md'
+                    ? 'ring-2 ring-[#f4a9aa] shadow-md'
                     : ''
                 } ${
                   item.status === 'completed'
-                    ? 'bg-[#7de19a]/10 border-[#7de19a]'
+                    ? 'bg-[#f4a9aa]/10 border-[#f4a9aa]'
                     : item.status === 'in_progress'
-                    ? 'bg-[#80c8f0]/10 border-[#80c8f0]'
+                    ? 'bg-[#f4a9aa]/10 border-[#f4a9aa]'
                     : item.status === 'warning'
                     ? 'bg-orange-50 border-orange-300'
                     : 'bg-[#f1f1f1] border-gray-200'
                 }`}
               >
                 <div className={`flex-shrink-0 mt-0.5 ${
-                  item.status === 'completed' ? 'text-[#7de19a]' :
-                  item.status === 'in_progress' ? 'text-[#80c8f0]' :
+                  item.status === 'completed' ? 'text-[#f4a9aa]' :
+                  item.status === 'in_progress' ? 'text-[#f4a9aa]' :
                   item.status === 'warning' ? 'text-orange-500' :
                   'text-gray-400'
                 }`}>
@@ -298,8 +298,8 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <h3 className={`font-medium ${
-                      item.status === 'completed' ? 'text-[#1A1F2C]' :
-                      item.status === 'in_progress' ? 'text-[#1A1F2C]' :
+                      item.status === 'completed' ? 'text-[#22183a]' :
+                      item.status === 'in_progress' ? 'text-[#22183a]' :
                       item.status === 'warning' ? 'text-orange-800' :
                       'text-gray-900'
                     }`}>

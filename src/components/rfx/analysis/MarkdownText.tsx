@@ -29,7 +29,7 @@ const MarkdownText: React.FC<MarkdownTextProps> = ({ children, className = '' })
         // Style links
         a: ({ node, ...props }) => (
           <a
-            className="text-[#80c8f0] hover:underline"
+            className="text-[#f4a9aa] hover:underline"
             target="_blank"
             rel="noopener noreferrer"
             {...props}
@@ -52,7 +52,7 @@ const MarkdownText: React.FC<MarkdownTextProps> = ({ children, className = '' })
         
         // Style blockquotes
         blockquote: ({ node, ...props }) => (
-          <blockquote className="border-l-4 border-[#80c8f0] pl-4 italic my-2" {...props} />
+          <blockquote className="border-l-4 border-[#f4a9aa] pl-4 italic my-2" {...props} />
         ),
         
         // Style headings

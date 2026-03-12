@@ -25,7 +25,7 @@ export const navItems = [
     page: FQAgent,
   },
   {
-    title: "FQ Agent", 
+    title: "Qanvit Agent", 
     to: "/fq-agent",
     icon: <Search className="h-4 w-4" />,
     page: FQAgent,

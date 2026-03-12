@@ -135,10 +135,10 @@ function LeafletLocationPicker({
       if (!circleRef.current) {
         circleRef.current = L.circle([value.lat, value.lng], {
           radius: radiusMeters,
-          color: '#80c8f0',
+          color: '#f4a9aa',
           weight: 2,
           opacity: 0.9,
-          fillColor: '#80c8f0',
+          fillColor: '#f4a9aa',
           fillOpacity: 0.18,
         }).addTo(map);
       } else {
@@ -226,7 +226,7 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="text-[#1A1F2C]">Where should FQ look for candidates?</DialogTitle>
+          <DialogTitle className="text-[#22183a]">Where should Qanvit look for candidates?</DialogTitle>
           <DialogDescription>
             Choose the geographic scope for the search. Default is global.
           </DialogDescription>
@@ -240,13 +240,13 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
                 htmlFor="ask-fq-scope-global"
                 className={cn(
                   'flex items-start gap-3 rounded-lg border p-4 cursor-pointer',
-                  mode === 'global' ? 'border-[#80c8f0] bg-[#80c8f0]/10' : 'border-gray-200 bg-white'
+                  mode === 'global' ? 'border-[#f4a9aa] bg-[#f4a9aa]/10' : 'border-gray-200 bg-white'
                 )}
               >
                 <RadioGroupItem id="ask-fq-scope-global" value="global" className="mt-1" />
                 <div className="space-y-1">
-                  <div className="text-base font-semibold text-[#1A1F2C]">Globally</div>
-                  <p className="text-sm text-gray-600">Best matches anywhere in the FQ database.</p>
+                  <div className="text-base font-semibold text-[#22183a]">Globally</div>
+                  <p className="text-sm text-gray-600">Best matches anywhere in the Qanvit database.</p>
                 </div>
               </label>
 
@@ -255,13 +255,13 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
                 htmlFor="ask-fq-scope-nearby"
                 className={cn(
                   'flex items-start gap-3 rounded-lg border p-4 cursor-pointer',
-                  mode === 'nearby' ? 'border-[#80c8f0] bg-[#80c8f0]/10' : 'border-gray-200 bg-white'
+                  mode === 'nearby' ? 'border-[#f4a9aa] bg-[#f4a9aa]/10' : 'border-gray-200 bg-white'
                 )}
               >
                 <RadioGroupItem id="ask-fq-scope-nearby" value="nearby" className="mt-1" />
                 <div className="space-y-3 w-full">
                   <div className="space-y-1">
-                    <div className="text-base font-semibold text-[#1A1F2C]">Near a location</div>
+                    <div className="text-base font-semibold text-[#22183a]">Near a location</div>
                     <p className="text-sm text-gray-600">
                       Choose a point and a radius — we’ll prioritize suppliers within that area.
                     </p>
@@ -322,8 +322,8 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
 
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <Label className="text-sm text-[#1A1F2C]">Radius</Label>
-                            <span className="text-sm font-semibold text-[#1A1F2C]">{radiusKm} km</span>
+                            <Label className="text-sm text-[#22183a]">Radius</Label>
+                            <span className="text-sm font-semibold text-[#22183a]">{radiusKm} km</span>
                           </div>
                           <input
                             type="range"
@@ -332,7 +332,7 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
                             step={50}
                             value={radiusKm}
                             onChange={(e) => setRadiusKm(Number(e.target.value))}
-                            className="w-full accent-[#80c8f0]"
+                            className="w-full accent-[#f4a9aa]"
                           />
                           <div className="flex items-center justify-between text-xs text-gray-600">
                             <span>100 km</span>

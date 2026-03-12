@@ -15,15 +15,15 @@ const KpiCard = ({ title, value, subtitle, trend, color }: KpiCardProps) => {
   const isPositive = trend.startsWith('+');
   
   const colorClasses = {
-    blue: 'bg-gradient-to-br from-[#80c8f0]/10 to-[#1bb3ff]/10 border-[#80c8f0]/30',
-    green: 'bg-gradient-to-br from-[#7de19a]/10 to-[#7de19a]/20 border-[#7de19a]/30',
-    navy: 'bg-gradient-to-br from-[#1b2c4a]/10 to-[#1b2c4a]/20 border-[#1b2c4a]/30'
+    blue: 'bg-gradient-to-br from-[#f4a9aa]/10 to-[#1bb3ff]/10 border-[#f4a9aa]/30',
+    green: 'bg-gradient-to-br from-[#f4a9aa]/10 to-[#f4a9aa]/20 border-[#f4a9aa]/30',
+    navy: 'bg-gradient-to-br from-[#22183a]/10 to-[#22183a]/20 border-[#22183a]/30'
   };
 
   const textColorClasses = {
     blue: 'text-[#1bb3ff]',
-    green: 'text-[#7de19a]',
-    navy: 'text-[#1b2c4a]'
+    green: 'text-[#f4a9aa]',
+    navy: 'text-[#22183a]'
   };
 
   return (

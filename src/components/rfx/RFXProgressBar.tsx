@@ -28,14 +28,14 @@ export const RFXProgressBar: React.FC<RFXProgressBarProps> = ({ progressStep }) 
       line1: 'RFX sent',
       line2: null,
       key: 'review',
-      tooltip: 'The RFX has been sent to FQ for review and validation before being sent to suppliers.'
+      tooltip: 'The RFX has been sent to Qanvit for review and validation before being sent to suppliers.'
     },
     { 
       label: 'validated', 
       line1: 'RFX',
       line2: 'validated',
       key: 'validation',
-      tooltip: 'FQ has validated the RFX and it is ready to be sent to the selected suppliers.'
+      tooltip: 'Qanvit has validated the RFX and it is ready to be sent to the selected suppliers.'
     },
     { 
       label: 'supplier proposals', 
@@ -49,7 +49,7 @@ export const RFXProgressBar: React.FC<RFXProgressBarProps> = ({ progressStep }) 
       line1: 'Proposals',
       line2: 'analyzed',
       key: 'analysis',
-      tooltip: 'FQ\'s AI will analyze the received proposals and provide recommendations to help make a final decision. This feature is under development.'
+      tooltip: 'Qanvit\'s AI will analyze the received proposals and provide recommendations to help make a final decision. This feature is under development.'
     }
   ];
 
@@ -112,7 +112,7 @@ export const RFXProgressBar: React.FC<RFXProgressBarProps> = ({ progressStep }) 
         
         {/* Progress bar fill */}
         <div 
-          className="absolute top-[20px] left-6 h-1 bg-[#7de19a] transition-all duration-500 ease-in-out"
+          className="absolute top-[20px] left-6 h-1 bg-[#f4a9aa] transition-all duration-500 ease-in-out"
           style={{ 
             width: currentStepIndex === 0 
               ? '0px' 
@@ -135,8 +135,8 @@ export const RFXProgressBar: React.FC<RFXProgressBarProps> = ({ progressStep }) 
                     <div
                       className={`
                         w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold z-10 transition-all duration-300
-                        ${isCompleted ? 'bg-[#7de19a] text-white' : ''}
-                        ${isNextActive ? 'bg-[#80c8f0] text-white border-2 border-[#80c8f0]' : ''}
+                        ${isCompleted ? 'bg-[#f4a9aa] text-white' : ''}
+                        ${isNextActive ? 'bg-[#f4a9aa] text-white border-2 border-[#f4a9aa]' : ''}
                         ${!isCompleted && !isNextActive ? 'bg-gray-200 text-gray-400 border-2 border-gray-200' : ''}
                       `}
                     >
@@ -151,7 +151,7 @@ export const RFXProgressBar: React.FC<RFXProgressBarProps> = ({ progressStep }) 
                     <div
                       className={`
                         mt-1.5 text-[10px] font-medium text-center flex flex-col items-center justify-center min-h-[2.5rem]
-                        ${isCompleted || isNextActive ? 'text-[#1A1F2C]' : 'text-gray-400'}
+                        ${isCompleted || isNextActive ? 'text-[#22183a]' : 'text-gray-400'}
                       `}
                     >
                       {step.line2 ? (

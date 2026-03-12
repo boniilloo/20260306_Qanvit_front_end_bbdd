@@ -26,8 +26,8 @@ const Home = () => {
         <div className="w-full px-4 sm:px-6 py-8 sm:py-12 relative z-10 flex flex-col items-center justify-center">
           {/* Simplified Header */}
           <div className="text-center mb-4 sm:mb-6 max-w-4xl mx-auto w-full">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#80c8f0] mb-4 leading-tight">
-              Your AI assistant <span className="text-[#1b2c4a]">for launching industrial sourcing projects</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#f4a9aa] mb-4 leading-tight">
+              Your AI assistant <span className="text-[#22183a]">for launching industrial sourcing projects</span>
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-6">
               Define your needs, discover verified suppliers and launch your RFQ, RFP or RFI in just one click
@@ -35,7 +35,7 @@ const Home = () => {
             <div className="flex items-center justify-center">
               <button
                 onClick={() => navigate('/rfxs')}
-                className="group relative px-6 py-3 bg-gradient-to-r from-[#80c8f0] to-[#7de19a] text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-2xl hover:shadow-[#80c8f0]/50 transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-100 overflow-hidden whitespace-nowrap shrink-0"
+                className="group relative px-6 py-3 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-2xl hover:shadow-[#f4a9aa]/50 transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-100 overflow-hidden whitespace-nowrap shrink-0"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Start a new RFX
@@ -54,7 +54,7 @@ const Home = () => {
                   </svg>
                 </span>
                 {/* Hover effect overlay */}
-                <div className="absolute inset-0 bg-gradient-to-r from-[#1b2c4a] to-[#1A1F2C] opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#22183a] to-[#22183a] opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
               </button>
             </div>
           </div>
@@ -64,8 +64,8 @@ const Home = () => {
           <Card className="border border-gray-300 shadow-sm">
             <CardContent className="p-6">
               <div className="text-center md:text-left mb-4">
-                <h2 className="text-2xl sm:text-3xl font-bold text-[#1b2c4a] mb-2 flex items-center gap-2 justify-center md:justify-start">
-                  <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-[#80c8f0]" />
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#22183a] mb-2 flex items-center gap-2 justify-center md:justify-start">
+                  <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-[#f4a9aa]" />
                   RFX Agent
                 </h2>
                 <p className="text-base sm:text-lg text-gray-600">
@@ -104,7 +104,7 @@ const Home = () => {
                           description={pr.description || pr.rfx?.description}
                           imageUrl={pr.image_url}
                           fallbackIcon={<FileText className="w-5 h-5 text-white" />}
-                          fallbackGradient="bg-gradient-to-br from-[#80c8f0] to-[#7de19a]"
+                          fallbackGradient="bg-gradient-to-br from-[#f4a9aa] to-[#f4a9aa]"
                           createdAt={new Date(pr.rfx?.created_at || pr.created_at)}
                           badge={{
                             label: 'Example',

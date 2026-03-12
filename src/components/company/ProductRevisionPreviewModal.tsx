@@ -314,7 +314,7 @@ export const ProductRevisionPreviewModal: React.FC<ProductRevisionPreviewModalPr
                               className="flex items-start gap-2 p-3 rounded-lg"
                               style={{ backgroundColor: 'rgba(128, 200, 240, 0.15)' }}
                             >
-                              <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#80c8f0' }} />
+                              <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#f4a9aa' }} />
                               <span className="text-sm" style={{ color: '#242424' }}>{useCase}</span>
                             </div>
                           ))}

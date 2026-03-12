@@ -298,9 +298,9 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
   const [companyRequirements, setCompanyRequirements] = useState(currentSpecs.company_requirements);
   const [timeline, setTimeline] = useState<TimelineMilestone[]>([]);
   const [imageCategories, setImageCategories] = useState<ImageCategory[]>([]);
-  const [pdfHeaderBgColor, setPdfHeaderBgColor] = useState<string>('#1A1F2C');
+  const [pdfHeaderBgColor, setPdfHeaderBgColor] = useState<string>('#22183a');
   const [pdfHeaderTextColor, setPdfHeaderTextColor] = useState<string>('#FFFFFF');
-  const [pdfSectionHeaderBgColor, setPdfSectionHeaderBgColor] = useState<string>('#80c8f0');
+  const [pdfSectionHeaderBgColor, setPdfSectionHeaderBgColor] = useState<string>('#f4a9aa');
   const [pdfSectionHeaderTextColor, setPdfSectionHeaderTextColor] = useState<string>('#FFFFFF');
   const [pdfLogoUrl, setPdfLogoUrl] = useState<string>('');
   const [pdfLogoBgColor, setPdfLogoBgColor] = useState<string>('#FFFFFF');
@@ -867,9 +867,9 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
       setImageCategories(initialImageCategories);
     }
     if (initialPdfCustomization) {
-      setPdfHeaderBgColor(initialPdfCustomization.pdf_header_bg_color || '#1A1F2C');
+      setPdfHeaderBgColor(initialPdfCustomization.pdf_header_bg_color || '#22183a');
       setPdfHeaderTextColor(initialPdfCustomization.pdf_header_text_color || '#FFFFFF');
-      setPdfSectionHeaderBgColor(initialPdfCustomization.pdf_section_header_bg_color || '#80c8f0');
+      setPdfSectionHeaderBgColor(initialPdfCustomization.pdf_section_header_bg_color || '#f4a9aa');
       setPdfSectionHeaderTextColor(initialPdfCustomization.pdf_section_header_text_color || '#FFFFFF');
       setPdfLogoUrl(initialPdfCustomization.pdf_logo_url || '');
       setPdfLogoBgColor(initialPdfCustomization.pdf_logo_bg_color || '#FFFFFF');
@@ -1240,9 +1240,9 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
         setCompanyRequirements(comp);
         setTimeline(((data as any).project_timeline as TimelineMilestone[]) || []);
         setImageCategories(((data as any).image_categories as ImageCategory[]) || []);
-        setPdfHeaderBgColor((data as any).pdf_header_bg_color || '#1A1F2C');
+        setPdfHeaderBgColor((data as any).pdf_header_bg_color || '#22183a');
         setPdfHeaderTextColor((data as any).pdf_header_text_color || '#FFFFFF');
-        setPdfSectionHeaderBgColor((data as any).pdf_section_header_bg_color || '#80c8f0');
+        setPdfSectionHeaderBgColor((data as any).pdf_section_header_bg_color || '#f4a9aa');
         setPdfSectionHeaderTextColor((data as any).pdf_section_header_text_color || '#FFFFFF');
         setPdfLogoUrl((data as any).pdf_logo_url || '');
         setPdfLogoBgColor((data as any).pdf_logo_bg_color || '#FFFFFF');
@@ -1557,7 +1557,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
     const isDecrypting = !isCryptoReady && rfxId;
     return (
       <div className="flex flex-col justify-center items-center py-12 space-y-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
         {isDecrypting && (
           <p className="text-sm text-gray-600 font-medium">Decrypting RFX info...</p>
         )}
@@ -1577,7 +1577,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
     <div className="border border-gray-200 rounded-md bg-white shadow-sm">
       <div className="p-4 space-y-3">
         <div className="flex items-center gap-2 mb-4">
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#80c8f0]"></div>
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#f4a9aa]"></div>
           <span className="text-sm text-black font-medium">Generating content...</span>
         </div>
         <Skeleton className="h-4 w-full" />
@@ -1870,7 +1870,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <FileText className="h-4 w-4 text-[#1A1F2C] shrink-0" />
+                          <FileText className="h-4 w-4 text-[#22183a] shrink-0" />
                           <p className="text-sm font-medium text-gray-900 truncate">{file.originalName}</p>
                           {file.isEncrypted && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-100 text-green-700 shrink-0">
@@ -2247,7 +2247,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
               )
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>
@@ -2272,11 +2272,11 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           onClick={handleDownloadPDF}
           disabled={isGenerating}
           variant="outline"
-          className="border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C]/5"
+          className="border-[#22183a] text-[#22183a] hover:bg-[#22183a]/5"
         >
           {isGenerating ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#1A1F2C] mr-2"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#22183a] mr-2"></div>
               Generating PDF...
             </>
           ) : (
@@ -2289,7 +2289,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
         <Button
           onClick={handleSave}
           disabled={saving || isArchived || readOnly}
-          className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+          className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
         >
           {saving ? (
             <>

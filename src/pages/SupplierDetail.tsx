@@ -689,7 +689,7 @@ const SupplierDetail = () => {
         {/* Header Section - 64px */}
         <header className="h-16 border-b border-gray-100 px-6 flex items-center justify-between hidden lg:flex">
           <div className="flex items-center gap-4">
-            <div className="text-2xl font-bold text-navy">FQ</div>
+            <div className="text-2xl font-bold text-navy">Qanvit</div>
             <nav className="flex items-center text-sm text-charcoal">
               <Link to="/supplier-search" className="hover:text-navy transition-colors">Search</Link>
               <span className="mx-2 text-gray-300">/</span>
@@ -742,13 +742,13 @@ const SupplierDetail = () => {
                             <TooltipTrigger asChild>
                               <span className="inline-flex items-center justify-center w-[34px] h-[34px] cursor-help" aria-label="Verified" role="img">
                                 <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M12 2L19 5V11C19 15.97 16.11 20.44 12 22C7.89 20.44 5 15.97 5 11V5L12 2Z" fill="#80c8f0"/>
+                                  <path d="M12 2L19 5V11C19 15.97 16.11 20.44 12 22C7.89 20.44 5 15.97 5 11V5L12 2Z" fill="#f4a9aa"/>
                                   <path d="M16.59 8.58L10.25 14.92L7.41 12.08" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </span>
                             </TooltipTrigger>
                             <TooltipContent className="max-w-xs">
-                              Company information was completed by the company and verified by FQ Source
+                              Company information was completed by the company and verified by Qanvit
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -887,13 +887,13 @@ const SupplierDetail = () => {
                             <TooltipTrigger asChild>
                               <span className="inline-flex items-center justify-center w-[41px] h-[41px] cursor-help" aria-label="Verified" role="img">
                                 <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M12 2L19 5V11C19 15.97 16.11 20.44 12 22C7.89 20.44 5 15.97 5 11V5L12 2Z" fill="#80c8f0"/>
+                                  <path d="M12 2L19 5V11C19 15.97 16.11 20.44 12 22C7.89 20.44 5 15.97 5 11V5L12 2Z" fill="#f4a9aa"/>
                                   <path d="M16.59 8.58L10.25 14.92L7.41 12.08" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                                 </svg>
                               </span>
                             </TooltipTrigger>
                             <TooltipContent className="max-w-xs">
-                              Company information was completed by the company and verified by FQ Source
+                              Company information was completed by the company and verified by Qanvit
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
@@ -1017,16 +1017,16 @@ const SupplierDetail = () => {
           {/* Tabs Navigation - 56px */}
           <Tabs defaultValue={searchParams.get('tab') || (productName ? "products" : "overview")} className="w-full">
             <TabsList className={`grid w-full ${isOwnerAdmin ? 'grid-cols-3' : 'grid-cols-2'} h-14 bg-[#f1f1f1] rounded-2xl p-1.5 mb-8 border border-white/60 shadow-inner`}>
-              <TabsTrigger value="overview" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+              <TabsTrigger value="overview" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
                 <Building2 className="w-4 h-4" />
                 Overview
               </TabsTrigger>
-              <TabsTrigger value="products" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+              <TabsTrigger value="products" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
                 <Package className="w-4 h-4" />
                 Products & Services
               </TabsTrigger>
               {isOwnerAdmin && (
-                <TabsTrigger value="manage" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+                <TabsTrigger value="manage" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
                   <div className="relative">
                     <Settings className="w-4 h-4" />
                     {(pendingForCompany > 0 || pendingRfxForCompany > 0) && (

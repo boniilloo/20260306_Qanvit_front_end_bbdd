@@ -148,7 +148,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
             <div className="grid grid-cols-12 gap-8">
               <div className="col-span-12 lg:col-span-8">
                 <Card className="shadow-lg border-0">
-                  <CardHeader style={{background: 'linear-gradient(135deg, #1b2c4a0D 0%, #80c8f026 100%)'}}>
+                  <CardHeader style={{background: 'linear-gradient(135deg, #22183a0D 0%, #f4a9aa26 100%)'}}>
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="text-3xl text-navy mb-2">{selectedProduct.product_name}</CardTitle>
@@ -240,10 +240,10 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                             <div
                               key={index}
                               className="flex items-center gap-2 p-3 rounded-lg"
-                              style={{ backgroundColor: 'rgba(125, 225, 154, 0.15)', border: '1px solid #7de19a' }}
+                              style={{ backgroundColor: 'rgba(244, 169, 170, 0.15)', border: '1px solid #f4a9aa' }}
                             >
-                              <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#7de19a' }} />
-                              <span className="text-sm" style={{ color: '#1b2c4a' }}>{feature}</span>
+                              <Check className="w-4 h-4 flex-shrink-0" style={{ color: '#f4a9aa' }} />
+                              <span className="text-sm" style={{ color: '#22183a' }}>{feature}</span>
                             </div>
                           ))}
                         </div>
@@ -294,7 +294,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                               className="flex items-start gap-2 p-3 rounded-lg"
                               style={{ backgroundColor: 'rgba(128, 200, 240, 0.15)' }}
                             >
-                              <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#80c8f0' }} />
+                              <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#f4a9aa' }} />
                               <span className="text-sm" style={{ color: '#242424' }}>{useCase}</span>
                             </div>
                           ))}
@@ -337,9 +337,9 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                     <div className="pt-4 border-t">
                       <Button
                         className="w-full font-semibold"
-                        style={{ backgroundColor: '#7de19a', color: '#1b2c4a' }}
+                        style={{ backgroundColor: '#f4a9aa', color: '#22183a' }}
                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#6cd389')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#7de19a')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#f4a9aa')}
                       >
                         <Mail className="w-4 h-4 mr-2" />
                         Request Quote
@@ -389,7 +389,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                     >
                       <div
                         style={{
-                          background: 'linear-gradient(135deg, #1b2c4a 0%, #80c8f0 100%)',
+                          background: 'linear-gradient(135deg, #22183a 0%, #f4a9aa 100%)',
                           padding: '20px',
                           color: 'white',
                         }}
@@ -423,7 +423,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                             <h5
                               style={{
                                 fontWeight: '600',
-                                color: '#1b2c4a',
+                                color: '#22183a',
                                 fontSize: '14px',
                                 marginBottom: '8px',
                               }}
@@ -436,11 +436,11 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                                   key={index}
                                   style={{
                                     fontSize: '12px',
-                                    backgroundColor: 'rgba(125, 225, 154, 0.15)',
-                                    color: '#1b2c4a',
+                                    backgroundColor: 'rgba(244, 169, 170, 0.15)',
+                                    color: '#22183a',
                                     padding: '4px 8px',
                                     borderRadius: '8px',
-                                    border: '1px solid #7de19a',
+                                    border: '1px solid #f4a9aa',
                                   }}
                                 >
                                   {feature}
@@ -468,7 +468,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                             <h5
                               style={{
                                 fontWeight: '600',
-                                color: '#1b2c4a',
+                                color: '#22183a',
                                 fontSize: '14px',
                                 marginBottom: '8px',
                               }}
@@ -494,7 +494,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                               display: 'flex',
                               alignItems: 'center',
                               fontSize: '12px',
-                              color: '#80c8f0',
+                              color: '#f4a9aa',
                               fontWeight: '500',
                             }}
                           >
@@ -517,7 +517,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                       <div className="flex flex-col md:flex-row md:min-h-[220px]">
                         <div
                           className="md:w-[280px] w-full p-5 md:p-6 text-white flex flex-col justify-between"
-                          style={{ background: 'linear-gradient(135deg, #1b2c4a 0%, #80c8f0 100%)' }}
+                          style={{ background: 'linear-gradient(135deg, #22183a 0%, #f4a9aa 100%)' }}
                         >
                           <div>
                             <h3 className="text-xl font-semibold mb-2">{product.product_name}</h3>
@@ -538,16 +538,16 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
 
                           {product.key_features && product.key_features.length > 0 && (
                             <div className="mb-4">
-                              <h5 className="font-semibold text-[#1b2c4a] text-sm mb-2">Key Features</h5>
+                              <h5 className="font-semibold text-[#22183a] text-sm mb-2">Key Features</h5>
                               <div className="flex flex-wrap gap-2">
                                 {product.key_features.slice(0, 4).map((feature, index) => (
                                   <div
                                     key={index}
                                     className="text-xs px-2 py-1 rounded-md border"
                                     style={{
-                                      backgroundColor: 'rgba(125, 225, 154, 0.15)',
-                                      color: '#1b2c4a',
-                                      borderColor: '#7de19a',
+                                      backgroundColor: 'rgba(244, 169, 170, 0.15)',
+                                      color: '#22183a',
+                                      borderColor: '#f4a9aa',
                                     }}
                                   >
                                     {feature}
@@ -564,7 +564,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
 
                           {product.target_industries && product.target_industries.length > 0 && (
                             <div>
-                              <h5 className="font-semibold text-[#1b2c4a] text-sm mb-2">Target Industries</h5>
+                              <h5 className="font-semibold text-[#22183a] text-sm mb-2">Target Industries</h5>
                               <p className="text-xs text-[#242424] leading-5">
                                 {product.target_industries.slice(0, 3).join(', ')}
                                 {product.target_industries.length > 3 && ` +${product.target_industries.length - 3} more`}
@@ -572,7 +572,7 @@ export const ProductsServicesTab: React.FC<ProductsServicesTabProps> = ({
                             </div>
                           )}
 
-                          <div className="md:hidden mt-4 pt-3 border-t border-[#f0f0f0] flex items-center text-xs font-medium text-[#80c8f0]">
+                          <div className="md:hidden mt-4 pt-3 border-t border-[#f0f0f0] flex items-center text-xs font-medium text-[#f4a9aa]">
                             <Eye className="w-3.5 h-3.5 mr-2" />
                             Click to view details
                           </div>

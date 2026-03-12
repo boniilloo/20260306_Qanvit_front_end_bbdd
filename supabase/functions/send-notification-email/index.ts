@@ -174,7 +174,7 @@ serve(async (req: Request) => {
       const gotoUrl = appBaseUrl;
       const html = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: #1A1F2C; color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+          <div style="background: #22183a; color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
             <h1 style="margin: 0; font-size: 20px;">You have a new notification in FQ Source</h1>
           </div>
           <div style="background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
@@ -183,7 +183,7 @@ serve(async (req: Request) => {
           </div>
           <div style="text-align: center; margin: 24px 0;">
             <a href="${gotoUrl}"
-               style="background: #80c8f0; color: #1A1F2C; padding: 10px 16px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
+               style="background: #f4a9aa; color: #22183a; padding: 10px 16px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block;">
               Open FQ Source
             </a>
           </div>

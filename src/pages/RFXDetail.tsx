@@ -701,7 +701,7 @@ const RFXDetail = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
         </div>
       </div>
     );
@@ -734,11 +734,11 @@ const RFXDetail = () => {
           <div className="max-w-7xl mx-auto">
         {/* Header Card */}
         <div className="mb-8">
-          <Card className="bg-gradient-to-r from-white to-[#f1f1f1] border-0 border-l-4 border-l-[#80c8f0] shadow-sm">
+          <Card className="bg-gradient-to-r from-white to-[#f1f1f1] border-0 border-l-4 border-l-[#f4a9aa] shadow-sm">
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h1 className="text-3xl font-extrabold text-[#1A1F2C] font-intro mb-2 max-w-[80%] line-clamp-1">
+                  <h1 className="text-3xl font-extrabold text-[#22183a] font-intro mb-2 max-w-[80%] line-clamp-1">
                     {rfx.name}
                   </h1>
                   {rfx.description && (
@@ -751,7 +751,7 @@ const RFXDetail = () => {
                 <div className="flex flex-col items-end gap-3 ml-6">
                   <Button
                     onClick={() => navigate('/rfxs')}
-                    className="inline-flex items-center px-4 py-2 rounded-md bg-[#1A1F2C] text-white hover:bg-[#1A1F2C]/90"
+                    className="inline-flex items-center px-4 py-2 rounded-md bg-[#22183a] text-white hover:bg-[#22183a]/90"
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" /> Back
                   </Button>
@@ -759,7 +759,7 @@ const RFXDetail = () => {
                     <RFXMembersAvatars rfxId={id!} />
                     <Button
                       onClick={() => setIsManageMembersOpen(true)}
-                      className="inline-flex items-center px-4 py-2 rounded-md bg-[#80c8f0] text-white hover:bg-[#80c8f0]/90"
+                      className="inline-flex items-center px-4 py-2 rounded-md bg-[#f4a9aa] text-white hover:bg-[#f4a9aa]/90"
                     >
                       <UserPlus className="h-4 w-4 mr-2" /> Manage RFX Members
                     </Button>
@@ -767,9 +767,9 @@ const RFXDetail = () => {
                       <Button
                         variant="outline"
                         onClick={() => setShowMakePublicDialog(true)}
-                        className="inline-flex items-center px-4 py-2 rounded-md border-[#80c8f0] text-[#1A1F2C] hover:bg-[#f1f1f1]"
+                        className="inline-flex items-center px-4 py-2 rounded-md border-[#f4a9aa] text-[#22183a] hover:bg-[#f1f1f1]"
                       >
-                        <Sparkles className="h-4 w-4 mr-2 text-[#80c8f0]" />
+                        <Sparkles className="h-4 w-4 mr-2 text-[#f4a9aa]" />
                         Public Example
                       </Button>
                     )}
@@ -870,7 +870,7 @@ const RFXDetail = () => {
         <div className="fixed bottom-6 right-6 z-50">
           <Button
             onClick={() => setIsChatExpanded(true)}
-            className="h-14 w-14 rounded-full bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white shadow-lg"
+            className="h-14 w-14 rounded-full bg-[#22183a] hover:bg-[#22183a]/90 text-white shadow-lg"
           >
             <MessageCircle className="h-6 w-6" />
           </Button>

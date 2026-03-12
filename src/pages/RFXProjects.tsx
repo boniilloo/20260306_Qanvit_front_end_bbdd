@@ -325,7 +325,7 @@ const RFXProjects = () => {
     if (rfx.status === 'revision requested by buyer') {
       toast({
         title: "Cannot Archive",
-        description: "RFX cannot be archived while under review by FQ",
+        description: "RFX cannot be archived while under review by Qanvit",
         variant: "destructive",
       });
       return;
@@ -643,7 +643,7 @@ const RFXProjects = () => {
     };
 
     return (
-      <Card className={`hover:shadow-lg transition-shadow border-l-4 ${rfx.archived ? 'border-l-gray-400 bg-gray-50' : 'border-l-[#1A1F2C]'}`}>
+      <Card className={`hover:shadow-lg transition-shadow border-l-4 ${rfx.archived ? 'border-l-gray-400 bg-gray-50' : 'border-l-[#22183a]'}`}>
         <CardHeader className="pb-0">
           <div className="flex justify-between items-start mb-2">
             <div className="flex-1">
@@ -676,9 +676,9 @@ const RFXProjects = () => {
                         <TooltipProvider key={member.user_id} delayDuration={100}>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Avatar className="w-8 h-8 border border-[#1A1F2C]">
+                              <Avatar className="w-8 h-8 border border-[#22183a]">
                                 <AvatarImage src={member.avatar_url || ''} />
-                                <AvatarFallback className="bg-[#80c8f0] text-white text-xs font-medium">
+                                <AvatarFallback className="bg-[#f4a9aa] text-white text-xs font-medium">
                                   {(member.name?.[0] || member.email?.[0] || 'U').toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
@@ -691,7 +691,7 @@ const RFXProjects = () => {
                       ))}
                       {cachedMembers.length > 3 && (
                         <div
-                          className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-medium border border-[#1A1F2C]"
+                          className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-medium border border-[#22183a]"
                           title={`${cachedMembers.length - 3} more users`}
                         >
                           +{cachedMembers.length - 3}
@@ -770,7 +770,7 @@ const RFXProjects = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => handleViewRFX(rfx.id)}
-                className="bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white border-[#80c8f0] h-10"
+                className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white border-[#f4a9aa] h-10"
                 disabled={isEditing}
               >
                 <Edit className="h-4 w-4 mr-1" />
@@ -837,11 +837,11 @@ const RFXProjects = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header Card */}
         <div className="mb-8">
-          <Card className="bg-gradient-to-r from-white to-[#f1f1f1] border-0 border-l-4 border-l-[#80c8f0] shadow-sm">
+          <Card className="bg-gradient-to-r from-white to-[#f1f1f1] border-0 border-l-4 border-l-[#f4a9aa] shadow-sm">
             <CardContent className="p-6">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h1 className="text-3xl font-black text-[#1A1F2C] font-intro mb-2 tracking-tight" style={{ fontWeight: 900 }}>
+                  <h1 className="text-3xl font-black text-[#22183a] font-intro mb-2 tracking-tight" style={{ fontWeight: 900 }}>
                     RFX Projects
                   </h1>
                   <p className="text-gray-600 font-inter text-lg">
@@ -851,7 +851,7 @@ const RFXProjects = () => {
                 <div className="flex items-center gap-3 ml-6">
                   <Button
                     onClick={handleOpenCreateRFXDialog}
-                    className="inline-flex items-center px-4 py-2 rounded-md bg-[#1A1F2C] text-white hover:bg-[#1A1F2C]/90"
+                    className="inline-flex items-center px-4 py-2 rounded-md bg-[#22183a] text-white hover:bg-[#22183a]/90"
                     disabled={isCreatingRFX || isCheckingCreateEligibility}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -927,25 +927,25 @@ const RFXProjects = () => {
 
         {/* Pending Invitations - show at the top */}
         {invitations.length > 0 && (
-          <Card className="mb-6 border-[#80c8f0]/50">
+          <Card className="mb-6 border-[#f4a9aa]/50">
             <CardHeader>
-              <CardTitle className="text-[#1A1F2C]">You have RFX invitations</CardTitle>
+              <CardTitle className="text-[#22183a]">You have RFX invitations</CardTitle>
               <CardDescription>Accept to access the project</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {invitations.map(inv => (
-                <div key={inv.id} className="flex items-center justify-between p-3 rounded-md bg-[#80c8f0]/10">
-                  <div className="text-sm text-[#1A1F2C]">
+                <div key={inv.id} className="flex items-center justify-between p-3 rounded-md bg-[#f4a9aa]/10">
+                  <div className="text-sm text-[#22183a]">
                     <div className="font-medium">{inv.rfx_name || 'RFX Project'}</div>
                     {inv.rfx_description && (
-                      <div className="text-xs text-[#1A1F2C] mb-1 line-clamp-2">{inv.rfx_description}</div>
+                      <div className="text-xs text-[#22183a] mb-1 line-clamp-2">{inv.rfx_description}</div>
                     )}
-                    <div className="text-[#1A1F2C]">
+                    <div className="text-[#22183a]">
                       Invited by {inv.inviter_name || ''} {inv.inviter_surname || ''} {inv.inviter_email ? `(${inv.inviter_email})` : ''}
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white" onClick={async () => {
+                    <Button size="sm" className="bg-[#22183a] hover:bg-[#22183a]/90 text-white" onClick={async () => {
                       const result = await acceptInvitation(inv.id);
                       if (result.requiresSubscription) {
                         setIsSubscriptionRequiredForInvitationModalOpen(true);
@@ -997,7 +997,7 @@ const RFXProjects = () => {
                     </p>
                     <Button
                       onClick={handleOpenCreateRFXDialog}
-                      className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                      className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                       disabled={isCheckingCreateEligibility}
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -1008,14 +1008,14 @@ const RFXProjects = () => {
                   {/* Right Column - Confidentiality Commitment */}
                   <div className="text-center border-t md:border-t-0 md:border-l border-gray-200 pt-6 md:pt-0 md:pl-8 flex flex-col justify-center">
                     <p className="text-sm text-gray-600 mb-4">
-                      <strong>FQ SOURCE CONFIDENTIALITY COMMITMENT:</strong> FQ Source is committed to protecting users' confidential information and using it solely to provide its discovery and RFX management services.
+                      <strong>QANVIT CONFIDENTIALITY COMMITMENT:</strong> Qanvit is committed to protecting users' confidential information and using it solely to provide its discovery and RFX management services.
                     </p>
                     <Button
                       onClick={() => setIsConfidentialityInfoModalOpen(true)}
                       variant="outline"
-                      className="border-[#1A1F2C] text-[#1A1F2C] bg-white hover:bg-[#1A1F2C] hover:text-white transition-colors"
+                      className="border-[#22183a] text-[#22183a] bg-white hover:bg-[#22183a] hover:text-white transition-colors"
                     >
-                      Read FQ Source Confidentiality Commitment
+                      Read Qanvit Confidentiality Commitment
                     </Button>
                   </div>
                 </div>
@@ -1074,7 +1074,7 @@ const RFXProjects = () => {
                       key={page}
                       variant={currentPage === page ? "default" : "outline"}
                       onClick={() => setCurrentPage(page)}
-                      className={currentPage === page ? "bg-[#1A1F2C] text-white" : "bg-white hover:bg-gray-100"}
+                      className={currentPage === page ? "bg-[#22183a] text-white" : "bg-white hover:bg-gray-100"}
                     >
                       {page}
                     </Button>
@@ -1142,7 +1142,7 @@ const RFXProjects = () => {
               <Button
                 onClick={handleCreateRFX}
                 disabled={!formData.name.trim() || isCreatingRFX}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 {isCreatingRFX ? (
                   <>
@@ -1175,7 +1175,7 @@ const RFXProjects = () => {
                 Close
               </Button>
               <Button
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 onClick={() => {
                   setIsPlanLimitModalOpen(false);
                   navigate('/my-subscription');
@@ -1205,7 +1205,7 @@ const RFXProjects = () => {
                 Close
               </Button>
               <Button
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 onClick={() => {
                   setIsSubscriptionRequiredForInvitationModalOpen(false);
                   navigate('/my-subscription');
@@ -1299,7 +1299,7 @@ const RFXProjects = () => {
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleArchiveRFX}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+                className="bg-[#22183a] hover:bg-[#22183a]/90"
               >
                 {selectedRFXId && rfxs.find(r => r.id === selectedRFXId)?.archived ? 'Unarchive' : 'Archive'}
               </AlertDialogAction>
@@ -1363,7 +1363,7 @@ const RFXProjects = () => {
               <Button
                 onClick={handleArchiveWithAnnouncement}
                 disabled={isPostingAnnouncement || !archiveAnnouncementSubject.trim() || !archiveAnnouncementMessage.trim()}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 {isPostingAnnouncement ? (
                   <>
@@ -1434,7 +1434,7 @@ const RFXProjects = () => {
               <Button
                 onClick={handleUnarchiveWithAnnouncement}
                 disabled={isPostingUnarchiveAnnouncement || !unarchiveAnnouncementSubject.trim() || !unarchiveAnnouncementMessage.trim()}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 {isPostingUnarchiveAnnouncement ? (
                   <>
@@ -1454,7 +1454,7 @@ const RFXProjects = () => {
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-[#1A1F2C]" />
+                <FileText className="h-5 w-5 text-[#22183a]" />
                 Confidentiality Commitment
               </DialogTitle>
               <DialogDescription className="pt-4">
@@ -1467,7 +1467,7 @@ const RFXProjects = () => {
                   setIsConfidentialityInfoModalOpen(false);
                   setIsConfidentialityModalOpen(true);
                 }}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white w-full"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white w-full"
               >
                 Continue to Document
               </Button>
@@ -1480,7 +1480,7 @@ const RFXProjects = () => {
           <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
             <DialogHeader className="px-6 pt-6 pb-4">
               <DialogTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-[#1A1F2C]" />
+                <FileText className="h-5 w-5 text-[#22183a]" />
                 Confidentiality Commitment
               </DialogTitle>
             </DialogHeader>
@@ -1498,8 +1498,8 @@ const RFXProjects = () => {
         <Dialog open={isLoginPromptModalOpen} onOpenChange={setIsLoginPromptModalOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-[#1A1F2C] flex items-center gap-2">
-                <FileText className="h-6 w-6 text-[#80c8f0]" />
+              <DialogTitle className="text-2xl font-bold text-[#22183a] flex items-center gap-2">
+                <FileText className="h-6 w-6 text-[#f4a9aa]" />
                 Create Your First RFX
               </DialogTitle>
               <DialogDescription className="text-base pt-2">
@@ -1507,9 +1507,9 @@ const RFXProjects = () => {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
-              <div className="bg-[#80c8f0]/10 border border-[#80c8f0]/30 rounded-lg p-4">
-                <p className="text-[#1A1F2C] font-medium mb-2">
-                  🎉 Start with your first RFX <span className="text-[#7de19a] font-bold">for free</span>!
+              <div className="bg-[#f4a9aa]/10 border border-[#f4a9aa]/30 rounded-lg p-4">
+                <p className="text-[#22183a] font-medium mb-2">
+                  🎉 Start with your first RFX <span className="text-[#f4a9aa] font-bold">for free</span>!
                 </p>
                 <p className="text-sm text-gray-700">
                   Sign up now to create your first RFX and discover suppliers. 
@@ -1517,7 +1517,7 @@ const RFXProjects = () => {
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-[#1A1F2C]">What you'll get:</p>
+                <p className="text-sm font-medium text-[#22183a]">What you'll get:</p>
                 <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
                   <li>Create your first RFX project for free</li>
                   <li>Discover and connect with suppliers</li>
@@ -1533,7 +1533,7 @@ const RFXProjects = () => {
                     setIsLoginPromptModalOpen(false);
                     navigate('/auth');
                   }}
-                  className="text-sm text-[#80c8f0] hover:text-[#80c8f0]/80 hover:underline"
+                  className="text-sm text-[#f4a9aa] hover:text-[#f4a9aa]/80 hover:underline"
                 >
                   Already have an account? Log in
                 </button>
@@ -1551,7 +1551,7 @@ const RFXProjects = () => {
                     setIsLoginPromptModalOpen(false);
                     navigate('/auth?tab=signup');
                   }}
-                  className="w-full sm:w-auto bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white order-1 sm:order-2"
+                  className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90 text-white order-1 sm:order-2"
                 >
                   Sign Up Free
                 </Button>

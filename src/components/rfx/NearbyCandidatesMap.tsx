@@ -122,10 +122,10 @@ export default function NearbyCandidatesMap({
       if (typeof radiusKm === 'number' && Number.isFinite(radiusKm) && radiusKm > 0) {
         const circle = L.circle([selected.lat, selected.lng], {
           radius: radiusKm * 1000,
-          color: '#80c8f0',
+          color: '#f4a9aa',
           weight: 2,
           opacity: 0.9,
-          fillColor: '#80c8f0',
+          fillColor: '#f4a9aa',
           fillOpacity: 0.14,
         }).addTo(group);
         try {
@@ -170,8 +170,8 @@ export default function NearbyCandidatesMap({
               data-candidate-id="${escapeHtml(c.reasoningCandidateId || c.id)}"
               style="
                 width: 100%;
-                background: #80c8f0;
-                color: #1A1F2C;
+                background: #f4a9aa;
+                color: #22183a;
                 font-weight: 800;
                 border: none;
                 border-radius: 10px;
@@ -179,7 +179,7 @@ export default function NearbyCandidatesMap({
                 cursor: pointer;
               "
             >
-              See FQ Match Reasoning
+              See Qanvit Match Reasoning
             </button>
           </div>
         `
@@ -247,12 +247,12 @@ export default function NearbyCandidatesMap({
 
       {/* Legend */}
       <div className="absolute top-3 right-3 z-[500] rounded-lg border border-gray-200 bg-white/95 px-3 py-2 shadow-sm">
-        <div className="text-[11px] font-semibold text-[#1A1F2C] mb-1">Match</div>
+        <div className="text-[11px] font-semibold text-[#22183a] mb-1">Match</div>
         <div className="space-y-1 text-[11px] text-gray-700">
           <LegendRow color="#dc2626" label="< 50%" />
           <LegendRow color="#f59e0b" label="50–65%" />
-          <LegendRow color="#80c8f0" label="65–80%" />
-          <LegendRow color="#7de19a" label="80–100%" />
+          <LegendRow color="#f4a9aa" label="65–80%" />
+          <LegendRow color="#f4a9aa" label="80–100%" />
         </div>
       </div>
 
@@ -260,7 +260,7 @@ export default function NearbyCandidatesMap({
         <div className="absolute inset-0 z-[450] flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
           <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
             <div className="h-2 w-40 rounded bg-gray-200 animate-pulse mb-2" />
-            <div className="text-sm font-semibold text-[#1A1F2C]">Generating map...</div>
+            <div className="text-sm font-semibold text-[#22183a]">Generating map...</div>
             <div className="text-xs text-gray-600 mt-1">Fetching company locations from Supabase</div>
           </div>
         </div>
@@ -335,7 +335,7 @@ function buildCandidateIcon(
                 justify-content: center;
                 font-weight: 800;
                 font-size: 14px;
-                color: #1A1F2C;
+                color: #22183a;
                 line-height: 1;
                 user-select: none;
                 opacity: ${visual.opacity};
@@ -378,8 +378,8 @@ function getMatchRingColor(matchPercent: number | null) {
 
   if (clamped < 50) return '#dc2626'; // stronger red
   if (clamped < 65) return '#f59e0b'; // orange
-  if (clamped < 80) return '#80c8f0'; // brand light-blue
-  return '#7de19a'; // brand green
+  if (clamped < 80) return '#f4a9aa'; // brand light-blue
+  return '#f4a9aa'; // brand green
 }
 
 function escapeHtml(input: string) {

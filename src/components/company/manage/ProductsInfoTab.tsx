@@ -142,10 +142,10 @@ export const ProductsInfoTab: React.FC<ProductsInfoTabProps> = ({
                         <TooltipTrigger asChild>
                           <Button onClick={onCreateWithAI} variant="default" size="sm" className="flex items-center gap-2 bg-sky text-navy hover:bg-sky-dark">
                             <Sparkles className="w-4 h-4" />
-                            Create with FQ AI
+                            Create with Qanvit AI
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Create with FQ AI</TooltipContent>
+                        <TooltipContent>Create with Qanvit AI</TooltipContent>
                       </Tooltip>
                     </div>
                   </TooltipProvider>
@@ -187,10 +187,10 @@ export const ProductsInfoTab: React.FC<ProductsInfoTabProps> = ({
                             <TooltipTrigger asChild>
                               <Button onClick={onEditWithAI} disabled={!selectedProductId} variant="default" size="sm" className="flex items-center gap-2 bg-sky text-navy hover:bg-sky-dark disabled:opacity-50">
                       <Sparkles className="w-4 h-4" />
-                      Edit with FQ AI
+                      Edit with Qanvit AI
                     </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Edit with FQ AI</TooltipContent>
+                            <TooltipContent>Edit with Qanvit AI</TooltipContent>
                           </Tooltip>
                           <Tooltip>
                             <TooltipTrigger asChild>

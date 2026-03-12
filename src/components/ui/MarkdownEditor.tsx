@@ -278,7 +278,7 @@ function findTodos(doc: any, activeTodoIndex: number = -1, todoOffset: number = 
         
         // Estilos diferentes para TODO activo vs normal
         const style = isActive
-          ? 'background-color: #ff9966; color: #7d2d0a; border: 2px solid #80c8f0; box-shadow: 0 0 0 3px rgba(128, 200, 240, 0.4); padding: 2px 4px; border-radius: 4px; font-weight: 700;'
+          ? 'background-color: #ff9966; color: #7d2d0a; border: 2px solid #f4a9aa; box-shadow: 0 0 0 3px rgba(128, 200, 240, 0.4); padding: 2px 4px; border-radius: 4px; font-weight: 700;'
           : 'background-color: #fed7aa; color: #c2410c; padding: 1px 2px; border-radius: 2px; font-weight: 500;';
         
         decorations.push(

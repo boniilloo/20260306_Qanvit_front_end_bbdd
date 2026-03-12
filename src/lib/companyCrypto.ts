@@ -4,7 +4,7 @@ const getFunctionsUrl = (functionName: string) => {
   // Check if we are using local Supabase
   const USE_LOCAL = import.meta.env.VITE_USE_LOCAL_SUPABASE === 'true';
   const LOCAL_URL = import.meta.env.VITE_SUPABASE_LOCAL_URL || 'http://127.0.0.1:54321';
-  const REMOTE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://fukzxedgbszcpakqkrjf.supabase.co';
+  const REMOTE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://bymbfjkezrwsuvbsaycg.supabase.co';
   
   const baseUrl = USE_LOCAL ? LOCAL_URL : REMOTE_URL;
   

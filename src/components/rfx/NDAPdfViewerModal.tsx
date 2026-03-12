@@ -33,7 +33,7 @@ export const NDAPdfViewerModal: React.FC<NDAPdfViewerModalProps> = ({
       <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-[#1A1F2C]" />
+            <FileText className="h-5 w-5 text-[#22183a]" />
             {title}
           </DialogTitle>
         </DialogHeader>
@@ -46,7 +46,7 @@ export const NDAPdfViewerModal: React.FC<NDAPdfViewerModalProps> = ({
             />
           ) : (
             <div className="flex items-center justify-center h-full">
-              <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+              <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
             </div>
           )}
         </div>

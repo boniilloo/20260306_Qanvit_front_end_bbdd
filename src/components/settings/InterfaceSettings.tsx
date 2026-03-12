@@ -99,7 +99,7 @@ const InterfaceSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Palette className="w-5 h-5 text-[#80c8f0]" />
+            <Palette className="w-5 h-5 text-[#f4a9aa]" />
             Visual Appearance
           </CardTitle>
         </CardHeader>
@@ -184,9 +184,9 @@ const InterfaceSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Layout className="w-5 h-5 text-[#80c8f0]" />
+            <Layout className="w-5 h-5 text-[#f4a9aa]" />
             Industrial Interface
-            <Badge className="bg-[#7de19a]/10 text-[#7de19a] font-medium">B2B Optimized</Badge>
+            <Badge className="bg-[#f4a9aa]/10 text-[#f4a9aa] font-medium">B2B Optimized</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -226,7 +226,7 @@ const InterfaceSettings = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Keyboard className="w-5 h-5 text-[#80c8f0]" />
+            <Keyboard className="w-5 h-5 text-[#f4a9aa]" />
             Power User Features
           </CardTitle>
         </CardHeader>
@@ -248,7 +248,7 @@ const InterfaceSettings = () => {
           
           {preferences.showKeyboardShortcuts && (
             <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium mb-3 text-[#1b2c4a]">Available Shortcuts</h4>
+              <h4 className="font-medium mb-3 text-[#22183a]">Available Shortcuts</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {keyboardShortcuts.map((shortcut, index) => (
                   <div key={index} className="flex justify-between items-center text-sm">
@@ -266,7 +266,7 @@ const InterfaceSettings = () => {
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <Button onClick={savePreferences} className="bg-[#80c8f0] hover:bg-[#80c8f0]/90">
+        <Button onClick={savePreferences} className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90">
           Save Preferences
         </Button>
         <Button variant="outline" onClick={resetToDefaults}>

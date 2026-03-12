@@ -205,7 +205,7 @@ const RFXPublicExample: React.FC = () => {
       <div className="flex-1 flex flex-col bg-background">
         <div className="container mx-auto px-4 py-8 max-w-2xl w-full flex-1 flex items-center justify-center min-h-[calc(100vh-300px)]">
           <div className="flex flex-col justify-center items-center">
-            <Loader2 className="h-12 w-12 animate-spin text-[#1A1F2C] mb-4" />
+            <Loader2 className="h-12 w-12 animate-spin text-[#22183a] mb-4" />
             <p className="text-gray-600">Loading public RFX example...</p>
           </div>
         </div>
@@ -233,19 +233,19 @@ const RFXPublicExample: React.FC = () => {
         <div className="max-w-7xl mx-auto">
         {/* Header - similar to RFXDetail */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
+          <div className="bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
             <div className="flex items-start md:items-center justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="h-5 w-5 text-[#80c8f0]" />
-                  <Badge variant="outline" className="text-xs bg-white border-[#80c8f0] text-[#1A1F2C]">
+                  <Sparkles className="h-5 w-5 text-[#f4a9aa]" />
+                  <Badge variant="outline" className="text-xs bg-white border-[#f4a9aa] text-[#22183a]">
                     Public RFX Example
                   </Badge>
                   {meta.is_featured && (
-                    <Badge className="bg-[#7de19a] text-[#1A1F2C] text-xs">Featured</Badge>
+                    <Badge className="bg-[#f4a9aa] text-[#22183a] text-xs">Featured</Badge>
                   )}
                 </div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-[#1A1F2C] font-intro tracking-tight mb-1">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-[#22183a] font-intro tracking-tight mb-1">
                   {meta.title || rfx.name}
                 </h1>
                 {meta.description && (
@@ -281,7 +281,7 @@ const RFXPublicExample: React.FC = () => {
                 <Button
                   variant="outline"
                   onClick={() => navigate('/')}
-                  className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+                  className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Home

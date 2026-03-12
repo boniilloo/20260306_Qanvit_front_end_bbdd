@@ -26,7 +26,7 @@ CREATE OR REPLACE FUNCTION "public"."_notify_on_email_confirmed"() RETURNS "trig
     SET "search_path" TO 'public'
     AS $$
 declare
-  endpoint text := 'https://fukzxedgbszcpakqkrjf.supabase.co/functions/v1/auth-onboarding-email';
+  endpoint text := 'https://bymbfjkezrwsuvbsaycg.supabase.co/functions/v1/auth-onboarding-email';
   payload  text;
 begin
   if new.email_confirmed_at is not null
@@ -171,7 +171,7 @@ CREATE OR REPLACE FUNCTION "public"."call_embed_edge_function"() RETURNS "trigge
     AS $$
 BEGIN
   PERFORM supabase_functions.http_request(  -- Asegúrate de que la función esté en el esquema correcto
-    'https://fukzxedgbszcpakqkrjf.supabase.co/functions/v1/embed',  -- tu URL
+    'https://bymbfjkezrwsuvbsaycg.supabase.co/functions/v1/embed',  -- tu URL
     'POST',                                                      -- método HTTP
     json_build_object(                                           -- headers
       'Content-Type', 'application/json',
@@ -1191,7 +1191,7 @@ CREATE OR REPLACE FUNCTION "public"."cron_run_process_embedding_scheduler"() RET
     AS $$
 begin
   -- Fire-and-forget: call the scheduler function via the Functions router
-  perform http_send('POST', 'https://fukzxedgbszcpakqkrjf.functions.supabase.co/process-embedding-scheduler/run',
+  perform http_send('POST', 'https://bymbfjkezrwsuvbsaycg.functions.supabase.co/process-embedding-scheduler/run',
                     json_build_object('Content-Type','application/json')::json,
                     '{}');
 exception when others then
@@ -4569,9 +4569,9 @@ CREATE TABLE IF NOT EXISTS "public"."rfx_specs" (
     "updated_at" timestamp with time zone DEFAULT "now"(),
     "project_timeline" "jsonb",
     "image_categories" "jsonb",
-    "pdf_header_bg_color" "text" DEFAULT '#1A1F2C'::"text",
+    "pdf_header_bg_color" "text" DEFAULT '#22183a'::"text",
     "pdf_header_text_color" "text" DEFAULT '#FFFFFF'::"text",
-    "pdf_section_header_bg_color" "text" DEFAULT '#80c8f0'::"text",
+    "pdf_section_header_bg_color" "text" DEFAULT '#f4a9aa'::"text",
     "pdf_section_header_text_color" "text" DEFAULT '#FFFFFF'::"text",
     "pdf_logo_url" "text",
     "pdf_logo_bg_color" "text" DEFAULT '#FFFFFF'::"text",
@@ -4635,7 +4635,7 @@ COMMENT ON COLUMN "public"."rfx_specs"."pdf_header_text_color" IS 'Hex color for
 
 
 
-COMMENT ON COLUMN "public"."rfx_specs"."pdf_section_header_bg_color" IS 'Hex color for section header background rectangles (default: #80c8f0)';
+COMMENT ON COLUMN "public"."rfx_specs"."pdf_section_header_bg_color" IS 'Hex color for section header background rectangles (default: #f4a9aa)';
 
 
 

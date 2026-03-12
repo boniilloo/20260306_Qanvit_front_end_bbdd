@@ -131,7 +131,7 @@ export const ProductCommentModal: React.FC<ProductCommentModalProps> = ({
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
           <Zap className="h-5 w-5" />
-          Teaching FQ Agent
+          Teaching Qanvit Agent
         </DialogTitle>
       </DialogHeader>
       

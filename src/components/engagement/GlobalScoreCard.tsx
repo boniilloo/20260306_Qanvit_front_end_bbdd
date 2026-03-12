@@ -30,15 +30,15 @@ const GlobalScoreCard = ({ scores }: GlobalScoreCardProps) => {
   }, [globalScore]);
 
   const getScoreBadge = (score: number) => {
-    if (score >= 85) return { label: 'Excellent', color: 'bg-[#7de19a] text-white' };
-    if (score >= 70) return { label: 'Good', color: 'bg-[#80c8f0] text-white' };
+    if (score >= 85) return { label: 'Excellent', color: 'bg-[#f4a9aa] text-white' };
+    if (score >= 70) return { label: 'Good', color: 'bg-[#f4a9aa] text-white' };
     if (score >= 55) return { label: 'Fair', color: 'bg-yellow-500 text-white' };
     return { label: 'Poor', color: 'bg-red-500 text-white' };
   };
 
   const getColor = (val: number) => {
-    if (val >= 85) return '#7de19a';
-    if (val >= 70) return '#80c8f0';
+    if (val >= 85) return '#f4a9aa';
+    if (val >= 70) return '#f4a9aa';
     if (val >= 55) return '#f59e0b';
     return '#ef4444';
   };
@@ -53,7 +53,7 @@ const GlobalScoreCard = ({ scores }: GlobalScoreCardProps) => {
   return (
     <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200">
       <div className="flex items-center gap-2 mb-6">
-        <h2 className="text-xl font-bold font-intro text-[#1b2c4a]">Global Score</h2>
+        <h2 className="text-xl font-bold font-intro text-[#22183a]">Global Score</h2>
         <div className="group relative">
           <Info className="w-4 h-4 text-gray-400 cursor-help" />
           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block">
@@ -104,7 +104,7 @@ const GlobalScoreCard = ({ scores }: GlobalScoreCardProps) => {
           {/* Center content */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <motion.div
-              className="text-5xl font-bold font-intro text-[#1b2c4a]"
+              className="text-5xl font-bold font-intro text-[#22183a]"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 1, type: "spring", stiffness: 200 }}
@@ -138,7 +138,7 @@ const GlobalScoreCard = ({ scores }: GlobalScoreCardProps) => {
             return (
               <div key={key} className="flex items-center justify-between text-sm">
                 <span className="text-gray-600 font-inter">{label}</span>
-                <span className="font-semibold text-[#1b2c4a] font-inter">{value}%</span>
+                <span className="font-semibold text-[#22183a] font-inter">{value}%</span>
               </div>
             );
           })}

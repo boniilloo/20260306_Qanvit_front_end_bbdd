@@ -911,7 +911,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
       case 'NDA signed by supplier':
         return <Badge className="bg-purple-100 text-purple-800 border-purple-300">NDA Signed</Badge>;
       case 'supplier evaluating RFX':
-        return <Badge className="bg-[#80c8f0]/20 text-[#1A1F2C] border-[#80c8f0]">Evaluating RFX</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">Evaluating RFX</Badge>;
       case 'submitted':
         return <Badge className="bg-green-100 text-green-800 border-green-300">Submitted</Badge>;
       case 'declined':
@@ -1140,7 +1140,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
         </div>
       </div>
     );
@@ -1154,7 +1154,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-7xl mx-auto">
         {/* Header styled consistent with RFX Specs, Candidates, and Sending */}
-        <div className="mb-8 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
+        <div className="mb-8 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
           <div className="flex items-start md:items-center justify-between gap-3">
             <div className="min-w-0 flex-1 max-w-[80%]">
               <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight line-clamp-1">
@@ -1170,7 +1170,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
               <Button
                 variant="outline"
                 onClick={handleBackToOverview}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
@@ -1182,19 +1182,19 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
         {/* Tabs Navigation */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="w-full">
           <TabsList className="grid w-full grid-cols-4 h-14 bg-[#f1f1f1] rounded-2xl p-1.5 mb-8 border border-white/60 shadow-inner">
-            <TabsTrigger value="analysis" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="analysis" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <BarChart3 className="w-4 h-4" />
               Analysis
             </TabsTrigger>
-            <TabsTrigger value="suppliers" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="suppliers" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <Building2 className="w-4 h-4" />
               Invited Suppliers
             </TabsTrigger>
-            <TabsTrigger value="chat" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="chat" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <MessagesSquare className="w-4 h-4" />
               Chat
             </TabsTrigger>
-            <TabsTrigger value="announcements" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#1b2c4a]/70 hover:bg-white/70 hover:text-[#1b2c4a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#1b2c4a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#80c8f0]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#80c8f0]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#80c8f0]/60">
+            <TabsTrigger value="announcements" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
               <MessageSquare className="w-4 h-4" />
               Announcements Board
             </TabsTrigger>
@@ -1216,7 +1216,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                   <Button
                     onClick={handleAnalyzeClick}
                       disabled={isCreatingJob || isGeneratingPDF || readOnly || isCheckingAnalysisDocsChanged}
-                    className="bg-[#80c8f0] hover:bg-[#80c8f0]/90 text-white"
+                    className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white"
                   >
                     {isCreatingJob || isGeneratingPDF ? (
                       <>
@@ -1264,7 +1264,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
               <CardContent>
             {loadingInvitations ? (
               <div className="flex justify-center items-center py-12">
-                <Loader2 className="h-6 w-6 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-6 w-6 animate-spin text-[#22183a]" />
               </div>
             ) : invitations.length === 0 ? (
               <div className="py-12 text-center">
@@ -1309,7 +1309,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                             
                             {/* Company Info */}
                             <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-[#1A1F2C] text-lg truncate">
+                              <h3 className="font-semibold text-[#22183a] text-lg truncate">
                                 {invitation.company_name}
                               </h3>
                               {invitation.company_website && (
@@ -1318,7 +1318,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   onClick={(e) => e.stopPropagation()}
-                                  className="text-sm text-[#80c8f0] hover:underline truncate block"
+                                  className="text-sm text-[#f4a9aa] hover:underline truncate block"
                                 >
                                   {invitation.company_website}
                                 </a>
@@ -1352,13 +1352,13 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                             <div className="space-y-6">
                               {/* Signed NDA Section */}
                               <div>
-                                <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                                <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                                   <FileText className="h-4 w-4 text-green-600" />
                                   Signed NDA
                                 </h4>
                                 {isLoadingNDA ? (
                                   <div className="flex justify-center items-center py-4">
-                                    <Loader2 className="h-5 w-5 animate-spin text-[#80c8f0]" />
+                                    <Loader2 className="h-5 w-5 animate-spin text-[#f4a9aa]" />
                                   </div>
                                 ) : signedNDA ? (
                                   <div className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors">
@@ -1402,11 +1402,11 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                               {/* Supplier Documents Section */}
                               {isLoadingDocs ? (
                                 <div className="flex justify-center items-center py-8">
-                                  <Loader2 className="h-6 w-6 animate-spin text-[#80c8f0]" />
+                                  <Loader2 className="h-6 w-6 animate-spin text-[#f4a9aa]" />
                                 </div>
                               ) : documents.length === 0 ? (
                                 <div>
-                                  <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                                  <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                                     <FileText className="h-4 w-4" />
                                     Supplier Documents
                                   </h4>
@@ -1417,7 +1417,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                                 </div>
                               ) : (
                                 <div>
-                                  <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                                  <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                                     <FileText className="h-4 w-4" />
                                     Supplier Documents
                                   </h4>
@@ -1425,7 +1425,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                                 {/* Proposal Documents */}
                                 {documentsByCategory.proposal.length > 0 && (
                                   <div>
-                                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                                    <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                                       <FileText className="h-4 w-4" />
                                       Proposal ({documentsByCategory.proposal.length})
                                     </h4>
@@ -1436,7 +1436,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                                           className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
                                         >
                                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                                            <FileText className="h-5 w-5 text-[#1A1F2C] flex-shrink-0" />
+                                            <FileText className="h-5 w-5 text-[#22183a] flex-shrink-0" />
                                             <div className="flex-1 min-w-0">
                                               <p className="text-sm font-medium text-gray-900 truncate">
                                                 {doc.file_name}
@@ -1473,7 +1473,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                                 {/* Offer Documents */}
                                 {documentsByCategory.offer.length > 0 && (
                                   <div>
-                                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                                    <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                                       <FileText className="h-4 w-4" />
                                       Offer ({documentsByCategory.offer.length})
                                     </h4>
@@ -1484,7 +1484,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                                           className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
                                         >
                                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                                            <FileText className="h-5 w-5 text-[#1A1F2C] flex-shrink-0" />
+                                            <FileText className="h-5 w-5 text-[#22183a] flex-shrink-0" />
                                             <div className="flex-1 min-w-0">
                                               <p className="text-sm font-medium text-gray-900 truncate">
                                                 {doc.file_name}
@@ -1521,7 +1521,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                                 {/* Other Documents */}
                                 {documentsByCategory.other.length > 0 && (
                                   <div>
-                                    <h4 className="text-sm font-semibold text-[#1A1F2C] mb-3 flex items-center gap-2">
+                                    <h4 className="text-sm font-semibold text-[#22183a] mb-3 flex items-center gap-2">
                                       <FileText className="h-4 w-4" />
                                       Other Documents ({documentsByCategory.other.length})
                                     </h4>
@@ -1532,7 +1532,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                                           className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors"
                                         >
                                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                                            <FileText className="h-5 w-5 text-[#1A1F2C] flex-shrink-0" />
+                                            <FileText className="h-5 w-5 text-[#22183a] flex-shrink-0" />
                                             <div className="flex-1 min-w-0">
                                               <p className="text-sm font-medium text-gray-900 truncate">
                                                 {doc.file_name}
@@ -1616,7 +1616,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
       {loadingFile && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 flex flex-col items-center gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
             <p className="text-sm text-gray-600">Loading file...</p>
           </div>
         </div>
@@ -1632,7 +1632,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
         <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#1A1F2C]" />
+              <FileText className="h-5 w-5 text-[#22183a]" />
               {viewingPdf?.title}
             </DialogTitle>
           </DialogHeader>
@@ -1655,7 +1655,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
               )
             ) : (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>
@@ -1690,7 +1690,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                   setAnalysisBlocked({ open: false, reasons: [] });
                   setActiveTab('announcements');
                 }}
-                className="border-[#80c8f0]/50"
+                className="border-[#f4a9aa]/50"
               >
                 Create announcement to all suppliers
               </Button>
@@ -1699,7 +1699,7 @@ const RFXResponsesPage: React.FC<RFXResponsesPageProps> = ({
                   setAnalysisBlocked({ open: false, reasons: [] });
                   setActiveTab('chat');
                 }}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 Message suppliers in Chat
               </Button>

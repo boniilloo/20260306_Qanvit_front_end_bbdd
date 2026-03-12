@@ -39,7 +39,7 @@ const RFXPublicPlaceholderPage: React.FC<RFXPublicPlaceholderPageProps> = ({ sec
           <Button
             variant="outline"
             onClick={() => navigate(rfxId ? `/rfx-example/${rfxId}` : '/')}
-            className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+            className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to RFX Overview
@@ -48,8 +48,8 @@ const RFXPublicPlaceholderPage: React.FC<RFXPublicPlaceholderPageProps> = ({ sec
 
         <Card className="border border-gray-200 rounded-xl shadow-sm bg-white">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl text-[#1A1F2C]">
-              <Sparkles className="h-5 w-5 text-[#80c8f0]" />
+            <CardTitle className="flex items-center gap-2 text-xl text-[#22183a]">
+              <Sparkles className="h-5 w-5 text-[#f4a9aa]" />
               {config.title}
             </CardTitle>
             <CardDescription>

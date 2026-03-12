@@ -24,7 +24,7 @@ const SupplierLists = () => {
       name: 'Vision – Brake Discs',
       supplierCount: 5,
       category: 'NDT / Machine Vision',
-      lastComment: 'FQ added 5 suppliers from automated vision search',
+      lastComment: 'Qanvit added 5 suppliers from automated vision search',
       updated: 'just now',
       unread: true,
     },

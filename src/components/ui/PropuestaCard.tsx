@@ -608,7 +608,7 @@ const PropuestaCard = ({
 
       {/* Botones de acción - Diseño mejorado */}
       <div className="px-5 pb-5 flex flex-col gap-3 pt-4">
-        {/* Botón See FQ Match Justification - Diseño mejorado y más llamativo */}
+        {/* Botón See Qanvit Match Justification - Diseño mejorado y más llamativo */}
         <button 
           onClick={() => setShowModal(true)}
           data-onboarding-target="see-fq-match-justification"
@@ -617,7 +617,7 @@ const PropuestaCard = ({
           {/* Efecto de brillo animado */}
           <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
           <span className="flex items-center justify-center gap-2 relative z-10">
-            See FQ Match Justification
+            See Qanvit Match Justification
           </span>
         </button>
 

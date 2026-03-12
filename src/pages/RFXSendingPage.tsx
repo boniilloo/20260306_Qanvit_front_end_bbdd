@@ -1070,7 +1070,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
         console.log('RFX sent to FQ review and then to suppliers', { sent_commit_id: commitIdToSend });
         toast({
           title: 'RFX in review',
-          description: 'The RFX has been sent to FQ Source reviewers. After validation, it will be sent to suppliers.',
+          description: 'The RFX has been sent to Qanvit reviewers. After validation, it will be sent to suppliers.',
         });
         
         // Fire-and-forget: invoke generic email sender with server-side filter
@@ -1186,7 +1186,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
       <div className="flex-1 overflow-y-auto flex flex-col min-h-full">
         <div className="container mx-auto px-4 py-8 flex-1">
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
           </div>
         </div>
       </div>
@@ -1203,7 +1203,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
         <div className="max-w-5xl mx-auto">
         {/* Consistent Header like specs/candidates */}
         <div className="mb-8">
-          <div className="mb-4 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#80c8f0] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
+          <div className="mb-4 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
             <div className="flex items-start md:items-center justify-between gap-3">
               <div className="min-w-0">
                 <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight truncate">
@@ -1219,7 +1219,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 <Button
                   variant="outline"
                   onClick={handleBackToOverview}
-                  className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+                  className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
@@ -1231,11 +1231,11 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
           <Card>
             <CardHeader>
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-3 bg-[#80c8f0]/20 rounded-lg">
-                  <Send className="h-8 w-8 text-[#80c8f0]" />
+                <div className="p-3 bg-[#f4a9aa]/20 rounded-lg">
+                  <Send className="h-8 w-8 text-[#f4a9aa]" />
                 </div>
                 <div>
-                  <CardTitle className="text-3xl font-semibold text-[#1A1F2C] font-intro">
+                  <CardTitle className="text-3xl font-semibold text-[#22183a] font-intro">
                     Launch RFX
                   </CardTitle>
                   <CardDescription className="text-base mt-1">
@@ -1264,9 +1264,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   <CollapsibleTrigger asChild>
                     <button className="w-full flex items-center justify-between p-4 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <FileText className="h-6 w-6 text-[#1A1F2C]" />
+                        <FileText className="h-6 w-6 text-[#22183a]" />
                         <div className="text-left">
-                          <h3 className="text-xl font-semibold text-[#1A1F2C]">Final Documentation</h3>
+                          <h3 className="text-xl font-semibold text-[#22183a]">Final Documentation</h3>
                           <p className="text-sm text-gray-600">
                             Generate comprehensive PDF documents with RFX specifications and candidate results.
                           </p>
@@ -1293,7 +1293,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                         <Button
                           onClick={handleGenerateSpecsPDF}
                           disabled={!hasSpecsContent() || isGeneratingSpecsPdf || !isSpecsCompleted}
-                          className="w-full bg-gradient-to-r from-[#80c8f0] to-[#80c8f0]/80 hover:from-[#80c8f0]/90 hover:to-[#80c8f0] text-[#1A1F2C] font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+                          className="w-full bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa]/80 hover:from-[#f4a9aa]/90 hover:to-[#f4a9aa] text-[#22183a] font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                         >
                           {isGeneratingSpecsPdf ? (
                             <>
@@ -1327,7 +1327,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                         <Button
                           onClick={handleGenerateCandidatesPDF}
                           disabled={!hasCandidates || isGeneratingCandidatesPdf || !isSpecsCompleted}
-                          className="w-full bg-gradient-to-r from-[#80c8f0] to-[#80c8f0]/80 hover:from-[#80c8f0]/90 hover:to-[#80c8f0] text-[#1A1F2C] font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+                          className="w-full bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa]/80 hover:from-[#f4a9aa]/90 hover:to-[#f4a9aa] text-[#22183a] font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                         >
                           {isGeneratingCandidatesPdf ? (
                             <>
@@ -1367,9 +1367,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                           className="w-full flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg"
                         >
                           <div className="flex items-center gap-3">
-                            <Users className="h-5 w-5 text-[#1A1F2C]" />
+                            <Users className="h-5 w-5 text-[#22183a]" />
                             <div className="text-left">
-                              <h4 className="text-lg font-semibold text-[#1A1F2C]">
+                              <h4 className="text-lg font-semibold text-[#22183a]">
                                 Selected Candidates
                               </h4>
                               <p className="text-sm text-gray-600">
@@ -1388,7 +1388,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                       <CollapsibleContent className="pt-4">
                         {loadingSelectedCandidates ? (
                           <div className="flex justify-center items-center py-8">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
                           </div>
                         ) : (
                           <>
@@ -1419,7 +1419,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                           className="flex items-center gap-4"
                                         >
                                           {/* Candidate Number */}
-                                          <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-[#1A1F2C] text-white rounded-full text-lg font-bold">
+                                          <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-[#22183a] text-white rounded-full text-lg font-bold">
                                             {candidateNumber}
                                           </div>
                                           
@@ -1445,7 +1445,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                                     href={companyWebsites[candidate.id_company_revision] || candidate.website} 
                                                     target="_blank" 
                                                     rel="noopener noreferrer"
-                                                    className="font-bold text-base text-[#1A1F2C] hover:text-[#80c8f0] transition-colors truncate"
+                                                    className="font-bold text-base text-[#22183a] hover:text-[#f4a9aa] transition-colors truncate"
                                                   >
                                                     {candidate.empresa}
                                                   </a>
@@ -1470,7 +1470,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                                 <div className="flex gap-3 flex-shrink-0">
                                                   <div className="text-center">
                                                     <div className="text-xs text-gray-500 mb-1">Overall</div>
-                                                    <div className="text-2xl font-bold text-[#1A1F2C]">{overallMatch}%</div>
+                                                    <div className="text-2xl font-bold text-[#22183a]">{overallMatch}%</div>
                                                   </div>
                                                   <div className="text-center">
                                                     <div className="text-xs text-gray-500 mb-1">Tech</div>
@@ -1482,7 +1482,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                                   </div>
                                                 </div>
                                               ) : (
-                                                <div className="flex items-center justify-center px-3 py-2 rounded-md bg-[#f1f1f1] text-[#1A1F2C] text-sm font-medium flex-shrink-0">
+                                                <div className="flex items-center justify-center px-3 py-2 rounded-md bg-[#f1f1f1] text-[#22183a] text-sm font-medium flex-shrink-0">
                                                   Manually selected
                                                 </div>
                                               )}
@@ -1502,7 +1502,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                                       });
                                                     }
                                                   }}
-                                                  className="px-4 py-2 border border-gray-300 rounded-lg text-[#1A1F2C] hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                                  className="px-4 py-2 border border-gray-300 rounded-lg text-[#22183a] hover:bg-gray-50 transition-colors flex items-center gap-2"
                                                 >
                                                   <ExternalLink size={16} />
                                                   View Website
@@ -1548,7 +1548,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                                   variant={currentPage === page ? "default" : "outline"}
                                                   size="sm"
                                                   onClick={() => setCurrentPage(page)}
-                                                  className={currentPage === page ? "bg-[#1A1F2C] text-white" : ""}
+                                                  className={currentPage === page ? "bg-[#22183a] text-white" : ""}
                                                 >
                                                   {page}
                                                 </Button>
@@ -1589,9 +1589,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   <CollapsibleTrigger asChild>
                     <button className="w-full flex items-center justify-between p-4 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <ClipboardCheck className="h-6 w-6 text-[#1A1F2C]" />
+                        <ClipboardCheck className="h-6 w-6 text-[#22183a]" />
                         <div className="text-left">
-                          <h3 className="text-xl font-semibold text-[#1A1F2C]">Final Review & Validation</h3>
+                          <h3 className="text-xl font-semibold text-[#22183a]">Final Review & Validation</h3>
                           <p className="text-sm text-gray-600">
                             All RFX members must review and validate the specifications and candidate selection before sending.
                           </p>
@@ -1722,7 +1722,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   <Button
                     onClick={startValidationProcess}
                     disabled={readOnly || selectedCandidates.length === 0}
-                    className="w-full mb-4 bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+                    className="w-full mb-4 bg-[#22183a] hover:bg-[#22183a]/90 text-white font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                   >
                     <ClipboardCheck className="h-4 w-4 mr-2" />
                     {readOnly ? 'Validation Complete (Read-Only)' : (currentUserValidation?.is_valid ? 'Review Validation' : 'Start Validation Process')}
@@ -1741,9 +1741,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   <CollapsibleTrigger asChild>
                     <button className="w-full flex items-center justify-between p-4 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <FileText className="h-6 w-6 text-[#1A1F2C]" />
+                        <FileText className="h-6 w-6 text-[#22183a]" />
                         <div className="text-left">
-                          <h3 className="text-xl font-semibold text-[#1A1F2C]">Non-Disclosure Agreement (NDA)</h3>
+                          <h3 className="text-xl font-semibold text-[#22183a]">Non-Disclosure Agreement (NDA)</h3>
                           <p className="text-sm text-gray-600">Upload and manage the NDA required before sending.</p>
                         </div>
                       </div>
@@ -1770,9 +1770,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   <CollapsibleTrigger asChild>
                     <button className="w-full flex items-center justify-between p-4 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <Send className="h-6 w-6 text-[#1A1F2C]" />
+                        <Send className="h-6 w-6 text-[#22183a]" />
                         <div className="text-left">
-                          <h3 className="text-xl font-semibold text-[#1A1F2C]">Send RFX to Suppliers</h3>
+                          <h3 className="text-xl font-semibold text-[#22183a]">Send RFX to Suppliers</h3>
                           <p className="text-sm text-gray-600">Send the RFX to the selected suppliers.</p>
                         </div>
                       </div>
@@ -1797,7 +1797,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                   data-onboarding-target="send-rfx-button"
                                   onClick={handleSendToSuppliers}
                                   disabled={readOnly || isDisabled}
-                                  className="w-full bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+                                  className="w-full bg-[#22183a] hover:bg-[#22183a]/90 text-white font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                                 >
                                   <Send className="h-4 w-4 mr-2" />
                                   {readOnly ? 'Read-Only Mode' : 'Send to Suppliers'}
@@ -1822,7 +1822,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                           variant="outline"
                           size="sm"
                           onClick={handleGoToValidationSection}
-                          className="border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C]/10 text-xs h-7"
+                          className="border-[#22183a] text-[#22183a] hover:bg-[#22183a]/10 text-xs h-7"
                         >
                           Go to validation section
                         </Button>
@@ -1842,7 +1842,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
           <DialogContent className="max-w-xl">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
-                <Info className="h-5 w-5 text-[#1A1F2C]" />
+                <Info className="h-5 w-5 text-[#22183a]" />
                 Save Version Before Validation
               </DialogTitle>
               <DialogDescription>
@@ -1889,7 +1889,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
               <Button
                 onClick={handleSaveVersionAndContinue}
                 disabled={!versionName.trim() || isSavingVersion}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               >
                 {isSavingVersion ? (
                   <>
@@ -1909,7 +1909,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-2xl">
-                <Info className="h-6 w-6 text-[#1A1F2C]" />
+                <Info className="h-6 w-6 text-[#22183a]" />
                 Final Validation Process
               </DialogTitle>
               <DialogDescription>
@@ -1922,9 +1922,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 You are about to start the final validation process for this RFX. This process consists of two validation steps:
               </p>
               
-              <div className="bg-[#f1f1f1] border border-[#80c8f0] rounded-lg p-4 space-y-3">
+              <div className="bg-[#f1f1f1] border border-[#f4a9aa] rounded-lg p-4 space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1A1F2C] text-white flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#22183a] text-white flex items-center justify-center font-bold">
                     1
                   </div>
                   <div>
@@ -1936,7 +1936,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 </div>
                 
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#1A1F2C] text-white flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#22183a] text-white flex items-center justify-center font-bold">
                     2
                   </div>
                   <div>
@@ -1984,7 +1984,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   Remove My Validation
                 </Button>
               )}
-              <Button onClick={handleValidationIntroConfirm} className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white">
+              <Button onClick={handleValidationIntroConfirm} className="bg-[#22183a] hover:bg-[#22183a]/90 text-white">
                 {currentUserValidation?.is_valid ? 'Review & Update Validation' : 'Start Validation'}
               </Button>
             </DialogFooter>
@@ -2023,10 +2023,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
         <Dialog open={showSendConfirm} onOpenChange={setShowSendConfirm}>
           <DialogContent className="max-w-xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl text-[#1A1F2C]">Send RFX to Suppliers</DialogTitle>
+              <DialogTitle className="text-2xl text-[#22183a]">Send RFX to Suppliers</DialogTitle>
               <DialogDescription>
                 {rfx?.status === 'draft' ? (
-                  'The RFX will be sent to FQ Source reviewers for validation. After this process, you will be notified and the RFX will be sent to the selected suppliers.'
+                  'The RFX will be sent to Qanvit reviewers for validation. After this process, you will be notified and the RFX will be sent to the selected suppliers.'
                 ) : (
                   'Suppliers will be notified that some aspects of the specifications have been updated. The new version will be sent to them.'
                 )}
@@ -2056,7 +2056,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     variant="outline"
                     size="sm"
                     onClick={handleGoToValidationSection}
-                    className="flex-shrink-0 border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C]/10"
+                    className="flex-shrink-0 border-[#22183a] text-[#22183a] hover:bg-[#22183a]/10"
                   >
                     Go to validation section
                   </Button>
@@ -2085,7 +2085,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     variant="outline"
                     size="sm"
                     onClick={handleGoToNDASection}
-                    className="flex-shrink-0 border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C]/10"
+                    className="flex-shrink-0 border-[#22183a] text-[#22183a] hover:bg-[#22183a]/10"
                   >
                     Go to NDA uploading
                   </Button>
@@ -2112,7 +2112,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
               </Button>
               <Button 
                 onClick={confirmSendToFQReview} 
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 disabled={isSending}
               >
                 {isSending ? (
@@ -2132,7 +2132,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
         <Dialog open={showNDAWarning} onOpenChange={setShowNDAWarning}>
           <DialogContent className="max-w-xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl text-[#1A1F2C] flex items-center gap-2">
+              <DialogTitle className="text-2xl text-[#22183a] flex items-center gap-2">
                 <AlertCircle className="h-6 w-6 text-amber-600" />
                 NDA Not Uploaded
               </DialogTitle>
@@ -2153,7 +2153,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 <Button 
                   variant="outline" 
                   onClick={handleUploadNDA}
-                  className="w-full sm:w-auto border-[#1A1F2C] text-[#1A1F2C] hover:bg-[#1A1F2C]/10"
+                  className="w-full sm:w-auto border-[#22183a] text-[#22183a] hover:bg-[#22183a]/10"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Upload NDA
@@ -2170,7 +2170,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 </Button>
                 <Button 
                   onClick={handleSendAnyway}
-                  className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white flex-1 sm:flex-initial"
+                  className="bg-[#22183a] hover:bg-[#22183a]/90 text-white flex-1 sm:flex-initial"
                   disabled={isSending}
                 >
                   {isSending ? (
@@ -2199,7 +2199,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
           <DialogContent className="w-[70vw] h-[90vh] max-w-[70vw] max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
-                <FileText className="h-5 w-5 text-[#1A1F2C]" />
+                <FileText className="h-5 w-5 text-[#22183a]" />
                 Step 1: Validate RFX Specifications
               </DialogTitle>
               <DialogDescription>
@@ -2219,7 +2219,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
               <div className="border rounded-lg bg-gray-50 flex-1 min-h-0 overflow-hidden">
                 {isLoadingSpecsPdf ? (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                    <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
                     <p className="text-sm text-gray-600">Generating PDF preview...</p>
                   </div>
                 ) : specsPdfUrl ? (
@@ -2276,7 +2276,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
           <DialogContent className="max-w-5xl max-h-[90vh]">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
-                <Users className="h-5 w-5 text-[#1A1F2C]" />
+                <Users className="h-5 w-5 text-[#22183a]" />
                 Step 2: Validate Candidate Selection
               </DialogTitle>
               <DialogDescription>
@@ -2310,7 +2310,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     return (
                       <div key={index} className="flex items-center gap-3 bg-white border border-gray-200 rounded-lg p-3">
                         {/* Number */}
-                        <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 bg-[#1A1F2C] text-white rounded-full text-sm font-bold">
+                        <div className="flex-shrink-0 flex items-center justify-center w-8 h-8 bg-[#22183a] text-white rounded-full text-sm font-bold">
                           {index + 1}
                         </div>
                         
@@ -2339,7 +2339,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                           <div className="flex gap-2 flex-shrink-0">
                             <div className="text-center">
                               <div className="text-xs text-gray-500">Overall</div>
-                              <div className="text-lg font-bold text-[#1A1F2C]">{overallMatch}%</div>
+                              <div className="text-lg font-bold text-[#22183a]">{overallMatch}%</div>
                             </div>
                             <div className="text-center">
                               <div className="text-xs text-gray-500">Tech</div>
@@ -2351,7 +2351,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                             </div>
                           </div>
                         ) : (
-                          <div className="flex items-center justify-center px-3 py-2 rounded-md bg-[#f1f1f1] text-[#1A1F2C] text-sm font-medium flex-shrink-0">
+                          <div className="flex items-center justify-center px-3 py-2 rounded-md bg-[#f1f1f1] text-[#22183a] text-sm font-medium flex-shrink-0">
                             Manually selected
                           </div>
                         )}
@@ -2426,7 +2426,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   This RFX has been archived by the project creator.
                 </p>
                 <div className="bg-[#f1f1f1] border-l-4 border-l-gray-400 rounded-lg p-4 space-y-2">
-                  <p className="font-medium text-[#1A1F2C]">
+                  <p className="font-medium text-[#22183a]">
                     While archived:
                   </p>
                   <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-2">
@@ -2453,7 +2453,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => setShowArchivedModal(false)}
-                className="w-full sm:w-auto bg-[#1A1F2C] hover:bg-[#1A1F2C]/90"
+                className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
               >
                 View Only
               </AlertDialogAction>

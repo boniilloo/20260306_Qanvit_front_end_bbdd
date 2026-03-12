@@ -192,8 +192,8 @@ const RFXManagement: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-semibold text-[#1A1F2C]">RFX Management</h1>
-        <p className="text-gray-600">Validación por revisores de FQ Source</p>
+        <h1 className="text-3xl font-semibold text-[#22183a]">RFX Management</h1>
+        <p className="text-gray-600">Validación por revisores de Qanvit</p>
       </div>
 
       <Tabs defaultValue="rfx-validation" className="w-full">
@@ -206,18 +206,18 @@ const RFXManagement: React.FC = () => {
         <TabsContent value="rfx-validation">
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1A1F2C]"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
             </div>
           ) : (
             <div className="space-y-4">
               {rfxs.length === 0 ? (
-                <Card className="border-2 border-[#80c8f0]">
+                <Card className="border-2 border-[#f4a9aa]">
                   <CardContent className="py-16">
                     <div className="text-center">
                       <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#f1f1f1] mb-6">
-                        <ClipboardCheck className="h-10 w-10 text-[#80c8f0]" />
+                        <ClipboardCheck className="h-10 w-10 text-[#f4a9aa]" />
                       </div>
-                      <h3 className="text-xl font-semibold text-[#1A1F2C] mb-2">
+                      <h3 className="text-xl font-semibold text-[#22183a] mb-2">
                         No RFXs pending validation
                       </h3>
                       <p className="text-gray-600 max-w-md mx-auto">
@@ -270,22 +270,22 @@ const ValidatedRFXHistory: React.FC<{
 
   if (loading && !isExpanded) {
     return (
-      <Card className="border-2 border-[#7de19a]">
+      <Card className="border-2 border-[#f4a9aa]">
         <CardHeader 
           onClick={() => setIsExpanded(!isExpanded)} 
           className="cursor-pointer"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <History className="h-5 w-5 text-[#1A1F2C]" />
-              <CardTitle className="text-xl text-[#1A1F2C]">Historial de RFXs Validadas</CardTitle>
+              <History className="h-5 w-5 text-[#22183a]" />
+              <CardTitle className="text-xl text-[#22183a]">Historial de RFXs Validadas</CardTitle>
             </div>
             <div className="flex items-center gap-2">
               {totalValidatedRfxs > 0 && (
                 <Badge variant="secondary">{totalValidatedRfxs} RFX{totalValidatedRfxs !== 1 ? 's' : ''} validada{totalValidatedRfxs !== 1 ? 's' : ''}</Badge>
               )}
               <svg
-                className={`w-5 h-5 text-[#1A1F2C] transition-transform ${isExpanded ? 'transform rotate-180' : ''}`}
+                className={`w-5 h-5 text-[#22183a] transition-transform ${isExpanded ? 'transform rotate-180' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -304,15 +304,15 @@ const ValidatedRFXHistory: React.FC<{
   }
 
   return (
-    <Card className="border-2 border-[#7de19a]">
+    <Card className="border-2 border-[#f4a9aa]">
       <CardHeader 
         onClick={() => setIsExpanded(!isExpanded)} 
         className="cursor-pointer hover:bg-gray-50 transition-colors"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <History className="h-5 w-5 text-[#1A1F2C]" />
-            <CardTitle className="text-xl text-[#1A1F2C]">Historial de RFXs Validadas</CardTitle>
+            <History className="h-5 w-5 text-[#22183a]" />
+            <CardTitle className="text-xl text-[#22183a]">Historial de RFXs Validadas</CardTitle>
           </div>
             <div className="flex items-center gap-2">
             {totalValidatedRfxs > 0 && !loading && (
@@ -322,7 +322,7 @@ const ValidatedRFXHistory: React.FC<{
               <Loader2 className="h-4 w-4 animate-spin text-gray-600" />
             )}
             <svg
-              className={`w-5 h-5 text-[#1A1F2C] transition-transform ${isExpanded ? 'transform rotate-180' : ''}`}
+              className={`w-5 h-5 text-[#22183a] transition-transform ${isExpanded ? 'transform rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -343,8 +343,8 @@ const ValidatedRFXHistory: React.FC<{
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h4 className="text-base font-semibold text-[#1A1F2C]">{rfx.name}</h4>
-                      <Badge className="bg-[#7de19a] text-[#1A1F2C]">Validada</Badge>
+                      <h4 className="text-base font-semibold text-[#22183a]">{rfx.name}</h4>
+                      <Badge className="bg-[#f4a9aa] text-[#22183a]">Validada</Badge>
                     </div>
                     {rfx.description && (
                       <p className="text-sm text-gray-600 mb-2">{rfx.description}</p>
@@ -352,14 +352,14 @@ const ValidatedRFXHistory: React.FC<{
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-gray-600">
                       {/* Columna izquierda: Owner */}
                       <div className="space-y-1">
-                        <div className="font-semibold text-[#1A1F2C] mb-2">Owner</div>
+                        <div className="font-semibold text-[#22183a] mb-2">Owner</div>
                         <div>
                           <span className="font-medium">Nombre:</span> {ownerName}
                         </div>
                         <div>
                           <span className="font-medium">Email:</span>{' '}
                           {rfx.owner_email ? (
-                            <a href={`mailto:${rfx.owner_email}`} className="text-[#80c8f0] hover:underline">
+                            <a href={`mailto:${rfx.owner_email}`} className="text-[#f4a9aa] hover:underline">
                               {rfx.owner_email}
                             </a>
                           ) : (
@@ -370,14 +370,14 @@ const ValidatedRFXHistory: React.FC<{
 
                       {/* Columna centro: Validador */}
                       <div className="space-y-1">
-                        <div className="font-semibold text-[#1A1F2C] mb-2">Validador</div>
+                        <div className="font-semibold text-[#22183a] mb-2">Validador</div>
                         <div>
                           <span className="font-medium">Nombre:</span> {reviewerName}
                         </div>
                         <div>
                           <span className="font-medium">Email:</span>{' '}
                           {rfx.reviewer_email ? (
-                            <a href={`mailto:${rfx.reviewer_email}`} className="text-[#80c8f0] hover:underline">
+                            <a href={`mailto:${rfx.reviewer_email}`} className="text-[#f4a9aa] hover:underline">
                               {rfx.reviewer_email}
                             </a>
                           ) : (
@@ -388,7 +388,7 @@ const ValidatedRFXHistory: React.FC<{
 
                       {/* Columna derecha: Estado y Fecha */}
                       <div className="space-y-1">
-                        <div className="font-semibold text-[#1A1F2C] mb-2">Información</div>
+                        <div className="font-semibold text-[#22183a] mb-2">Información</div>
                         <div>
                           <span className="font-medium">Estado actual:</span>{' '}
                           <Badge variant="outline" className="text-xs">{rfx.status}</Badge>
@@ -445,7 +445,7 @@ const ValidatedRFXHistory: React.FC<{
                           size="sm"
                           onClick={() => onPageChange(page)}
                           disabled={loading}
-                          className={currentPage === page ? "bg-[#1A1F2C] text-white" : ""}
+                          className={currentPage === page ? "bg-[#22183a] text-white" : ""}
                         >
                           {page}
                         </Button>
@@ -756,13 +756,13 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
   };
 
   return (
-    <Card className="border-2 border-[#80c8f0]">
+    <Card className="border-2 border-[#f4a9aa]">
       <CardHeader onClick={onToggle} className="cursor-pointer">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <ClipboardCheck className="h-6 w-6 text-[#1A1F2C]" />
+            <ClipboardCheck className="h-6 w-6 text-[#22183a]" />
             <div>
-              <CardTitle className="text-xl text-[#1A1F2C]">{rfx.name}</CardTitle>
+              <CardTitle className="text-xl text-[#22183a]">{rfx.name}</CardTitle>
               <CardDescription>{rfx.description}</CardDescription>
             </div>
           </div>
@@ -788,21 +788,21 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
             <>
               <div className="space-y-2">
                 <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2"><Users className="h-4 w-4" /> Participantes</h4>
-                <div className="overflow-x-auto border rounded-md border-[#80c8f0]">
+                <div className="overflow-x-auto border rounded-md border-[#f4a9aa]">
                   <table className="min-w-full">
                     <thead className="bg-[#f1f1f1]">
                       <tr>
-                        <th className="text-left text-xs font-medium text-[#1A1F2C] px-3 py-2">Nombre</th>
-                        <th className="text-left text-xs font-medium text-[#1A1F2C] px-3 py-2">Apellidos</th>
-                        <th className="text-left text-xs font-medium text-[#1A1F2C] px-3 py-2">Correo</th>
+                        <th className="text-left text-xs font-medium text-[#22183a] px-3 py-2">Nombre</th>
+                        <th className="text-left text-xs font-medium text-[#22183a] px-3 py-2">Apellidos</th>
+                        <th className="text-left text-xs font-medium text-[#22183a] px-3 py-2">Correo</th>
                       </tr>
                     </thead>
                     <tbody>
                       {members.map((m) => (
                         <tr key={m.user_id} className="border-t">
-                          <td className="px-3 py-2 text-sm text-[#1A1F2C]">{m.name || '-'}</td>
-                          <td className="px-3 py-2 text-sm text-[#1A1F2C]">{m.surname || '-'}</td>
-                          <td className="px-3 py-2 text-sm text-[#1A1F2C]">{m.email || '-'}</td>
+                          <td className="px-3 py-2 text-sm text-[#22183a]">{m.name || '-'}</td>
+                          <td className="px-3 py-2 text-sm text-[#22183a]">{m.surname || '-'}</td>
+                          <td className="px-3 py-2 text-sm text-[#22183a]">{m.email || '-'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -814,12 +814,12 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                 <Card className="border-gray-200">
                   <CardHeader>
                     <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-[#1A1F2C]" />
+                      <FileText className="h-5 w-5 text-[#22183a]" />
                       <CardTitle className="text-base">Especificaciones (PDF)</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <Button onClick={() => openPreview('specs')} disabled={isGeneratingSpecsPdf} className="w-full bg-gradient-to-r from-[#80c8f0] to-[#80c8f0]/80 text-[#1A1F2C] font-bold">
+                    <Button onClick={() => openPreview('specs')} disabled={isGeneratingSpecsPdf} className="w-full bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa]/80 text-[#22183a] font-bold">
                       {isGeneratingSpecsPdf ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <FileText className="h-4 w-4 mr-2" />}
                       {isGeneratingSpecsPdf ? 'Generando...' : 'Previsualizar PDF'}
                     </Button>
@@ -829,7 +829,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                 <Card className="border-gray-200">
                   <CardHeader>
                     <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-[#1A1F2C]" />
+                      <FileText className="h-5 w-5 text-[#22183a]" />
                       <CardTitle className="text-base">NDA (PDF)</CardTitle>
                     </div>
                   </CardHeader>
@@ -837,7 +837,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                     {originalNda ? (
                       <div className="space-y-3">
                         <div>
-                          <p className="text-sm font-medium text-[#1A1F2C]">{originalNda.file_name}</p>
+                          <p className="text-sm font-medium text-[#22183a]">{originalNda.file_name}</p>
                           <p className="text-xs text-gray-500">
                             {formatFileSize(originalNda.file_size)} • {new Date(originalNda.uploaded_at).toLocaleDateString()}
                           </p>
@@ -867,7 +867,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                 <Card className="border-gray-200">
                   <CardHeader>
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-[#1A1F2C]" />
+                      <CheckCircle className="h-5 w-5 text-[#22183a]" />
                       <CardTitle className="text-base">Candidatos</CardTitle>
                     </div>
                   </CardHeader>
@@ -875,7 +875,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Columna izquierda: Seleccionados */}
                       <div>
-                        <div className="text-sm font-medium text-[#1A1F2C] mb-3">Seleccionados</div>
+                        <div className="text-sm font-medium text-[#22183a] mb-3">Seleccionados</div>
                         <div className="space-y-2 max-h-96 overflow-y-auto">
                           {!Array.isArray(selectedCandidates) || selectedCandidates.length === 0 ? (
                             <div className="text-xs text-gray-500">Sin selección</div>
@@ -896,7 +896,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                                       <span className="text-xs text-gray-500">- {c.producto}</span>
                                     )}
                                     <Badge variant={fromAgent ? 'default' : 'secondary'} className={fromAgent ? 'bg-green-600' : ''}>
-                                      {fromAgent ? 'FQ' : 'Manual'}
+                                      {fromAgent ? 'Qanvit' : 'Manual'}
                                     </Badge>
                                   </div>
                                   {websiteUrl && (
@@ -904,7 +904,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                                       href={websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-[#80c8f0] hover:text-[#1A1F2C] hover:underline flex items-center gap-1 text-xs whitespace-nowrap"
+                                      className="text-[#f4a9aa] hover:text-[#22183a] hover:underline flex items-center gap-1 text-xs whitespace-nowrap"
                                     >
                                       <ExternalLink className="h-3 w-3" />
                                       Visit website
@@ -917,9 +917,9 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                         </div>
                       </div>
 
-                      {/* Columna derecha: Recomendados por FQ */}
+                      {/* Columna derecha: Recomendados por Qanvit */}
                       <div>
-                        <div className="text-sm font-medium text-[#1A1F2C] mb-3">Recomendados por FQ</div>
+                        <div className="text-sm font-medium text-[#22183a] mb-3">Recomendados por Qanvit</div>
                         <div className="space-y-2 max-h-96 overflow-y-auto">
                           {!Array.isArray(agentCandidates) || agentCandidates.length === 0 ? (
                             <div className="text-xs text-gray-500">Sin recomendaciones</div>
@@ -943,7 +943,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                                       href={websiteUrl.startsWith('http') ? websiteUrl : `https://${websiteUrl}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-[#80c8f0] hover:text-[#1A1F2C] hover:underline flex items-center gap-1 text-xs whitespace-nowrap"
+                                      className="text-[#f4a9aa] hover:text-[#22183a] hover:underline flex items-center gap-1 text-xs whitespace-nowrap"
                                     >
                                       <ExternalLink className="h-3 w-3" />
                                       Visit website
@@ -1055,8 +1055,8 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                           if (companyIds.length > 0) {
                             const compTitle = 'Your company was invited to an RFX';
                             const compBody = hasNDA 
-                              ? `Your company has been invited to the RFX "${rfx.name}" in FQ Source. Next step: your team must sign the NDA before accessing the RFX information.`
-                              : `Your company has been invited to the RFX "${rfx.name}" in FQ Source. You can now access the RFX information.`;
+                              ? `Your company has been invited to the RFX "${rfx.name}" in Qanvit. Next step: your team must sign the NDA before accessing the RFX information.`
+                              : `Your company has been invited to the RFX "${rfx.name}" in Qanvit. You can now access the RFX information.`;
                             // Create per-company notifications with tailored target_url to Supplier page in RFX tab
                             for (const cid of companyIds) {
                               const slug = companySlugById[cid];
@@ -1089,8 +1089,8 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                       try {
                         const title = 'RFX approved and sent to suppliers';
                         const body = hasNDA
-                          ? `Your RFX "${rfx.name}" has been approved by FQ Source and sent to suppliers. Next step: suppliers must sign the NDA before accessing the RFX information.`
-                          : `Your RFX "${rfx.name}" has been approved by FQ Source and sent to suppliers. Suppliers can now access the RFX information.`;
+                          ? `Your RFX "${rfx.name}" has been approved by Qanvit and sent to suppliers. Next step: suppliers must sign the NDA before accessing the RFX information.`
+                          : `Your RFX "${rfx.name}" has been approved by Qanvit and sent to suppliers. Suppliers can now access the RFX information.`;
                         const targetUrl = `/rfxs/${rfx.id}`;
                         
                         // Use RPC function with SECURITY DEFINER to create notifications
@@ -1129,7 +1129,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
                       setInviting(false);
                     }
                   }}
-                  className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+                  className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 >
                   {developerReviewed ? 'Revisada por developer' : (inviting ? 'Validando...' : 'Marcar como validada (developer)')}
                 </Button>
@@ -1169,7 +1169,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
         <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#1A1F2C]" />
+              <FileText className="h-5 w-5 text-[#22183a]" />
               {viewingNda?.title}
             </DialogTitle>
           </DialogHeader>
@@ -1182,7 +1182,7 @@ const RFXReviewCard: React.FC<{ rfx: RFXRow; expanded: boolean; onToggle: () => 
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>
@@ -1383,7 +1383,7 @@ const NDARevisionTab: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
       </div>
     );
   }
@@ -1592,13 +1592,13 @@ const NDASubmissionCard: React.FC<{
   };
 
   return (
-    <Card className="border-2 border-[#80c8f0]">
+    <Card className="border-2 border-[#f4a9aa]">
       <CardHeader onClick={onToggle} className="cursor-pointer">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <FileText className="h-6 w-6 text-[#1A1F2C]" />
+            <FileText className="h-6 w-6 text-[#22183a]" />
             <div>
-              <CardTitle className="text-xl text-[#1A1F2C]">{submission.rfx_name}</CardTitle>
+              <CardTitle className="text-xl text-[#22183a]">{submission.rfx_name}</CardTitle>
               <CardDescription>Company: {submission.company_name || 'N/A'}</CardDescription>
             </div>
           </div>
@@ -1611,7 +1611,7 @@ const NDASubmissionCard: React.FC<{
           <Card className="border-gray-200">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <ClipboardCheck className="h-5 w-5 text-[#1A1F2C]" />
+                <ClipboardCheck className="h-5 w-5 text-[#22183a]" />
                 <CardTitle className="text-base">RFX Information</CardTitle>
               </div>
             </CardHeader>
@@ -1629,7 +1629,7 @@ const NDASubmissionCard: React.FC<{
                   <p className="text-sm font-medium text-gray-700 mb-1">Creator Email</p>
                   <p className="text-sm text-gray-900">
                     {submission.rfx_creator_email ? (
-                      <a href={`mailto:${submission.rfx_creator_email}`} className="text-[#80c8f0] hover:underline">
+                      <a href={`mailto:${submission.rfx_creator_email}`} className="text-[#f4a9aa] hover:underline">
                         {submission.rfx_creator_email}
                       </a>
                     ) : 'N/A'}
@@ -1649,7 +1649,7 @@ const NDASubmissionCard: React.FC<{
           <Card className="border-gray-200">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-[#1A1F2C]" />
+                <Users className="h-5 w-5 text-[#22183a]" />
                 <CardTitle className="text-base">Company Information</CardTitle>
               </div>
             </CardHeader>
@@ -1667,7 +1667,7 @@ const NDASubmissionCard: React.FC<{
                         href={submission.company_website.startsWith('http') ? submission.company_website : `https://${submission.company_website}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#80c8f0] hover:underline flex items-center gap-1"
+                        className="text-[#f4a9aa] hover:underline flex items-center gap-1"
                       >
                         {submission.company_website}
                         <ExternalLink className="h-3 w-3" />
@@ -1683,7 +1683,7 @@ const NDASubmissionCard: React.FC<{
                   <p className="text-sm font-medium text-gray-700 mb-1">Uploader Email</p>
                   <p className="text-sm text-gray-900">
                     {submission.uploaded_by_user?.email ? (
-                      <a href={`mailto:${submission.uploaded_by_user.email}`} className="text-[#80c8f0] hover:underline">
+                      <a href={`mailto:${submission.uploaded_by_user.email}`} className="text-[#f4a9aa] hover:underline">
                         {submission.uploaded_by_user.email}
                       </a>
                     ) : 'N/A'}
@@ -1791,7 +1791,7 @@ const NDASubmissionCard: React.FC<{
               Reject NDA
             </Button>
             <Button
-              className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+              className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
               onClick={() => handleValidation(true)}
               disabled={validating}
             >
@@ -1821,7 +1821,7 @@ const NDASubmissionCard: React.FC<{
         <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#1A1F2C]" />
+              <FileText className="h-5 w-5 text-[#22183a]" />
               {viewingPdf?.title}
             </DialogTitle>
           </DialogHeader>
@@ -1834,7 +1834,7 @@ const NDASubmissionCard: React.FC<{
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>
@@ -2040,7 +2040,7 @@ const NDAHistoryTab: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
       </div>
     );
   }
@@ -2154,13 +2154,13 @@ const NDAHistoryCard: React.FC<{
   };
 
   return (
-    <Card className="border-2 border-[#7de19a]">
+    <Card className="border-2 border-[#f4a9aa]">
       <CardHeader onClick={onToggle} className="cursor-pointer">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <History className="h-6 w-6 text-[#1A1F2C]" />
+            <History className="h-6 w-6 text-[#22183a]" />
             <div>
-              <CardTitle className="text-xl text-[#1A1F2C]">{historyItem.rfx_name}</CardTitle>
+              <CardTitle className="text-xl text-[#22183a]">{historyItem.rfx_name}</CardTitle>
               <CardDescription>
                 {historyItem.company_name || 'N/A'} • Validated on {historyItem.validated_nda?.validated_at 
                   ? new Date(historyItem.validated_nda.validated_at).toLocaleDateString()
@@ -2168,7 +2168,7 @@ const NDAHistoryCard: React.FC<{
               </CardDescription>
             </div>
           </div>
-          <Badge className="bg-[#7de19a] text-[#1A1F2C]">Validated</Badge>
+          <Badge className="bg-[#f4a9aa] text-[#22183a]">Validated</Badge>
         </div>
       </CardHeader>
       {expanded && (
@@ -2177,7 +2177,7 @@ const NDAHistoryCard: React.FC<{
           <Card className="border-gray-200">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <ClipboardCheck className="h-5 w-5 text-[#1A1F2C]" />
+                <ClipboardCheck className="h-5 w-5 text-[#22183a]" />
                 <CardTitle className="text-base">RFX Information</CardTitle>
               </div>
             </CardHeader>
@@ -2195,7 +2195,7 @@ const NDAHistoryCard: React.FC<{
                   <p className="text-sm font-medium text-gray-700 mb-1">Creator Email</p>
                   <p className="text-sm text-gray-900">
                     {historyItem.rfx_creator_email ? (
-                      <a href={`mailto:${historyItem.rfx_creator_email}`} className="text-[#80c8f0] hover:underline">
+                      <a href={`mailto:${historyItem.rfx_creator_email}`} className="text-[#f4a9aa] hover:underline">
                         {historyItem.rfx_creator_email}
                       </a>
                     ) : 'N/A'}
@@ -2215,7 +2215,7 @@ const NDAHistoryCard: React.FC<{
           <Card className="border-gray-200">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-[#1A1F2C]" />
+                <Users className="h-5 w-5 text-[#22183a]" />
                 <CardTitle className="text-base">Company Information</CardTitle>
               </div>
             </CardHeader>
@@ -2233,7 +2233,7 @@ const NDAHistoryCard: React.FC<{
                         href={historyItem.company_website.startsWith('http') ? historyItem.company_website : `https://${historyItem.company_website}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#80c8f0] hover:underline flex items-center gap-1"
+                        className="text-[#f4a9aa] hover:underline flex items-center gap-1"
                       >
                         {historyItem.company_website}
                         <ExternalLink className="h-3 w-3" />
@@ -2249,7 +2249,7 @@ const NDAHistoryCard: React.FC<{
                   <p className="text-sm font-medium text-gray-700 mb-1">Uploader Email</p>
                   <p className="text-sm text-gray-900">
                     {historyItem.uploaded_by_user?.email ? (
-                      <a href={`mailto:${historyItem.uploaded_by_user.email}`} className="text-[#80c8f0] hover:underline">
+                      <a href={`mailto:${historyItem.uploaded_by_user.email}`} className="text-[#f4a9aa] hover:underline">
                         {historyItem.uploaded_by_user.email}
                       </a>
                     ) : 'N/A'}
@@ -2260,10 +2260,10 @@ const NDAHistoryCard: React.FC<{
           </Card>
 
           {/* Validation Information Section */}
-          <Card className="border-gray-200 bg-[#7de19a]/10">
+          <Card className="border-gray-200 bg-[#f4a9aa]/10">
             <CardHeader>
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-[#7de19a]" />
+                <CheckCircle className="h-5 w-5 text-[#f4a9aa]" />
                 <CardTitle className="text-base">Validation Information</CardTitle>
               </div>
             </CardHeader>
@@ -2277,7 +2277,7 @@ const NDAHistoryCard: React.FC<{
                   <p className="text-sm font-medium text-gray-700 mb-1">Validator Email</p>
                   <p className="text-sm text-gray-900">
                     {historyItem.validated_by_user?.email ? (
-                      <a href={`mailto:${historyItem.validated_by_user.email}`} className="text-[#80c8f0] hover:underline">
+                      <a href={`mailto:${historyItem.validated_by_user.email}`} className="text-[#f4a9aa] hover:underline">
                         {historyItem.validated_by_user.email}
                       </a>
                     ) : 'N/A'}
@@ -2393,7 +2393,7 @@ const NDAHistoryCard: React.FC<{
         <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#1A1F2C]" />
+              <FileText className="h-5 w-5 text-[#22183a]" />
               {viewingPdf?.title}
             </DialogTitle>
           </DialogHeader>
@@ -2406,7 +2406,7 @@ const NDAHistoryCard: React.FC<{
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>

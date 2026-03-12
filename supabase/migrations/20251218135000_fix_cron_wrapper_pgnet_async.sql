@@ -16,7 +16,7 @@ BEGIN
     -- Call net.http_post with CORRECT async signature
     -- Returns a request_id (bigint) for async tracking
     SELECT net.http_post(
-      url := 'https://fukzxedgbszcpakqkrjf.functions.supabase.co/chat-unread-email-notifier',
+      url := 'https://bymbfjkezrwsuvbsaycg.functions.supabase.co/chat-unread-email-notifier',
       body := '{}'::jsonb,
       params := '{}'::jsonb,  -- No query params
       headers := '{"Content-Type": "application/json"}'::jsonb,

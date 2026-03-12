@@ -70,7 +70,7 @@ begin
   -- Fire-and-forget: call the notifier via Edge Functions router.
   perform public.http_send(
     'POST',
-    'https://fukzxedgbszcpakqkrjf.functions.supabase.co/chat-unread-email-notifier',
+    'https://bymbfjkezrwsuvbsaycg.functions.supabase.co/chat-unread-email-notifier',
     json_build_object('Content-Type','application/json')::json,
     '{}'
   );

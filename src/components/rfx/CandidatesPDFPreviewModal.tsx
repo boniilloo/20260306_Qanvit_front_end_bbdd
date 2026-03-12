@@ -21,7 +21,7 @@ const CandidatesPDFPreviewModal: React.FC<CandidatesPDFPreviewModalProps> = ({
         <div className="w-full h-full rounded-md border border-gray-200 overflow-hidden bg-white">
           {generating && !pdfUrl ? (
             <div className="w-full h-full flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+              <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
             </div>
           ) : pdfUrl ? (
             <iframe src={pdfUrl} className="w-full h-full" title="RFX Candidates PDF" />

@@ -10,7 +10,7 @@ const getProjectRefFromUrl = (url: string | undefined) => {
   if (!url) return '';
   try {
     const u = new URL(url);
-    const host = u.hostname; // e.g. fukzxedgbszcpakqkrjf.supabase.co
+    const host = u.hostname; // e.g. bymbfjkezrwsuvbsaycg.supabase.co
     const [sub] = host.split('.');
     return host.endsWith('supabase.co') ? sub : '';
   } catch {
@@ -25,8 +25,8 @@ const ConnectionInfoTab: React.FC = () => {
   const localAnon = import.meta.env.VITE_SUPABASE_LOCAL_ANON_KEY || 'sb_publishable_…';
 
   // Use same fallbacks as the Supabase client so info is visible even without envs
-  const remoteUrl = import.meta.env.VITE_SUPABASE_URL || 'https://fukzxedgbszcpakqkrjf.supabase.co';
-  const remoteAnon = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1a3p4ZWRnYnN6Y3Bha3FrcmpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA0MzIzMDQsImV4cCI6MjA2NjAwODMwNH0.sz4lyS_ljaJyFsxD0TKxcDTTDm0ovVg_uIAfilG6-GA';
+  const remoteUrl = import.meta.env.VITE_SUPABASE_URL || 'https://bymbfjkezrwsuvbsaycg.supabase.co';
+  const remoteAnon = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
   const effectiveUrl = isLocal ? localUrl : remoteUrl;
   const effectiveKey = isLocal ? localAnon : remoteAnon;

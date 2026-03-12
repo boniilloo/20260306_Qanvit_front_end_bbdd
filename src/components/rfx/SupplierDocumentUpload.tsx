@@ -673,7 +673,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="h-5 w-5 text-[#1A1F2C]" />
+                <FileText className="h-5 w-5 text-[#22183a]" />
                 {getCategoryLabel(category)}
               </CardTitle>
               <CardDescription>
@@ -700,7 +700,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
                 size="sm"
                 disabled={isUploading}
                 onClick={() => document.getElementById(`file-upload-${category}`)?.click()}
-                className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
               >
                 {isUploading ? (
                   <>
@@ -720,8 +720,8 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
             <div
               className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
                 isDragOver
-                  ? 'border-[#80c8f0] bg-[#80c8f0]/5'
-                  : 'border-gray-300 hover:border-[#80c8f0]/50'
+                  ? 'border-[#f4a9aa] bg-[#f4a9aa]/5'
+                  : 'border-gray-300 hover:border-[#f4a9aa]/50'
               }`}
               onDragOver={(e) => {
                 e.preventDefault();
@@ -732,7 +732,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
             >
               {isUploading ? (
                 <>
-                  <Loader2 className="h-8 w-8 mx-auto mb-4 text-[#80c8f0] animate-spin" />
+                  <Loader2 className="h-8 w-8 mx-auto mb-4 text-[#f4a9aa] animate-spin" />
                   <p className="text-sm text-gray-600">Uploading files...</p>
                 </>
               ) : (
@@ -756,7 +756,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
                     size="sm"
                     disabled={isUploading || isAtLimit}
                     onClick={() => document.getElementById(`file-upload-${category}`)?.click()}
-                    className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white border-[#1A1F2C]"
+                    className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                   >
                     {isUploading ? 'Uploading...' : 'Select Files'}
                   </Button>
@@ -771,7 +771,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
           {/* Documents List */}
           {hasDocuments && (
             <div className="space-y-2">
-              <h4 className="text-sm font-medium text-[#1A1F2C]">
+              <h4 className="text-sm font-medium text-[#22183a]">
                 Uploaded Documents ({categoryDocuments.length})
               </h4>
               <div className="space-y-2">
@@ -781,7 +781,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
                     className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <FileText className="h-5 w-5 text-[#1A1F2C] flex-shrink-0" />
+                      <FileText className="h-5 w-5 text-[#22183a] flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {doc.file_name}
@@ -856,7 +856,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-6 w-6 animate-spin text-[#80c8f0]" />
+        <Loader2 className="h-6 w-6 animate-spin text-[#f4a9aa]" />
       </div>
     );
   }
@@ -875,7 +875,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-lg font-semibold text-[#1A1F2C]">
+                    <h3 className="text-lg font-semibold text-[#22183a]">
                       Submit Proposal
                     </h3>
                     <TooltipProvider delayDuration={50}>
@@ -883,7 +883,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
                         <TooltipTrigger asChild>
                           <button
                             type="button"
-                            className="text-[#80c8f0] hover:text-[#1A1F2C] transition-colors cursor-help"
+                            className="text-[#f4a9aa] hover:text-[#22183a] transition-colors cursor-help"
                             aria-label="What happens after you submit?"
                           >
                             <HelpCircle className="h-5 w-5" />
@@ -896,7 +896,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
                               The buyer will be notified that your company has submitted documents for review and will have direct access to them.
                             </p>
                             <p className="text-sm">
-                              In the future, an FQ agent will help evaluate proposals before sending them to ensure they meet all the conditions specified in the RFX.
+                              In the future, a Qanvit agent will help evaluate proposals before sending them to ensure they meet all the conditions specified in the RFX.
                             </p>
                           </div>
                         </TooltipContent>
@@ -912,7 +912,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
                 <Button
                   onClick={() => setShowSubmitModal(true)}
                   disabled={!canSubmit || isSubmitting}
-                  className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-[#1A1F2C]"
+                  className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a]"
                 >
                   {isSubmitting ? (
                     <>
@@ -932,12 +932,12 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
         )}
 
         {!hideSubmitButton && isSubmitted && (
-          <Card className="border border-[#7de19a] rounded-xl shadow-sm bg-[#7de19a]/10">
+          <Card className="border border-[#f4a9aa] rounded-xl shadow-sm bg-[#f4a9aa]/10">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <CheckCircle2 className="h-5 w-5 text-[#7de19a]" />
+                <CheckCircle2 className="h-5 w-5 text-[#f4a9aa]" />
                 <div>
-                  <h3 className="text-lg font-semibold text-[#1A1F2C] mb-1">
+                  <h3 className="text-lg font-semibold text-[#22183a] mb-1">
                     Proposal Submitted
                   </h3>
                   <p className="text-sm text-gray-600">
@@ -970,7 +970,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
             <Button
               onClick={handleSubmitProposal}
               disabled={isSubmitting}
-              className="bg-[#7de19a] hover:bg-[#7de19a]/90 text-white"
+              className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white"
             >
               {isSubmitting ? (
                 <>
@@ -1034,7 +1034,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
         <DialogContent className="max-w-[80vw] w-[80vw] h-[85vh] max-h-[85vh] flex flex-col p-0">
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#1A1F2C]" />
+              <FileText className="h-5 w-5 text-[#22183a]" />
               {viewingPdf?.title}
             </DialogTitle>
           </DialogHeader>
@@ -1047,7 +1047,7 @@ export const SupplierDocumentUpload: React.FC<SupplierDocumentUploadProps> = ({
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="h-8 w-8 animate-spin text-[#1A1F2C]" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
               </div>
             )}
           </div>

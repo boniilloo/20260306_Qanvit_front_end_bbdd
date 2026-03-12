@@ -309,7 +309,7 @@ Ver archivos:
 
 ### 3. Integrar componente en tu web
 - [ ] Copiar `SUBSCRIPTION_COMPONENT_EXAMPLE.tsx`
-- [ ] Adaptarlo a tu diseño (colores: #1A1F2C, #80c8f0, #f1f1f1, #7de19a)
+- [ ] Adaptarlo a tu diseño (colores: #22183a, #f4a9aa, #f1f1f1, #7de19a)
 - [ ] Añadirlo a la página de suscripción
 
 ### 4. Probar flujo completo

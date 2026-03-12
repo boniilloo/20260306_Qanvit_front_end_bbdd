@@ -2220,7 +2220,7 @@ CREATE TABLE IF NOT EXISTS "public"."supplier_lists" (
     "user_id" "uuid" NOT NULL,
     "name" "text" NOT NULL,
     "description" "text",
-    "color" "text" DEFAULT '#80c8f0'::"text",
+    "color" "text" DEFAULT '#f4a9aa'::"text",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL
 );

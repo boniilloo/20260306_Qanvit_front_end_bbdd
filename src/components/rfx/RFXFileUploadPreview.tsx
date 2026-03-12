@@ -52,7 +52,7 @@ const RFXFileUploadPreview: React.FC<RFXFileUploadPreviewProps> = ({
           {typeof progressPercent === 'number' && (
             <Progress
               value={Math.max(0, Math.min(100, progressPercent))}
-              className="h-2 bg-gray-200 [&_[data-state]]:bg-[#80c8f0]"
+              className="h-2 bg-gray-200 [&_[data-state]]:bg-[#f4a9aa]"
             />
           )}
         </div>

@@ -69,7 +69,7 @@ import RFXAnalysisResults from '@/components/rfx/analysis/RFXAnalysisResults';
 
 Match percentage colors:
 - **Green** (`#7de19a`): ≥85%
-- **Blue** (`#80c8f0`): ≥70%
+- **Blue** (`#f4a9aa`): ≥70%
 - **Yellow** (`#f5d547`): ≥50%
 - **Red** (`#ff6b6b`): <50%
 

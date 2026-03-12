@@ -105,7 +105,7 @@ const NextStep: React.FC<NextStepProps> = ({
       return 0;
     };
 
-    // Calculate FQ Source validation status
+    // Calculate Qanvit validation status
     const getFQValidationStatus = (): TodoStatus => {
       if (rfxStatus === 'waiting for supplier proposals') {
         return 'completed';
@@ -232,8 +232,8 @@ const NextStep: React.FC<NextStepProps> = ({
         const fqValidationVisualStatus = getItemVisualStatus('fq_validation');
         return {
           id: 'fq_validation',
-          title: 'Validating by FQ Source',
-          description: 'Our FQ team is carefully reviewing all details to ensure everything is correct.\n\nThis step includes:\n  • Final validation of RFX specifications\n  • Review of selected suppliers\n  • Preparation of sending logistics\n  • Quality assurance checks\n\nYou will be notified once validation is complete and the RFX is ready to be sent to suppliers.',
+          title: 'Validating by Qanvit',
+          description: 'Our Qanvit team is carefully reviewing all details to ensure everything is correct.\n\nThis step includes:\n  • Final validation of RFX specifications\n  • Review of selected suppliers\n  • Preparation of sending logistics\n  • Quality assurance checks\n\nYou will be notified once validation is complete and the RFX is ready to be sent to suppliers.',
           icon: <Send className="h-6 w-6" />,
           action: undefined, // No action needed - passive step
           buttonText: undefined,
@@ -270,15 +270,15 @@ const NextStep: React.FC<NextStepProps> = ({
   const getStatusBadge = (status: TodoStatus) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-[#7de19a]/20 text-[#1A1F2C] border-[#7de19a]">Completed</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">Completed</Badge>;
       case 'in_progress':
-        return <Badge className="bg-[#80c8f0]/20 text-[#1A1F2C] border-[#80c8f0]">In Progress</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">In Progress</Badge>;
       case 'warning':
         return <Badge className="bg-orange-100 text-orange-800 border-orange-300">Warning</Badge>;
       case 'coming_soon':
-        return <Badge className="bg-[#f1f1f1] text-[#1A1F2C] border-gray-300">Coming Soon</Badge>;
+        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">Coming Soon</Badge>;
       default:
-        return <Badge className="bg-[#f1f1f1] text-[#1A1F2C] border-gray-300">Next Step</Badge>;
+        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">Next Step</Badge>;
     }
   };
 
@@ -296,9 +296,9 @@ const NextStep: React.FC<NextStepProps> = ({
         <div className="space-y-4">
           {/* Step Icon and Title */}
           <div className="flex items-start gap-4">
-            <div className={`flex-shrink-0 p-3 rounded-lg text-[#1A1F2C] ${
-              stepConfig.status === 'completed' ? 'bg-[#7de19a]/20' :
-              stepConfig.status === 'in_progress' ? 'bg-[#80c8f0]' :
+            <div className={`flex-shrink-0 p-3 rounded-lg text-[#22183a] ${
+              stepConfig.status === 'completed' ? 'bg-[#f4a9aa]/20' :
+              stepConfig.status === 'in_progress' ? 'bg-[#f4a9aa]' :
               stepConfig.status === 'warning' ? 'bg-orange-100' :
               'bg-[#f1f1f1]'
             }`}>
@@ -307,16 +307,16 @@ const NextStep: React.FC<NextStepProps> = ({
             
             <div className="flex-1 min-w-0">
               <h3 className={`text-lg font-semibold mb-2 ${
-                stepConfig.status === 'completed' ? 'text-[#1A1F2C]' :
-                stepConfig.status === 'in_progress' ? 'text-[#1A1F2C]' :
+                stepConfig.status === 'completed' ? 'text-[#22183a]' :
+                stepConfig.status === 'in_progress' ? 'text-[#22183a]' :
                 stepConfig.status === 'warning' ? 'text-orange-800' :
                 'text-gray-900'
               }`}>
                 {stepConfig.title}
               </h3>
               <div className={`text-sm mb-4 ${
-                stepConfig.status === 'completed' ? 'text-[#1A1F2C]' :
-                stepConfig.status === 'in_progress' ? 'text-[#1A1F2C]' :
+                stepConfig.status === 'completed' ? 'text-[#22183a]' :
+                stepConfig.status === 'in_progress' ? 'text-[#22183a]' :
                 stepConfig.status === 'warning' ? 'text-orange-700' :
                 'text-gray-600'
               }`}>
@@ -335,26 +335,26 @@ const NextStep: React.FC<NextStepProps> = ({
                     <div className="flex gap-1">
                       <div className={`px-2 py-1 rounded text-xs text-center font-medium flex items-center gap-1 cursor-default ${
                         specsCompletion.description 
-                          ? 'bg-[#7de19a]/20 text-[#1A1F2C] border border-[#7de19a]' 
+                          ? 'bg-[#f4a9aa]/20 text-[#22183a] border border-[#f4a9aa]' 
                           : 'bg-[#f1f1f1] text-gray-500 border border-gray-200'
                       }`}>
-                        {specsCompletion.description && <Check className="h-3 w-3 text-[#7de19a]" />}
+                        {specsCompletion.description && <Check className="h-3 w-3 text-[#f4a9aa]" />}
                         Project Description
                       </div>
                       <div className={`px-2 py-1 rounded text-xs text-center font-medium flex items-center gap-1 cursor-default ${
                         specsCompletion.technical_requirements 
-                          ? 'bg-[#7de19a]/20 text-[#1A1F2C] border border-[#7de19a]' 
+                          ? 'bg-[#f4a9aa]/20 text-[#22183a] border border-[#f4a9aa]' 
                           : 'bg-[#f1f1f1] text-gray-500 border border-gray-200'
                       }`}>
-                        {specsCompletion.technical_requirements && <Check className="h-3 w-3 text-[#7de19a]" />}
+                        {specsCompletion.technical_requirements && <Check className="h-3 w-3 text-[#f4a9aa]" />}
                         Technical Requirements
                       </div>
                       <div className={`px-2 py-1 rounded text-xs text-center font-medium flex items-center gap-1 cursor-default ${
                         specsCompletion.company_requirements 
-                          ? 'bg-[#7de19a]/20 text-[#1A1F2C] border border-[#7de19a]' 
+                          ? 'bg-[#f4a9aa]/20 text-[#22183a] border border-[#f4a9aa]' 
                           : 'bg-[#f1f1f1] text-gray-500 border border-gray-200'
                       }`}>
-                        {specsCompletion.company_requirements && <Check className="h-3 w-3 text-[#7de19a]" />}
+                        {specsCompletion.company_requirements && <Check className="h-3 w-3 text-[#f4a9aa]" />}
                         Company Requirements
                       </div>
                     </div>
@@ -372,7 +372,7 @@ const NextStep: React.FC<NextStepProps> = ({
                           onClick={stepConfig.action}
                           disabled={!forceButtonsEnabled && stepConfig.status === 'pending'}
                           data-onboarding-target={stepConfig.id === 'specs' ? 'go-to-rfx-specs-button' : undefined}
-                          className="w-full bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full bg-[#22183a] hover:bg-[#22183a]/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <ArrowRight className="h-4 w-4 mr-2" />
                           {stepConfig.buttonText}

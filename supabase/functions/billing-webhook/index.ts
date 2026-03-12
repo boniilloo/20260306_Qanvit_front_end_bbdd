@@ -72,10 +72,10 @@ async function sendClaimCodeEmail(payerEmail: string, claimCode: string): Promis
   const subject = "Your FQ Source subscription code";
   const html = `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: #1A1F2C; color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+  <div style="background: #22183a; color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
     <h1 style="margin: 0; font-size: 20px;">Payment confirmed</h1>
   </div>
-  <p style="color: #1A1F2C; line-height: 1.6;">Your FQ Source subscription is now active. Keep this code for your records and to share with your team.</p>
+  <p style="color: #22183a; line-height: 1.6;">Your FQ Source subscription is now active. Keep this code for your records and to share with your team.</p>
   <div style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 8px; padding: 16px; margin: 16px 0; text-align: center;">
     <p style="margin: 0 0 8px 0; font-size: 12px; color: #92400e; font-weight: 600;">Subscription code</p>
     <p style="margin: 0; font-size: 24px; font-weight: bold; letter-spacing: 0.1em; font-family: monospace;">${escapeHtml(claimCode)}</p>

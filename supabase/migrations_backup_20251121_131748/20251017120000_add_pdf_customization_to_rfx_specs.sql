@@ -2,9 +2,9 @@
 -- Includes colors for header and section titles, and optional header logo
 
 ALTER TABLE public.rfx_specs
-ADD COLUMN IF NOT EXISTS pdf_header_bg_color TEXT DEFAULT '#1A1F2C',
+ADD COLUMN IF NOT EXISTS pdf_header_bg_color TEXT DEFAULT '#22183a',
 ADD COLUMN IF NOT EXISTS pdf_header_text_color TEXT DEFAULT '#FFFFFF',
-ADD COLUMN IF NOT EXISTS pdf_section_header_bg_color TEXT DEFAULT '#80c8f0',
+ADD COLUMN IF NOT EXISTS pdf_section_header_bg_color TEXT DEFAULT '#f4a9aa',
 ADD COLUMN IF NOT EXISTS pdf_section_header_text_color TEXT DEFAULT '#FFFFFF',
 ADD COLUMN IF NOT EXISTS pdf_logo_url TEXT,
 ADD COLUMN IF NOT EXISTS pdf_logo_bg_color TEXT DEFAULT '#FFFFFF',

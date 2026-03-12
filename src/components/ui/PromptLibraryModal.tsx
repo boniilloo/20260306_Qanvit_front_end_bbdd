@@ -135,7 +135,7 @@ export default function PromptLibraryModal({ open, onOpenChange, onPromptSelect 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh] bg-white">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-[#1b2c4a]">
+          <DialogTitle className="text-xl font-semibold text-[#22183a]">
             Machine Vision Prompt Library
           </DialogTitle>
         </DialogHeader>
@@ -170,7 +170,7 @@ export default function PromptLibraryModal({ open, onOpenChange, onPromptSelect 
               {filteredCategories.map((category) => (
                 <div key={category.name} className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-[#1b2c4a]">{category.name}</h3>
+                    <h3 className="font-semibold text-[#22183a]">{category.name}</h3>
                     <Badge variant="secondary" className="text-xs">
                       {category.prompts.length} prompts
                     </Badge>
@@ -179,11 +179,11 @@ export default function PromptLibraryModal({ open, onOpenChange, onPromptSelect 
                     {category.prompts.map((prompt, index) => (
                       <div
                         key={index}
-                        className="group p-3 border border-gray-200 rounded-lg hover:border-[#80c8f0] hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                        className="group p-3 border border-gray-200 rounded-lg hover:border-[#f4a9aa] hover:bg-gray-50 transition-all duration-200 cursor-pointer"
                         onClick={() => handlePromptClick(prompt)}
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <p className="text-sm text-gray-700 group-hover:text-[#1b2c4a] leading-relaxed flex-1">
+                          <p className="text-sm text-gray-700 group-hover:text-[#22183a] leading-relaxed flex-1">
                             {prompt}
                           </p>
                           <Button

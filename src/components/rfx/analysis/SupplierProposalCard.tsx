@@ -25,8 +25,8 @@ const SupplierProposalCard: React.FC<SupplierProposalCardProps> = ({
 
   // Determine color based on percentage
   const getMatchColor = (percentage: number) => {
-    if (percentage >= 85) return 'text-[#7de19a]'; // verde (85+)
-    if (percentage >= 75) return 'text-[#80c8f0]'; // azul claro (75-84)
+    if (percentage >= 85) return 'text-[#f4a9aa]'; // verde (85+)
+    if (percentage >= 75) return 'text-[#f4a9aa]'; // azul claro (75-84)
     if (percentage >= 65) return 'text-[#fbbf24]'; // amarillo (65-74)
     if (percentage >= 50) return 'text-[#fb923c]'; // naranja (50-64)
     return 'text-[#ef4444]'; // rojo (<50)
@@ -37,7 +37,7 @@ const SupplierProposalCard: React.FC<SupplierProposalCardProps> = ({
   return (
     <Card
       className={`cursor-pointer transition-all hover:shadow-md ${
-        isSelected ? 'ring-2 ring-[#80c8f0] bg-[#80c8f0]/5' : 'hover:bg-gray-50'
+        isSelected ? 'ring-2 ring-[#f4a9aa] bg-[#f4a9aa]/5' : 'hover:bg-gray-50'
       }`}
       onClick={onClick}
     >
@@ -59,7 +59,7 @@ const SupplierProposalCard: React.FC<SupplierProposalCardProps> = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div
-                      className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[#7de19a] text-[#1A1F2C] text-[11px] font-bold flex items-center justify-center border border-white shadow-sm"
+                      className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[#f4a9aa] text-[#22183a] text-[11px] font-bold flex items-center justify-center border border-white shadow-sm"
                       aria-label={`${commentCount} comment${commentCount === 1 ? '' : 's'}`}
                     >
                       {commentCount > 99 ? '99+' : commentCount}

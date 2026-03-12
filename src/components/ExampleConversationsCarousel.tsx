@@ -150,7 +150,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
         {/* Header */}
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="w-4 h-4 text-yellow-500" />
-          <h2 className="text-base font-bold text-[#1b2c4a]">Example Conversations</h2>
+          <h2 className="text-base font-bold text-[#22183a]">Example Conversations</h2>
           <Badge variant="secondary" className="ml-1 text-xs">
             {publicConversations.length}
           </Badge>
@@ -164,7 +164,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
               className="snap-start"
             >
               <Card 
-                className="cursor-pointer active:scale-[0.98] transition-all duration-200 border-2 active:border-[#80c8f0]"
+                className="cursor-pointer active:scale-[0.98] transition-all duration-200 border-2 active:border-[#f4a9aa]"
                 onClick={() => handleConversationClick(conversation.conversation_id)}
               >
                 <CardContent className="p-3 flex gap-3">
@@ -178,7 +178,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
                   
                   {/* Content on right */}
                   <div className="flex-1 min-w-0 flex flex-col">
-                    <h3 className="font-semibold text-sm text-[#1b2c4a] mb-1 line-clamp-2">
+                    <h3 className="font-semibold text-sm text-[#22183a] mb-1 line-clamp-2">
                       {conversation.title || conversation.preview || 'Example Conversation'}
                     </h3>
                     
@@ -187,7 +187,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
                         <Clock className="w-3 h-3 flex-shrink-0" />
                         <span className="truncate">{formatDistanceToNow(new Date(conversation.created_at), { addSuffix: false })}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-[#80c8f0] text-xs font-medium flex-shrink-0">
+                      <div className="flex items-center gap-1 text-[#f4a9aa] text-xs font-medium flex-shrink-0">
                         <span>View</span>
                         <ArrowRight className="w-3 h-3" />
                       </div>
@@ -203,7 +203,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
         <div className="mt-4">
           <Button
             onClick={onStartYourOwn}
-            className="w-full bg-[#1e293b] hover:bg-[#334155] text-white shadow-lg text-sm h-10"
+            className="w-full bg-[#22183a] hover:bg-[#334155] text-white shadow-lg text-sm h-10"
           >
             <MessageSquare className="w-4 h-4 mr-2" />
             Start Your Own Conversation
@@ -217,7 +217,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
         <div className="flex items-center justify-between mb-4 px-2">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-yellow-500" />
-            <h2 className="text-xl font-bold text-[#1b2c4a]">Example Conversations</h2>
+            <h2 className="text-xl font-bold text-[#22183a]">Example Conversations</h2>
             <Badge variant="secondary" className="ml-2">
               {publicConversations.length} examples
             </Badge>
@@ -236,7 +236,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
             {publicConversations.map((conversation) => (
               <CarouselItem key={conversation.conversation_id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
                 <Card 
-                  className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-[#80c8f0] h-full"
+                  className="cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-2 hover:border-[#f4a9aa] h-full"
                   onClick={() => handleConversationClick(conversation.conversation_id)}
                 >
                   <CardContent className="p-5 h-full flex flex-col">
@@ -254,7 +254,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
                     </div>
 
                     {/* Title */}
-                    <h3 className="font-semibold text-[#1b2c4a] mb-2 line-clamp-2 flex-shrink-0">
+                    <h3 className="font-semibold text-[#22183a] mb-2 line-clamp-2 flex-shrink-0">
                       {conversation.title || conversation.preview || 'Example Conversation'}
                     </h3>
 
@@ -271,7 +271,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
                         <Clock className="w-3 h-3" />
                         <span>{formatDistanceToNow(new Date(conversation.created_at), { addSuffix: true })}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-[#80c8f0] text-sm font-medium">
+                      <div className="flex items-center gap-1 text-[#f4a9aa] text-sm font-medium">
                         <span>View</span>
                         <ArrowRight className="w-4 h-4" />
                       </div>
@@ -290,7 +290,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
           <Button
             onClick={handleRandomConversation}
             variant="outline"
-            className="w-full sm:w-auto border-2 border-[#80c8f0] text-[#80c8f0] hover:bg-[#80c8f0] hover:text-white transition-all duration-300"
+            className="w-full sm:w-auto border-2 border-[#f4a9aa] text-[#f4a9aa] hover:bg-[#f4a9aa] hover:text-white transition-all duration-300"
           >
             <Sparkles className="w-4 h-4 mr-2" />
             Get Random Example
@@ -298,7 +298,7 @@ const ExampleConversationsCarousel: React.FC<ExampleConversationsCarouselProps> 
           
           <Button
             onClick={onStartYourOwn}
-            className="w-full sm:w-auto bg-[#1e293b] hover:bg-[#334155] text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            className="w-full sm:w-auto bg-[#22183a] hover:bg-[#334155] text-white shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <MessageSquare className="w-4 h-4 mr-2" />
             Start Your Own Conversation

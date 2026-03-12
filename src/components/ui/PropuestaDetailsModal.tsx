@@ -223,7 +223,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                           cx="64"
                           cy="64"
                           r="56"
-                          stroke="#7de19a"
+                          stroke="#f4a9aa"
                           strokeWidth="12"
                           fill="none"
                           strokeDasharray={`${2 * Math.PI * 56}`}
@@ -233,7 +233,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="text-center">
-                          <div className="text-3xl font-bold text-[#7de19a]">{overallMatch}%</div>
+                          <div className="text-3xl font-bold text-[#f4a9aa]">{overallMatch}%</div>
                         </div>
                       </div>
                     </div>
@@ -255,7 +255,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
               {/* Summary */}
               <div>
                 <h4 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[#80c8f0]" />
+                  <FileText className="h-5 w-5 text-[#f4a9aa]" />
                   Summary
                 </h4>
                 <div className="space-y-3">
@@ -279,7 +279,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
               {/* Match analysis */}
               <div>
                 <h4 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <BarChart className="h-5 w-5 text-[#80c8f0]" />
+                  <BarChart className="h-5 w-5 text-[#f4a9aa]" />
                   Match Analysis
                 </h4>
                 {(() => {
@@ -352,7 +352,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                           cx="64"
                           cy="64"
                           r="56"
-                          stroke="#7de19a"
+                          stroke="#f4a9aa"
                           strokeWidth="12"
                           fill="none"
                           strokeDasharray={`${2 * Math.PI * 56}`}
@@ -362,7 +362,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                       </svg>
                       <div className="absolute inset-0 flex items-center justify-center">
                         <div className="text-center">
-                          <div className="text-3xl font-bold text-[#7de19a]">{overallMatch}%</div>
+                          <div className="text-3xl font-bold text-[#f4a9aa]">{overallMatch}%</div>
                         </div>
                       </div>
                     </div>

@@ -366,47 +366,47 @@ const FQAgent = () => {
             <div className="w-full relative overflow-hidden flex flex-col items-center justify-center min-h-[calc(100vh-160px)]">
               {/* Enhanced background pattern */}
               <div className="absolute inset-0 opacity-5">
-                <div className="absolute top-20 left-20 w-72 h-72 bg-[#80c8f0] rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
-                <div className="absolute top-20 right-20 w-72 h-72 bg-[#7de19a] rounded-full mix-blend-multiply filter blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
-                <div className="absolute -bottom-8 left-20 w-72 h-72 bg-[#1b2c4a] rounded-full mix-blend-multiply filter blur-xl animate-pulse" style={{animationDelay: '4s'}}></div>
+                <div className="absolute top-20 left-20 w-72 h-72 bg-[#f4a9aa] rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+                <div className="absolute top-20 right-20 w-72 h-72 bg-[#f4a9aa] rounded-full mix-blend-multiply filter blur-xl animate-pulse" style={{animationDelay: '2s'}}></div>
+                <div className="absolute -bottom-8 left-20 w-72 h-72 bg-[#22183a] rounded-full mix-blend-multiply filter blur-xl animate-pulse" style={{animationDelay: '4s'}}></div>
               </div>
               <div className="w-full px-4 sm:px-6 py-8 sm:py-12 relative z-10">
                 {/* Simplified Header */}
                 <div className="text-center mb-12 sm:mb-16 max-w-4xl mx-auto">
-                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1b2c4a] mb-4 leading-tight">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#22183a] mb-4 leading-tight">
                     Find the right industrial<br />
-                    supplier <span className="text-[#80c8f0]">in one prompt</span>
+                    supplier <span className="text-[#f4a9aa]">in one prompt</span>
                   </h1>
                 </div>
                 {/* Functional Sections - Horizontal Cards - TEMPORARILY DISABLED */}
                 {/* 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 max-w-4xl mx-auto">
                   <EnhancedCard hover={false} clickable={false} className="flex items-center gap-4 p-4 bg-white border-0">
-                    <div className="w-12 h-12 bg-gradient-to-r from-[#80c8f0] to-[#7de19a] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] rounded-lg flex items-center justify-center flex-shrink-0">
                       <Target className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#1b2c4a] mb-1">Smart Match</h3>
+                      <h3 className="font-semibold text-[#22183a] mb-1">Smart Match</h3>
                       <p className="text-sm text-gray-600">Get AI-recommended suppliers instantly</p>
                     </div>
                   </EnhancedCard>
                   
                   <EnhancedCard hover={false} clickable={false} className="flex items-center gap-4 p-4 bg-white border-0">
-                    <div className="w-12 h-12 bg-gradient-to-r from-[#80c8f0] to-[#7de19a] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] rounded-lg flex items-center justify-center flex-shrink-0">
                       <Eye className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#1b2c4a] mb-1">Live Search</h3>
+                      <h3 className="font-semibold text-[#22183a] mb-1">Live Search</h3>
                       <p className="text-sm text-gray-600">Browse and filter live suppliers</p>
                     </div>
                   </EnhancedCard>
                   
                   <EnhancedCard hover={false} clickable={false} className="flex items-center gap-4 p-4 bg-white border-0">
-                    <div className="w-12 h-12 bg-gradient-to-r from-[#80c8f0] to-[#7de19a] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] rounded-lg flex items-center justify-center flex-shrink-0">
                       <Zap className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#1b2c4a] mb-1">Quick RFXs</h3>
+                      <h3 className="font-semibold text-[#22183a] mb-1">Quick RFXs</h3>
                       <p className="text-sm text-gray-600">Create and send RFXs in minutes</p>
                     </div>
                   </EnhancedCard>

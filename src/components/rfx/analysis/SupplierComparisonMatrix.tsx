@@ -28,8 +28,8 @@ const SupplierComparisonMatrix: React.FC<SupplierComparisonMatrixProps> = ({
 
   // Determine color for match percentage
   const getMatchColor = (percentage: number) => {
-    if (percentage >= 85) return '#7de19a'; // verde (85+)
-    if (percentage >= 75) return '#80c8f0'; // azul claro (75-84)
+    if (percentage >= 85) return '#f4a9aa'; // verde (85+)
+    if (percentage >= 75) return '#f4a9aa'; // azul claro (75-84)
     if (percentage >= 65) return '#fbbf24'; // amarillo (65-74)
     if (percentage >= 50) return '#fb923c'; // naranja (50-64)
     return '#ef4444'; // rojo (<50)
@@ -38,8 +38,8 @@ const SupplierComparisonMatrix: React.FC<SupplierComparisonMatrixProps> = ({
   // Get quality grade color
   const getGradeColor = (grade: string) => {
     const baseLetter = grade.charAt(0).toUpperCase();
-    if (baseLetter === 'A') return '#7de19a'; // verde
-    if (baseLetter === 'B') return '#80c8f0'; // azul claro
+    if (baseLetter === 'A') return '#f4a9aa'; // verde
+    if (baseLetter === 'B') return '#f4a9aa'; // azul claro
     if (baseLetter === 'C') return '#fbbf24'; // amarillo
     if (baseLetter === 'D') return '#fb923c'; // naranja
     return '#ef4444'; // rojo para E, F
@@ -57,7 +57,7 @@ const SupplierComparisonMatrix: React.FC<SupplierComparisonMatrixProps> = ({
       {/* Header Card */}
       <Card>
         <CardContent className="pt-6">
-          <h2 className="text-xl font-bold text-[#1A1F2C] mb-4">Multi-supplier comparison</h2>
+          <h2 className="text-xl font-bold text-[#22183a] mb-4">Multi-supplier comparison</h2>
           
           {/* Comparison Table */}
           <div className="overflow-x-auto">
@@ -68,7 +68,7 @@ const SupplierComparisonMatrix: React.FC<SupplierComparisonMatrixProps> = ({
                   {sortedSuppliers.map((supplier) => (
                     <th
                       key={supplier.company_uuid || supplier.supplier_name}
-                      className="text-center p-4 min-w-[180px] cursor-pointer hover:bg-[#80c8f0]/5 transition-colors"
+                      className="text-center p-4 min-w-[180px] cursor-pointer hover:bg-[#f4a9aa]/5 transition-colors"
                       onClick={() => onSupplierClick?.(supplier)}
                     >
                       <div className="flex flex-col items-center gap-2">
@@ -80,7 +80,7 @@ const SupplierComparisonMatrix: React.FC<SupplierComparisonMatrixProps> = ({
                           className="rounded-lg"
                           isSupplierRoute={true}
                         />
-                        <span className="font-semibold text-[#1A1F2C]">{supplier.supplier_name}</span>
+                        <span className="font-semibold text-[#22183a]">{supplier.supplier_name}</span>
                       </div>
                     </th>
                   ))}
@@ -162,7 +162,7 @@ const SupplierComparisonMatrix: React.FC<SupplierComparisonMatrixProps> = ({
 
                     return (
                       <td key={supplier.company_uuid || supplier.supplier_name} className="p-4 text-center">
-                        <span className="text-xl font-bold text-[#1A1F2C]">
+                        <span className="text-xl font-bold text-[#22183a]">
                           {price ? `${currency}${price.toLocaleString()}` : 'N/A'}
                         </span>
                       </td>

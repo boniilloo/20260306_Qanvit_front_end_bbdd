@@ -31,7 +31,8 @@ import RFXEncryptedImage from './RFXEncryptedImage';
 import RFXEncryptedDocument from './RFXEncryptedDocument';
 
 // La línea sin comentar es la URL que se usa (producción = Vercel; local = dev).
-const RFX_AGENT_WS_URL = 'ws://localhost:8000/ws-rfx-agent';
+//const RFX_AGENT_WS_URL = 'ws://localhost:8000/ws-rfx-agent';
+const ws = new WebSocket('wss://web-production-c08e9.up.railway.app/ws-rfx-agent');
 
 // Toggle to enable extra console diagnostics for WS resume/debugging.
 // Keep it false for normal use to avoid spamming the console.

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Plus, Trash2, Edit, FileText, Calendar, Check, X, Pencil, ChevronLeft, ChevronRight, User, Search, Filter, ArrowUpDown, Loader2, MoreVertical, Archive } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,6 +48,7 @@ import { RFXProgressBar } from '@/components/rfx/RFXProgressBar';
 import PublicRFXExamplesCarousel from '@/components/rfx/PublicRFXExamplesCarousel';
 
 const RFXProjects = () => {
+  const { t } = useTranslation();
   const { rfxs, totalCount, loading, createRFX, deleteRFX, updateRFX, archiveRFX, fetchRFXs } = useRFXs();
   const { user } = useAuth();
   const isMobile = useIsMobile();
@@ -254,8 +256,8 @@ const RFXProjects = () => {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "You have been removed from this RFX",
+        title: t('rfxs.success'),
+        description: t('rfxs.removedFromRfx'),
       });
 
       setIsRemoveSelfDialogOpen(false);
@@ -271,8 +273,8 @@ const RFXProjects = () => {
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to remove yourself from the RFX",
+        title: t('rfxs.error'),
+        description: t('rfxs.failedToRemoveSelf'),
         variant: "destructive",
       });
     }
@@ -314,8 +316,8 @@ const RFXProjects = () => {
 
     if (!isOwner) {
       toast({
-        title: "Error",
-        description: "Only the RFX creator can archive it",
+        title: t('rfxs.error'),
+        description: t('rfxs.onlyCreatorCanArchive'),
         variant: "destructive",
       });
       return;
@@ -324,8 +326,8 @@ const RFXProjects = () => {
     // Cannot archive if in revision
     if (rfx.status === 'revision requested by buyer') {
       toast({
-        title: "Cannot Archive",
-        description: "RFX cannot be archived while under review by Qanvit",
+        title: t('rfxs.cannotArchive'),
+        description: t('rfxs.cannotArchiveUnderReview'),
         variant: "destructive",
       });
       return;
@@ -341,7 +343,7 @@ const RFXProjects = () => {
         setIsArchiveDialogOpen(true);
       } else {
         // Reset announcement fields for unarchive
-        setUnarchiveAnnouncementSubject('RFX Project Unarchived');
+        setUnarchiveAnnouncementSubject(t('rfxs.rfxProjectUnarchived'));
         setUnarchiveAnnouncementMessage('');
         setIsUnarchiveWithAnnouncementDialogOpen(true);
       }
@@ -352,7 +354,7 @@ const RFXProjects = () => {
         setIsArchiveDialogOpen(true);
       } else {
         // Reset announcement fields
-        setArchiveAnnouncementSubject('RFX Project Archived');
+        setArchiveAnnouncementSubject(t('rfxs.rfxProjectArchived'));
         setArchiveAnnouncementMessage('');
         setIsArchiveWithAnnouncementDialogOpen(true);
       }
@@ -382,8 +384,8 @@ const RFXProjects = () => {
 
     if (!archiveAnnouncementSubject.trim()) {
       toast({
-        title: 'Error',
-        description: 'Subject cannot be empty',
+        title: t('rfxs.error'),
+        description: t('rfxs.subjectRequired'),
         variant: 'destructive',
       });
       return;
@@ -391,8 +393,8 @@ const RFXProjects = () => {
     
     if (!archiveAnnouncementMessage.trim()) {
       toast({
-        title: 'Error',
-        description: 'Message cannot be empty',
+        title: t('rfxs.error'),
+        description: t('rfxs.messageRequired'),
         variant: 'destructive',
       });
       return;
@@ -446,8 +448,8 @@ const RFXProjects = () => {
     } catch (error: any) {
       console.error('Error posting announcement:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to post announcement and archive RFX',
+        title: t('rfxs.error'),
+        description: t('rfxs.failedPostAndArchive'),
         variant: 'destructive',
       });
     } finally {
@@ -462,8 +464,8 @@ const RFXProjects = () => {
 
     if (!unarchiveAnnouncementSubject.trim()) {
       toast({
-        title: 'Error',
-        description: 'Subject cannot be empty',
+        title: t('rfxs.error'),
+        description: t('rfxs.subjectRequired'),
         variant: 'destructive',
       });
       return;
@@ -471,8 +473,8 @@ const RFXProjects = () => {
     
     if (!unarchiveAnnouncementMessage.trim()) {
       toast({
-        title: 'Error',
-        description: 'Message cannot be empty',
+        title: t('rfxs.error'),
+        description: t('rfxs.messageRequired'),
         variant: 'destructive',
       });
       return;
@@ -526,8 +528,8 @@ const RFXProjects = () => {
     } catch (error: any) {
       console.error('Error posting announcement:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to post announcement and unarchive RFX',
+        title: t('rfxs.error'),
+        description: t('rfxs.failedPostAndUnarchive'),
         variant: 'destructive',
       });
     } finally {
@@ -553,8 +555,11 @@ const RFXProjects = () => {
   };
 
   const getStatusLabel = (status: string) => {
-    if (status === 'revision requested by buyer') return 'Revision requested by buyer';
-    if (status === 'waiting for supplier proposals') return 'Waiting for supplier proposals';
+    if (status === 'revision requested by buyer') return t('rfxs.statusRevisionRequested');
+    if (status === 'waiting for supplier proposals') return t('rfxs.statusWaitingProposals');
+    if (status === 'draft') return t('rfxs.statusDraft');
+    if (status === 'closed') return t('rfxs.statusClosed');
+    if (status === 'cancelled') return t('rfxs.statusCancelled');
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
@@ -653,7 +658,7 @@ const RFXProjects = () => {
                     value={editData.name}
                     onChange={(e) => setEditData({ ...editData, name: e.target.value })}
                     className="text-lg font-semibold text-navy"
-                    placeholder="RFX Name"
+                    placeholder={t('rfxs.rfxNamePlaceholder')}
                   />
                 </div>
               ) : (
@@ -663,7 +668,7 @@ const RFXProjects = () => {
                   </CardTitle>
                   {rfx.archived && (
                     <Badge variant="secondary" className="bg-gray-400 text-white">
-                      Archived
+                      {t('rfxs.archived')}
                     </Badge>
                   )}
                 </div>
@@ -692,7 +697,7 @@ const RFXProjects = () => {
                       {cachedMembers.length > 3 && (
                         <div
                           className="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center text-white text-xs font-medium border border-[#22183a]"
-                          title={`${cachedMembers.length - 3} more users`}
+                          title={t('rfxs.moreUsers_other', { count: cachedMembers.length - 3 })}
                         >
                           +{cachedMembers.length - 3}
                         </div>
@@ -733,13 +738,13 @@ const RFXProjects = () => {
                 value={editData.description}
                 onChange={(e) => setEditData({ ...editData, description: e.target.value })}
                 className="min-h-[40px] resize-none"
-                placeholder="RFX Description"
+                placeholder={t('rfxs.rfxDescriptionPlaceholder')}
                 rows={2}
               />
             </div>
           ) : (
             <CardDescription className="line-clamp-2 min-h-[40px] text-left max-w-[80%]">
-              {rfx.description || 'No description provided'}
+              {rfx.description || t('rfxs.noDescription')}
             </CardDescription>
           )}
         </CardHeader>
@@ -751,7 +756,7 @@ const RFXProjects = () => {
                 <User className="h-4 w-4 mr-2" />
                 {rfx.creator_name && rfx.creator_surname 
                   ? `${rfx.creator_name} ${rfx.creator_surname}` 
-                  : 'Unknown user'}
+                  : t('rfxs.unknownUser')}
               </div>
               <div className="flex items-center text-sm text-gray-500">
                 <Calendar className="h-4 w-4 mr-2" />
@@ -774,7 +779,7 @@ const RFXProjects = () => {
                 disabled={isEditing}
               >
                 <Edit className="h-4 w-4 mr-1" />
-                View
+                {t('rfxs.view')}
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -792,14 +797,14 @@ const RFXProjects = () => {
                     onClick={handleEdit}
                     className="cursor-pointer hover:bg-gray-100 focus:bg-gray-100 transition-colors"
                   >
-                    Edit
+                    {t('rfxs.edit')}
                   </DropdownMenuItem>
                   {isOwner && rfx.status !== 'revision requested by buyer' && (
                     <DropdownMenuItem 
                       onClick={() => openArchiveDialog(rfx.id)}
                       className="cursor-pointer hover:bg-gray-100 focus:bg-gray-100 transition-colors"
                     >
-                      Postpone or cancel
+                      {t('rfxs.postponeOrCancel')}
                     </DropdownMenuItem>
                   )}
                   <TooltipProvider delayDuration={100}>
@@ -811,13 +816,13 @@ const RFXProjects = () => {
                             disabled={rfx.status !== 'draft'}
                             className={`${rfx.status === 'draft' ? 'cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50 focus:bg-red-50 focus:text-red-700' : 'cursor-not-allowed opacity-50 text-red-400'} transition-colors`}
                           >
-                            Delete
+                            {t('rfxs.delete')}
                           </DropdownMenuItem>
                         </div>
                       </TooltipTrigger>
                       {rfx.status !== 'draft' && (
                         <TooltipContent>
-                          <p>Cannot delete an RFX that has been sent to suppliers</p>
+                          <p>{t('rfxs.cannotDeleteSentRfx')}</p>
                         </TooltipContent>
                       )}
                     </Tooltip>
@@ -842,10 +847,10 @@ const RFXProjects = () => {
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <h1 className="text-3xl font-black text-[#22183a] font-intro mb-2 tracking-tight" style={{ fontWeight: 900 }}>
-                    RFX Projects
+                    {t('rfxs.title')}
                   </h1>
                   <p className="text-gray-600 font-inter text-lg">
-                  Manage your sourcing requests from draft to completion. Create your RFX from 0, discover and connect with best suited suppliers and launch it in minutes. Receive proposals and analyze them with the RFX AI Agent.
+                  {t('rfxs.subtitle')}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 ml-6">
@@ -855,7 +860,7 @@ const RFXProjects = () => {
                     disabled={isCreatingRFX || isCheckingCreateEligibility}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    New RFX
+                    {t('rfxs.newRfx')}
                   </Button>
                 </div>
               </div>
@@ -871,7 +876,7 @@ const RFXProjects = () => {
               <div className="relative flex-1 min-w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
-                  placeholder="Search RFXs by name or description..."
+                  placeholder={t('rfxs.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -883,12 +888,12 @@ const RFXProjects = () => {
                 <Filter className="h-4 w-4 text-gray-500" />
                 <Select value={filterBy} onValueChange={(value: 'all' | 'member' | 'owner') => setFilterBy(value)}>
                   <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Filter by" />
+                    <SelectValue placeholder={t('rfxs.filterBy')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All RFXs</SelectItem>
-                    <SelectItem value="owner">My RFXs</SelectItem>
-                    <SelectItem value="member">Member RFXs</SelectItem>
+                    <SelectItem value="all">{t('rfxs.allRfxs')}</SelectItem>
+                    <SelectItem value="owner">{t('rfxs.myRfxs')}</SelectItem>
+                    <SelectItem value="member">{t('rfxs.memberRfxs')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -898,11 +903,11 @@ const RFXProjects = () => {
                 <ArrowUpDown className="h-4 w-4 text-gray-500" />
                 <Select value={sortBy} onValueChange={(value: 'date' | 'progress') => setSortBy(value)}>
                   <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Sort by" />
+                    <SelectValue placeholder={t('rfxs.sortBy')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="date">Creation Date</SelectItem>
-                    <SelectItem value="progress">Progress</SelectItem>
+                    <SelectItem value="date">{t('rfxs.creationDate')}</SelectItem>
+                    <SelectItem value="progress">{t('rfxs.progress')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -920,7 +925,7 @@ const RFXProjects = () => {
             
             {/* Results count */}
             <div className="mt-3 text-sm text-gray-600">
-              {totalCount} RFX{totalCount !== 1 ? 's' : ''} found
+              {t('rfxs.rfxsFound', { count: totalCount })}
             </div>
           </div>
         )}
@@ -929,19 +934,19 @@ const RFXProjects = () => {
         {invitations.length > 0 && (
           <Card className="mb-6 border-[#f4a9aa]/50">
             <CardHeader>
-              <CardTitle className="text-[#22183a]">You have RFX invitations</CardTitle>
-              <CardDescription>Accept to access the project</CardDescription>
+              <CardTitle className="text-[#22183a]">{t('rfxs.youHaveInvitations')}</CardTitle>
+              <CardDescription>{t('rfxs.acceptToAccess')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {invitations.map(inv => (
                 <div key={inv.id} className="flex items-center justify-between p-3 rounded-md bg-[#f4a9aa]/10">
                   <div className="text-sm text-[#22183a]">
-                    <div className="font-medium">{inv.rfx_name || 'RFX Project'}</div>
+                    <div className="font-medium">{inv.rfx_name || t('rfxs.rfxProject')}</div>
                     {inv.rfx_description && (
                       <div className="text-xs text-[#22183a] mb-1 line-clamp-2">{inv.rfx_description}</div>
                     )}
                     <div className="text-[#22183a]">
-                      Invited by {inv.inviter_name || ''} {inv.inviter_surname || ''} {inv.inviter_email ? `(${inv.inviter_email})` : ''}
+                      {t('rfxs.invitedBy')} {inv.inviter_name || ''} {inv.inviter_surname || ''} {inv.inviter_email ? `(${inv.inviter_email})` : ''}
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -962,8 +967,8 @@ const RFXProjects = () => {
                           sortOrder,
                         });
                       }
-                    }}>Accept</Button>
-                    <Button size="sm" variant="outline" onClick={() => declineInvitation(inv.id)}>Decline</Button>
+                    }}>{t('rfxs.accept')}</Button>
+                    <Button size="sm" variant="outline" onClick={() => declineInvitation(inv.id)}>{t('rfxs.decline')}</Button>
                   </div>
                 </div>
               ))}
@@ -988,12 +993,12 @@ const RFXProjects = () => {
                   <div className="text-center flex flex-col justify-center">
                     <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
                     <h3 className="text-xl font-semibold text-navy mb-1.5">
-                      {user ? 'No RFX Projects Yet' : 'Start Creating RFXs'}
+                      {user ? t('rfxs.noRfxYet') : t('rfxs.startCreatingRfxs')}
                     </h3>
                     <p className="text-gray-600 mb-4">
                       {user 
-                        ? 'Create your first RFX project to get started'
-                        : 'Sign up for free to create your first RFX project and start discovering suppliers'}
+                        ? t('rfxs.createFirstToGetStarted')
+                        : t('rfxs.signUpToCreateFirst')}
                     </p>
                     <Button
                       onClick={handleOpenCreateRFXDialog}
@@ -1001,21 +1006,21 @@ const RFXProjects = () => {
                       disabled={isCheckingCreateEligibility}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Create Your First RFX
+                      {t('rfxs.createYourFirstRfx')}
                     </Button>
                   </div>
 
                   {/* Right Column - Confidentiality Commitment */}
                   <div className="text-center border-t md:border-t-0 md:border-l border-gray-200 pt-6 md:pt-0 md:pl-8 flex flex-col justify-center">
                     <p className="text-sm text-gray-600 mb-4">
-                      <strong>QANVIT CONFIDENTIALITY COMMITMENT:</strong> Qanvit is committed to protecting users' confidential information and using it solely to provide its discovery and RFX management services.
+                      {t('rfxs.confidentialityBlurb')}
                     </p>
                     <Button
                       onClick={() => setIsConfidentialityInfoModalOpen(true)}
                       variant="outline"
                       className="border-[#22183a] text-[#22183a] bg-white hover:bg-[#22183a] hover:text-white transition-colors"
                     >
-                      Read Qanvit Confidentiality Commitment
+                      {t('rfxs.readConfidentiality')}
                     </Button>
                   </div>
                 </div>
@@ -1098,17 +1103,17 @@ const RFXProjects = () => {
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create New RFX</DialogTitle>
+              <DialogTitle>{t('rfxs.createNewRfx')}</DialogTitle>
               <DialogDescription>
-                Create a new Request for X project
+                {t('rfxs.createNewRfxDesc')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name *</Label>
+                <Label htmlFor="name">{t('rfxs.nameRequired')}</Label>
                 <Input
                   id="name"
-                  placeholder="Enter RFX name"
+                  placeholder={t('rfxs.enterRfxName')}
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -1116,10 +1121,10 @@ const RFXProjects = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">{t('rfxs.description')}</Label>
                 <Textarea
                   id="description"
-                  placeholder="Enter RFX description"
+                  placeholder={t('rfxs.enterRfxDescription')}
                   value={formData.description}
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
@@ -1137,7 +1142,7 @@ const RFXProjects = () => {
                 }}
                 disabled={isCreatingRFX}
               >
-                Cancel
+                {t('rfxs.cancel')}
               </Button>
               <Button
                 onClick={handleCreateRFX}
@@ -1147,10 +1152,10 @@ const RFXProjects = () => {
                 {isCreatingRFX ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Creating...
+                    {t('rfxs.creating')}
                   </>
                 ) : (
-                  'Create RFX'
+                  t('rfxs.createRfx')
                 )}
               </Button>
             </DialogFooter>
@@ -1161,10 +1166,9 @@ const RFXProjects = () => {
         <Dialog open={isPlanLimitModalOpen} onOpenChange={setIsPlanLimitModalOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>RFX creation limit reached</DialogTitle>
+              <DialogTitle>{t('rfxs.limitReached')}</DialogTitle>
               <DialogDescription>
-                You are currently on the Free plan and already have one RFX created. Free users can only create one RFX.
-                To create more, please upgrade your plan.
+                {t('rfxs.limitReachedDesc')}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -1172,7 +1176,7 @@ const RFXProjects = () => {
                 variant="outline"
                 onClick={() => setIsPlanLimitModalOpen(false)}
               >
-                Close
+                {t('rfxs.close')}
               </Button>
               <Button
                 className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
@@ -1181,7 +1185,7 @@ const RFXProjects = () => {
                   navigate('/my-subscription');
                 }}
               >
-                Go to My Subscription
+                {t('rfxs.goToMySubscription')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1191,10 +1195,9 @@ const RFXProjects = () => {
         <Dialog open={isSubscriptionRequiredForInvitationModalOpen} onOpenChange={setIsSubscriptionRequiredForInvitationModalOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Paid plan required</DialogTitle>
+              <DialogTitle>{t('rfxs.paidPlanRequired')}</DialogTitle>
               <DialogDescription>
-                You need to be associated with a paid subscription seat to accept this collaborator invitation.
-                Upgrade your plan to accept invitations and collaborate on RFX projects.
+                {t('rfxs.paidPlanRequiredDesc')}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -1202,7 +1205,7 @@ const RFXProjects = () => {
                 variant="outline"
                 onClick={() => setIsSubscriptionRequiredForInvitationModalOpen(false)}
               >
-                Close
+                {t('rfxs.close')}
               </Button>
               <Button
                 className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
@@ -1211,7 +1214,7 @@ const RFXProjects = () => {
                   navigate('/my-subscription');
                 }}
               >
-                Go to My Subscription
+                {t('rfxs.goToMySubscription')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1221,20 +1224,20 @@ const RFXProjects = () => {
         <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete RFX</AlertDialogTitle>
+              <AlertDialogTitle>{t('rfxs.deleteRfx')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this RFX? This action cannot be undone.
+                {t('rfxs.deleteRfxConfirm')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel onClick={() => setSelectedRFXId(null)}>
-                Cancel
+                {t('rfxs.cancel')}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteRFX}
                 className="bg-red-600 hover:bg-red-700"
               >
-                Delete
+                {t('rfxs.delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -1244,9 +1247,9 @@ const RFXProjects = () => {
         <AlertDialog open={isRemoveSelfDialogOpen} onOpenChange={setIsRemoveSelfDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Cannot Delete RFX</AlertDialogTitle>
+              <AlertDialogTitle>{t('rfxs.cannotDeleteRfx')}</AlertDialogTitle>
               <AlertDialogDescription>
-                You are not the owner of this RFX, so you cannot delete it. However, you can remove yourself from this RFX if you no longer wish to be a member.
+                {t('rfxs.cannotDeleteRfxDesc')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -1254,13 +1257,13 @@ const RFXProjects = () => {
                 setSelectedRFXId(null);
                 setIsRemoveSelfDialogOpen(false);
               }}>
-                Cancel
+                {t('rfxs.cancel')}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleRemoveSelfFromRFX}
                 className="bg-orange-600 hover:bg-orange-700"
               >
-                Remove Myself from RFX
+                {t('rfxs.removeMyself')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -1271,21 +1274,21 @@ const RFXProjects = () => {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                {selectedRFXId && rfxs.find(r => r.id === selectedRFXId)?.archived ? 'Unarchive RFX' : 'Archive RFX'}
+                {selectedRFXId && rfxs.find(r => r.id === selectedRFXId)?.archived ? t('rfxs.unarchiveRfx') : t('rfxs.archiveRfx')}
               </AlertDialogTitle>
               <AlertDialogDescription>
                 {selectedRFXId && rfxs.find(r => r.id === selectedRFXId)?.archived ? (
                   <>
-                    Are you sure you want to unarchive this RFX? Once unarchived, you will be able to modify the RFX and invited suppliers will be able to upload their documents again.
+                    {t('rfxs.unarchiveConfirm')}
                   </>
                 ) : (
                   <>
-                    Are you sure you want to archive this RFX? While archived:
+                    {t('rfxs.archiveConfirm')}
                     <ul className="list-disc list-inside mt-2 space-y-1">
-                      <li>You will not be able to modify the RFX</li>
-                      <li>Invited suppliers will not be able to upload documents</li>
+                      <li>{t('rfxs.archiveConfirmBullet1')}</li>
+                      <li>{t('rfxs.archiveConfirmBullet2')}</li>
                     </ul>
-                    <p className="mt-2">You can unarchive it later if needed.</p>
+                    <p className="mt-2">{t('rfxs.archiveConfirmUnarchiveLater')}</p>
                   </>
                 )}
               </AlertDialogDescription>
@@ -1295,13 +1298,13 @@ const RFXProjects = () => {
                 setSelectedRFXId(null);
                 setIsArchiveDialogOpen(false);
               }}>
-                Cancel
+                {t('rfxs.cancel')}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleArchiveRFX}
                 className="bg-[#22183a] hover:bg-[#22183a]/90"
               >
-                {selectedRFXId && rfxs.find(r => r.id === selectedRFXId)?.archived ? 'Unarchive' : 'Archive'}
+                {selectedRFXId && rfxs.find(r => r.id === selectedRFXId)?.archived ? t('rfxs.unarchive') : t('rfxs.archive')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -1311,36 +1314,36 @@ const RFXProjects = () => {
         <Dialog open={isArchiveWithAnnouncementDialogOpen} onOpenChange={setIsArchiveWithAnnouncementDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Archive RFX - Notify Suppliers</DialogTitle>
+              <DialogTitle>{t('rfxs.archiveNotifyTitle')}</DialogTitle>
               <DialogDescription>
-                This RFX has been sent to suppliers. You must post an announcement to notify them that the RFX is being archived and they will no longer be able to upload documents.
+                {t('rfxs.archiveNotifyDesc')}
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4">
               <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                 <p className="text-sm text-yellow-800">
-                  <strong>Important:</strong> Once archived, invited suppliers will not be able to upload documents. You can unarchive it later if needed.
+                  {t('rfxs.archiveImportant')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="announcement-subject">Announcement Subject *</Label>
+                <Label htmlFor="announcement-subject">{t('rfxs.announcementSubject')}</Label>
                 <Input
                   id="announcement-subject"
                   value={archiveAnnouncementSubject}
                   onChange={(e) => setArchiveAnnouncementSubject(e.target.value)}
-                  placeholder="e.g., RFX Project Archived"
+                  placeholder={t('rfxs.announcementSubjectPlaceholder')}
                   disabled={isPostingAnnouncement}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="announcement-message">Announcement Message *</Label>
+                <Label htmlFor="announcement-message">{t('rfxs.announcementMessage')}</Label>
                 <MarkdownEditor
                   value={archiveAnnouncementMessage}
                   onChange={setArchiveAnnouncementMessage}
-                  placeholder="Explain to suppliers why the RFX is being archived and what they should do next..."
+                  placeholder={t('rfxs.announcementMessagePlaceholder')}
                   minRows={6}
                   disabled={isPostingAnnouncement}
                 />
@@ -1358,7 +1361,7 @@ const RFXProjects = () => {
                 }}
                 disabled={isPostingAnnouncement}
               >
-                Cancel
+                {t('rfxs.cancel')}
               </Button>
               <Button
                 onClick={handleArchiveWithAnnouncement}
@@ -1368,10 +1371,10 @@ const RFXProjects = () => {
                 {isPostingAnnouncement ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Posting & Archiving...
+                    {t('rfxs.postingArchiving')}
                   </>
                 ) : (
-                  'Post Announcement & Archive'
+                  t('rfxs.postAnnouncementAndArchive')
                 )}
               </Button>
             </DialogFooter>
@@ -1382,36 +1385,36 @@ const RFXProjects = () => {
         <Dialog open={isUnarchiveWithAnnouncementDialogOpen} onOpenChange={setIsUnarchiveWithAnnouncementDialogOpen}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle>Unarchive RFX - Notify Suppliers</DialogTitle>
+              <DialogTitle>{t('rfxs.unarchiveNotifyTitle')}</DialogTitle>
               <DialogDescription>
-                This RFX has been sent to suppliers. You must post an announcement to notify them that the RFX is being unarchived and they will be able to upload documents again.
+                {t('rfxs.unarchiveNotifyDesc')}
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4">
               <div className="bg-green-50 border-l-4 border-green-400 p-4">
                 <p className="text-sm text-green-800">
-                  <strong>Important:</strong> Once unarchived, invited suppliers will be able to upload documents again. The RFX will be fully functional.
+                  {t('rfxs.unarchiveImportant')}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="unarchive-announcement-subject">Announcement Subject *</Label>
+                <Label htmlFor="unarchive-announcement-subject">{t('rfxs.announcementSubject')}</Label>
                 <Input
                   id="unarchive-announcement-subject"
                   value={unarchiveAnnouncementSubject}
                   onChange={(e) => setUnarchiveAnnouncementSubject(e.target.value)}
-                  placeholder="e.g., RFX Project Unarchived"
+                  placeholder={t('rfxs.unarchiveSubjectPlaceholder')}
                   disabled={isPostingUnarchiveAnnouncement}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="unarchive-announcement-message">Announcement Message *</Label>
+                <Label htmlFor="unarchive-announcement-message">{t('rfxs.announcementMessage')}</Label>
                 <MarkdownEditor
                   value={unarchiveAnnouncementMessage}
                   onChange={setUnarchiveAnnouncementMessage}
-                  placeholder="Explain to suppliers that the RFX has been unarchived and they can now upload their documents..."
+                  placeholder={t('rfxs.unarchiveMessagePlaceholder')}
                   minRows={6}
                   disabled={isPostingUnarchiveAnnouncement}
                 />
@@ -1429,7 +1432,7 @@ const RFXProjects = () => {
                 }}
                 disabled={isPostingUnarchiveAnnouncement}
               >
-                Cancel
+                {t('rfxs.cancel')}
               </Button>
               <Button
                 onClick={handleUnarchiveWithAnnouncement}
@@ -1439,10 +1442,10 @@ const RFXProjects = () => {
                 {isPostingUnarchiveAnnouncement ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Posting & Unarchiving...
+                    {t('rfxs.postingUnarchiving')}
                   </>
                 ) : (
-                  'Post Announcement & Unarchive'
+                  t('rfxs.postAnnouncementAndUnarchive')
                 )}
               </Button>
             </DialogFooter>
@@ -1455,10 +1458,10 @@ const RFXProjects = () => {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-[#22183a]" />
-                Confidentiality Commitment
+                {t('rfxs.confidentialityCommitment')}
               </DialogTitle>
               <DialogDescription className="pt-4">
-                In case you want to read this document in the future, it is always available in the footer at the bottom of the page.
+                {t('rfxs.confidentialityInfoDesc')}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -1469,7 +1472,7 @@ const RFXProjects = () => {
                 }}
                 className="bg-[#22183a] hover:bg-[#22183a]/90 text-white w-full"
               >
-                Continue to Document
+                {t('rfxs.continueToDocument')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1481,14 +1484,14 @@ const RFXProjects = () => {
             <DialogHeader className="px-6 pt-6 pb-4">
               <DialogTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-[#22183a]" />
-                Confidentiality Commitment
+                {t('rfxs.confidentialityCommitment')}
               </DialogTitle>
             </DialogHeader>
             <div className="flex-1 min-h-0 px-6 pb-6">
               <iframe
                 src="https://auth.fqsource.com/storage/v1/object/public/company-documents/USER%20-%20FQ%20SOURCE%20CONFIDENTIALITY%20COMMITMENT%20signed.pdf"
                 className="w-full h-full rounded-lg border border-gray-200"
-                title="Confidentiality Commitment"
+                title={t('rfxs.confidentialityCommitment')}
               />
             </div>
           </DialogContent>
@@ -1500,29 +1503,28 @@ const RFXProjects = () => {
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-[#22183a] flex items-center gap-2">
                 <FileText className="h-6 w-6 text-[#f4a9aa]" />
-                Create Your First RFX
+                {t('rfxs.loginPromptTitle')}
               </DialogTitle>
               <DialogDescription className="text-base pt-2">
-                Start your sourcing journey today!
+                {t('rfxs.loginPromptSubtitle')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="bg-[#f4a9aa]/10 border border-[#f4a9aa]/30 rounded-lg p-4">
                 <p className="text-[#22183a] font-medium mb-2">
-                  🎉 Start with your first RFX <span className="text-[#f4a9aa] font-bold">for free</span>!
+                  {t('rfxs.loginPromptFree')}
                 </p>
                 <p className="text-sm text-gray-700">
-                  Sign up now to create your first RFX and discover suppliers. 
-                  You can upgrade later for additional projects and paid seats.
+                  {t('rfxs.loginPromptSignUp')}
                 </p>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-[#22183a]">What you'll get:</p>
+                <p className="text-sm font-medium text-[#22183a]">{t('rfxs.whatYouGet')}</p>
                 <ul className="text-sm text-gray-700 space-y-1 list-disc list-inside">
-                  <li>Create your first RFX project for free</li>
-                  <li>Discover and connect with suppliers</li>
-                  <li>AI-powered proposal analysis</li>
-                  <li>Upgrade anytime from My Subscription</li>
+                  <li>{t('rfxs.benefit1')}</li>
+                  <li>{t('rfxs.benefit2')}</li>
+                  <li>{t('rfxs.benefit3')}</li>
+                  <li>{t('rfxs.benefit4')}</li>
                 </ul>
               </div>
             </div>
@@ -1535,7 +1537,7 @@ const RFXProjects = () => {
                   }}
                   className="text-sm text-[#f4a9aa] hover:text-[#f4a9aa]/80 hover:underline"
                 >
-                  Already have an account? Log in
+                  {t('rfxs.alreadyHaveAccount')}
                 </button>
               </div>
               <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-2">
@@ -1544,7 +1546,7 @@ const RFXProjects = () => {
                   onClick={() => setIsLoginPromptModalOpen(false)}
                   className="w-full sm:w-auto order-2 sm:order-1"
                 >
-                  Maybe Later
+                  {t('rfxs.maybeLater')}
                 </Button>
                 <Button
                   onClick={() => {
@@ -1553,7 +1555,7 @@ const RFXProjects = () => {
                   }}
                   className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90 text-white order-1 sm:order-2"
                 >
-                  Sign Up Free
+                  {t('rfxs.signUpFree')}
                 </Button>
               </DialogFooter>
             </div>

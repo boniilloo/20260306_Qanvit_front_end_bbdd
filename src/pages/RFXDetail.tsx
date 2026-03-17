@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, MessageCircle, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +29,7 @@ import { Sparkles } from 'lucide-react';
 import { useRFXSpecs } from '@/hooks/useRFXSpecs';
 
 const RFXDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -272,10 +274,10 @@ const RFXDetail = () => {
       // Only show error notification for non-duplicate key errors
       if (err.code !== '23505') {
         toast({
-          title: 'Auto-save failed',
+          title: t('rfxs.detail_toast_autoSaveFailed'),
           description: err.message === 'Cannot save: Encryption key not available' 
-            ? 'Cannot save securely: Encryption key missing'
-            : 'Changes were applied but not saved. Please use the Save button.',
+            ? t('rfxs.detail_toast_encryptionMissing')
+            : t('rfxs.detail_toast_useSaveButton'),
           variant: 'destructive',
           duration: 3000,
         });
@@ -491,14 +493,14 @@ const RFXDetail = () => {
       setPendingProposals([]);
 
       toast({
-        title: 'Proposals auto-accepted',
-        description: 'All proposals have been automatically applied since the fields were empty.',
+        title: t('rfxs.detail_toast_proposalsAutoAccepted'),
+        description: t('rfxs.detail_toast_proposalsAutoAcceptedDesc'),
       });
     } catch (e: any) {
       console.error('❌ [RFX Detail] Error auto-accepting proposals:', e);
       toast({
-        title: 'Error',
-        description: 'Could not auto-accept proposals',
+        title: t('rfxs.error'),
+        description: t('rfxs.detail_toast_couldNotAutoAccept'),
         variant: 'destructive'
       });
     }
@@ -553,8 +555,8 @@ const RFXDetail = () => {
 
       if (!diffText) {
         toast({ 
-          title: 'No changes', 
-          description: 'No changes found for this field.', 
+          title: t('rfxs.detail_toast_noChanges'), 
+          description: t('rfxs.detail_toast_noChangesForField'), 
           variant: 'destructive' 
         });
         return;
@@ -583,14 +585,14 @@ const RFXDetail = () => {
       }
       
       toast({ 
-        title: 'Applied', 
-        description: `Changes for ${fieldName} have been applied.` 
+        title: t('rfxs.detail_toast_applied'), 
+        description: t('rfxs.detail_toast_changesApplied', { field: fieldName }) 
       });
     } catch (e: any) {
       console.error('❌ [RFX Detail] Error applying proposal:', e);
       toast({ 
-        title: 'Error', 
-        description: 'Could not apply this proposal', 
+        title: t('rfxs.error'), 
+        description: t('rfxs.detail_toast_couldNotApply'), 
         variant: 'destructive' 
       });
     }
@@ -608,8 +610,8 @@ const RFXDetail = () => {
     }));
     
     toast({ 
-      title: 'Hidden', 
-      description: `Changes for ${fieldName} have been hidden. You can show them again if needed.` 
+      title: t('rfxs.detail_toast_hidden'), 
+      description: t('rfxs.detail_toast_changesHidden', { field: fieldName }) 
     });
   };
 
@@ -632,8 +634,8 @@ const RFXDetail = () => {
       
       if (!user) {
         toast({
-          title: 'Error',
-          description: 'You must be logged in',
+          title: t('rfxs.error'),
+          description: t('rfxs.detail_toast_mustBeLoggedIn'),
           variant: 'destructive',
         });
         navigate('/rfxs');
@@ -653,8 +655,8 @@ const RFXDetail = () => {
 
       if (!data) {
         toast({
-          title: 'Error',
-          description: 'RFX not found',
+          title: t('rfxs.error'),
+          description: t('rfxs.detail_toast_rfxNotFound'),
           variant: 'destructive',
         });
         navigate('/rfxs');
@@ -672,7 +674,7 @@ const RFXDetail = () => {
           .eq('user_id', user.id)
           .maybeSingle();
         if (!memberRow) {
-          toast({ title: 'Access denied', description: 'You do not have access to this RFX', variant: 'destructive' });
+          toast({ title: t('rfxs.detail_toast_accessDenied'), description: t('rfxs.detail_toast_noAccessToRfx'), variant: 'destructive' });
           navigate('/rfxs');
           return;
         }
@@ -685,8 +687,8 @@ const RFXDetail = () => {
     } catch (err: any) {
       console.error('❌ [RFX Detail] Error fetching RFX:', err);
       toast({
-        title: 'Error',
-        description: 'Failed to load RFX',
+        title: t('rfxs.error'),
+        description: t('rfxs.detail_toast_failedToLoadRfx'),
         variant: 'destructive',
       });
       navigate('/rfxs');
@@ -753,7 +755,7 @@ const RFXDetail = () => {
                     onClick={() => navigate('/rfxs')}
                     className="inline-flex items-center px-4 py-2 rounded-md bg-[#22183a] text-white hover:bg-[#22183a]/90"
                   >
-                    <ArrowLeft className="h-4 w-4 mr-2" /> Back
+                    <ArrowLeft className="h-4 w-4 mr-2" /> {t('rfxs.detail_back')}
                   </Button>
                   <div className="flex items-center gap-3">
                     <RFXMembersAvatars rfxId={id!} />
@@ -761,7 +763,7 @@ const RFXDetail = () => {
                       onClick={() => setIsManageMembersOpen(true)}
                       className="inline-flex items-center px-4 py-2 rounded-md bg-[#f4a9aa] text-white hover:bg-[#f4a9aa]/90"
                     >
-                      <UserPlus className="h-4 w-4 mr-2" /> Manage RFX Members
+                      <UserPlus className="h-4 w-4 mr-2" /> {t('rfxs.detail_manageMembers')}
                     </Button>
                     {!developerLoading && isDeveloper && (
                       <Button
@@ -770,7 +772,7 @@ const RFXDetail = () => {
                         className="inline-flex items-center px-4 py-2 rounded-md border-[#f4a9aa] text-[#22183a] hover:bg-[#f1f1f1]"
                       >
                         <Sparkles className="h-4 w-4 mr-2 text-[#f4a9aa]" />
-                        Public Example
+                        {t('rfxs.detail_publicExample')}
                       </Button>
                     )}
                   </div>
@@ -824,7 +826,7 @@ const RFXDetail = () => {
               className="mb-4 hover:bg-gray-100"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Overview
+              {t('rfxs.detail_backToOverview')}
             </Button>
             <RFXSpecs 
               rfxId={id!}
@@ -851,7 +853,7 @@ const RFXDetail = () => {
               className="mb-4 hover:bg-gray-100"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Overview
+              {t('rfxs.detail_backToOverview')}
             </Button>
             <CandidatesSection 
               rfxId={id!}

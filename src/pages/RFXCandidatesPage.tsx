@@ -29,6 +29,7 @@ import FaviconLogo from '@/components/ui/FaviconLogo';
 import { useRFXCompanyInvitationCheck } from '@/hooks/useRFXCompanyInvitationCheck';
 import { useRFXSpecs } from '@/hooks/useRFXSpecs';
 import { usePublicRFXCrypto } from '@/hooks/usePublicRFXCrypto';
+import { useTranslation } from 'react-i18next';
 
 interface RFXCandidatesPageProps {
   /** When true, renders the page in read-only mode (no writes, public example) */
@@ -45,6 +46,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
   const rfxId = params.rfxId || params.id;
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   // Use public crypto for public examples, which loads unencrypted symmetric key
   const publicCrypto = usePublicRFXCrypto(isPublicExample ? (rfxId || null) : null);
@@ -141,8 +143,8 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
         if (error || !data) {
           console.error('❌ [RFX Candidates Page] Error fetching public RFX:', error);
           toast({
-            title: 'Error',
-            description: 'Public RFX example not found',
+            title: t('rfxs.error'),
+            description: t('rfxs.candidates_toast_publicNotFound'),
             variant: 'destructive',
           });
           navigate('/');
@@ -158,8 +160,8 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       
       if (!user) {
         toast({
-          title: 'Error',
-          description: 'You must be logged in',
+          title: t('rfxs.error'),
+          description: t('rfxs.candidates_toast_mustBeLoggedIn'),
           variant: 'destructive',
         });
         navigate('/rfxs');
@@ -179,8 +181,8 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
 
       if (!data) {
         toast({
-          title: 'Error',
-          description: 'RFX not found',
+          title: t('rfxs.error'),
+          description: t('rfxs.candidates_toast_rfxNotFound'),
           variant: 'destructive',
         });
         navigate('/rfxs');
@@ -199,8 +201,8 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
         
         if (!memberRow) {
           toast({
-            title: 'Access denied',
-            description: 'You do not have access to this RFX',
+            title: t('rfxs.candidates_toast_accessDeniedTitle'),
+            description: t('rfxs.candidates_toast_accessDenied'),
             variant: 'destructive',
           });
           navigate('/rfxs');
@@ -221,8 +223,8 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
     } catch (err: any) {
       console.error('❌ [RFX Candidates Page] Error fetching RFX:', err);
       toast({
-        title: 'Error',
-        description: 'Failed to load RFX',
+        title: t('rfxs.error'),
+        description: t('rfxs.candidates_toast_failedLoadRfx'),
         variant: 'destructive',
       });
       // In public mode, send user to home; in private, back to list
@@ -253,12 +255,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
 
   // Helper functions to trigger buttons in CandidatesSection
   const handleAskAgent = () => {
-    // Find the "Ask FQ Agent" button by looking for the specific text content
-    const buttons = Array.from(document.querySelectorAll('button'));
-    const askAgentButton = buttons.find(btn => 
-      btn.textContent?.includes('Ask Qanvit Agent') || btn.textContent?.includes('Ask Qanvit')
-    );
-    
+    const askAgentButton = document.querySelector<HTMLButtonElement>('[data-onboarding-target="ask-fq-agent-button"]');
     if (askAgentButton) {
       askAgentButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => {
@@ -266,20 +263,15 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       }, 300);
     } else {
       toast({
-        title: 'Button not found',
-        description: 'Could not find the Ask Qanvit Agent button. Please click it manually.',
+        title: t('rfxs.candidates_toast_buttonNotFound'),
+        description: t('rfxs.candidates_toast_askAgentNotFound'),
         variant: 'destructive',
       });
     }
   };
 
   const handleSelectCandidates = () => {
-    // Find the "Select Candidates for RFX" button by looking for the specific text content
-    const buttons = Array.from(document.querySelectorAll('button'));
-    const selectButton = buttons.find(btn => 
-      btn.textContent?.includes('Select Candidates for RFX') || btn.textContent?.includes('Select Candidates')
-    );
-    
+    const selectButton = document.querySelector<HTMLButtonElement>('[data-onboarding-target="select-candidates-for-rfx"]');
     if (selectButton) {
       selectButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
       setTimeout(() => {
@@ -287,8 +279,8 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       }, 300);
     } else {
       toast({
-        title: 'Button not found',
-        description: 'Could not find the Select Candidates button. Please click it manually.',
+        title: t('rfxs.candidates_toast_buttonNotFound'),
+        description: t('rfxs.candidates_toast_selectNotFound'),
         variant: 'destructive',
       });
     }
@@ -321,9 +313,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
   useEffect(() => {
     if (activeTab === 'manual') {
       const t = setTimeout(() => {
-        const heading = Array.from(document.querySelectorAll('h3, h2, p, div')).find(el =>
-          el.textContent && el.textContent.includes('Add Companies or Products')
-        ) as HTMLElement | undefined;
+        const heading = document.querySelector('[data-scroll-target="manual-search"]') as HTMLElement | undefined;
         if (heading) heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 150);
       return () => clearTimeout(t);
@@ -471,15 +461,15 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       await loadSelected?.();
 
       toast({
-        title: 'Candidate Removed',
-        description: `${candidate.empresa} has been removed from selection`,
+        title: t('rfxs.candidates_toast_candidateRemoved'),
+        description: t('rfxs.candidates_toast_removedFromSelection', { name: candidate.empresa }),
       });
 
     } catch (error) {
       console.error('Error removing candidate:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to remove candidate',
+        title: t('rfxs.error'),
+        description: t('rfxs.candidates_toast_failedRemove'),
         variant: 'destructive',
       });
     } finally {
@@ -525,7 +515,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
           <div className="flex items-start md:items-center justify-between gap-3">
             <div className="min-w-0">
               <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight truncate">
-                {rfx.name} - Candidates
+                {rfx.name} - {t('rfxs.candidates_suffix')}
               </h1>
               {rfx.description && (
                 <p className="mt-1 text-sm md:text-base text-gray-600 leading-relaxed max-w-3xl font-inter line-clamp-2">
@@ -547,7 +537,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                     }}
                     className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-black"
                   >
-                    Go to Validation & Sending
+                    {t('rfxs.candidates_goToValidation')}
                   </Button>
                 ) : (
                   <TooltipProvider delayDuration={100}>
@@ -559,12 +549,12 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                             className="bg-[#f4a9aa] text-black opacity-70 cursor-not-allowed"
                             aria-disabled="true"
                           >
-                            Go to Validation & Sending
+                            {t('rfxs.candidates_goToValidation')}
                           </Button>
                         </span>
                       </TooltipTrigger>
                       <TooltipContent>
-                        First select candidates
+                        {t('rfxs.candidates_firstSelectCandidates')}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -575,7 +565,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                   className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
+                  {t('rfxs.candidates_back')}
                 </Button>
               </div>
               <div className="flex items-center gap-2">
@@ -593,20 +583,20 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                             <>
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                               {pdfProgress ? (
-                                <>Candidate {pdfProgress.current} of {pdfProgress.total}</>
+                                <>{t('rfxs.candidates_candidateOfTotal', { current: pdfProgress.current, total: pdfProgress.total })}</>
                               ) : (
-                                <>Generating PDF...</>
+                                <>{t('rfxs.candidates_generatingPdf')}</>
                               )}
                             </>
                           ) : pdfCryptoLoading ? (
                             <>
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Loading keys...
+                              {t('rfxs.candidates_loadingKeys')}
                             </>
                           ) : (
                             <>
                               <FileText className="h-4 w-4 mr-2" />
-                              Generate Candidates PDF
+                              {t('rfxs.candidates_generatePdf')}
                             </>
                           )}
                         </Button>
@@ -614,12 +604,12 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                     </TooltipTrigger>
                     {!hasCandidates && (
                       <TooltipContent>
-                        Generate candidates first
+                        {t('rfxs.candidates_generateCandidatesFirst')}
                       </TooltipContent>
                     )}
                     {hasCandidates && (pdfCryptoLoading || !pdfCryptoReady) && (
                       <TooltipContent>
-                        Loading encryption keys...
+                        {t('rfxs.candidates_loadingEncryptionKeys')}
                       </TooltipContent>
                     )}
                   </Tooltip>
@@ -643,17 +633,17 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
               data-onboarding-target="candidates-tab-recommended"
               className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
             >
-              Qanvit recommended candidates
+              {t('rfxs.candidates_tabRecommended')}
             </TabsTrigger>
             <TabsTrigger
               value="manual"
               data-onboarding-target="candidates-tab-manual"
               className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
             >
-              Manual selection
+              {t('rfxs.candidates_tabManual')}
             </TabsTrigger>
-            <TabsTrigger value="selected" className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50">Selected candidates</TabsTrigger>
-            <TabsTrigger value="specs" className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50">Specs overview</TabsTrigger>
+            <TabsTrigger value="selected" className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50">{t('rfxs.candidates_tabSelected')}</TabsTrigger>
+            <TabsTrigger value="specs" className="group rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50">{t('rfxs.candidates_tabSpecs')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="recommended">
@@ -694,7 +684,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 <div className="flex items-center justify-center py-12">
                   <div className="flex flex-col items-center gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-[#f4a9aa]" />
-                    <p className="text-sm text-gray-600">Loading and decrypting selected candidates...</p>
+                    <p className="text-sm text-gray-600">{t('rfxs.candidates_loadingSelected')}</p>
                   </div>
                 </div>
               ) : !hasSelectedCandidates ? (
@@ -703,23 +693,23 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#f1f1f1] text-[#22183a] mb-4">
                       <Users className="h-8 w-8" />
                     </div>
-                    <h3 className="text-xl font-semibold text-[#22183a] mb-2">No candidates selected yet</h3>
+                    <h3 className="text-xl font-semibold text-[#22183a] mb-2">{t('rfxs.candidates_noCandidatesYet')}</h3>
                     <p className="text-sm text-gray-600 mb-6">
-                      Choose your preferred way to start selecting candidates for this RFX.
+                      {t('rfxs.candidates_chooseWay')}
                     </p>
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                       <Button
                         onClick={() => setActiveTab('recommended')}
                         className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-white"
                       >
-                        Explore Qanvit recommendations
+                        {t('rfxs.candidates_exploreRecommendations')}
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => setActiveTab('manual')}
                         className="border-[#f4a9aa] text-[#22183a] hover:bg-[#f4a9aa]/10"
                       >
-                        Go to manual selection
+                        {t('rfxs.candidates_goToManual')}
                       </Button>
                     </div>
                   </div>
@@ -758,21 +748,21 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                           className={selectedFilter === 'all' ? 'bg-navy text-white' : ''}
                           onClick={() => { setSelectedFilter('all'); setSelectedPage(1); }}
                         >
-                          All ({totalCount})
+                          {t('rfxs.candidates_filterAll', { count: totalCount })}
                         </Button>
                         <Button
                           variant={selectedFilter === 'fq' ? 'default' : 'outline'}
                           className={selectedFilter === 'fq' ? 'bg-navy text-white' : ''}
                           onClick={() => { setSelectedFilter('fq'); setSelectedPage(1); }}
                         >
-                          Qanvit recommended ({fqCount})
+                          {t('rfxs.candidates_filterRecommended', { count: fqCount })}
                         </Button>
                         <Button
                           variant={selectedFilter === 'manual' ? 'default' : 'outline'}
                           className={selectedFilter === 'manual' ? 'bg-navy text-white' : ''}
                           onClick={() => { setSelectedFilter('manual'); setSelectedPage(1); }}
                         >
-                          Manual ({manualCount})
+                          {t('rfxs.candidates_filterManual', { count: manualCount })}
                         </Button>
                       </div>
                       {currentPageItems.map((candidate: any, index: number) => {
@@ -814,15 +804,15 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                           {!isManual ? (
                             <div className="flex gap-3 flex-shrink-0">
                               <div className="text-center">
-                                <div className="text-xs text-gray-500 mb-1">Overall</div>
+                                <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_overall')}</div>
                                 <div className="text-2xl font-bold text-navy">{overall}%</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-xs text-gray-500 mb-1">Tech</div>
+                                <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_tech')}</div>
                                 <div className="text-lg font-semibold text-gray-700">{tech}%</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-xs text-gray-500 mb-1">Company</div>
+                                <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_company')}</div>
                                 <div className="text-lg font-semibold text-gray-700">{comp}%</div>
                               </div>
                             </div>
@@ -874,19 +864,19 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                                 </TooltipTrigger>
                                 {readOnly ? (
                                   <TooltipContent>
-                                    <p>This is a read-only public example. Modifications are not allowed.</p>
+                                    <p>{t('rfxs.candidates_readOnlyExample')}</p>
                                   </TooltipContent>
                                 ) : rfx.archived ? (
                                   <TooltipContent>
-                                    <p>Suppliers cannot be modified because the RFX is archived</p>
+                                    <p>{t('rfxs.candidates_archivedNoModify')}</p>
                                   </TooltipContent>
                                 ) : rfx.status === 'revision requested by buyer' ? (
                                   <TooltipContent>
-                                    <p>Suppliers cannot be modified during the RFX review process</p>
+                                    <p>{t('rfxs.candidates_reviewNoModify')}</p>
                                   </TooltipContent>
                                 ) : canRemoveCandidates && invitedCompanies.has(`${candidate.id_company_revision}-${candidate.id_product_revision || 'company'}`) ? (
                                   <TooltipContent>
-                                    <p>The RFX has already been sent to this supplier, so it can no longer be removed from the RFX</p>
+                                    <p>{t('rfxs.candidates_alreadySentNoRemove')}</p>
                                   </TooltipContent>
                                 ) : null}
                               </Tooltip>
@@ -956,7 +946,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-md px-3 py-2">
                   <h3 className="text-lg font-bold text-[#22183a] flex items-center gap-2 m-0">
                     <FileTextIcon className="h-5 w-5 text-[#22183a]/70" />
-                    Project Description
+                    {t('rfxs.specs_projectDescription')}
                   </h3>
                 </div>
                 {currentSpecs.description ? (
@@ -969,7 +959,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-md px-3 py-2">
                   <h3 className="text-lg font-bold text-[#22183a] flex items-center gap-2 m-0">
                     <Cog className="h-5 w-5 text-[#22183a]/70" />
-                    Technical Specifications
+                    {t('rfxs.specs_technicalSpecs')}
                   </h3>
                 </div>
                 {currentSpecs.technical_requirements ? (
@@ -982,7 +972,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 <div className="mb-4 bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-md px-3 py-2">
                   <h3 className="text-lg font-bold text-[#22183a] flex items-center gap-2 m-0">
                     <Building2 className="h-5 w-5 text-[#22183a]/70" />
-                    Company Requirements
+                    {t('rfxs.specs_companyRequirements')}
                   </h3>
                 </div>
                 {currentSpecs.company_requirements ? (
@@ -1029,11 +1019,13 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
             </div>
             <div className="text-center">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Remove Candidate
+                {t('rfxs.candidates_removeTitle')}
               </h3>
               <p className="text-sm text-gray-600">
-                Are you sure you want to remove <span className="font-semibold">{candidateToRemove?.empresa}</span>
-                {candidateToRemove?.producto && <> ({candidateToRemove.producto})</>} from the selected candidates?
+                {t('rfxs.candidates_removeConfirm', { 
+                  name: candidateToRemove?.empresa ?? '', 
+                  product: candidateToRemove?.producto ? ` (${candidateToRemove.producto})` : '' 
+                })}
               </p>
             </div>
             <div className="flex gap-3 w-full">
@@ -1046,7 +1038,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 }}
                 disabled={removingCandidates.size > 0}
               >
-                Cancel
+                {t('rfxs.candidates_cancel')}
               </Button>
               <Button
                 className="flex-1 bg-red-600 hover:bg-red-700 text-white"
@@ -1056,10 +1048,10 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 {removingCandidates.size > 0 ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Removing...
+                    {t('rfxs.candidates_removing')}
                   </>
                 ) : (
-                  'Remove'
+                  t('rfxs.candidates_remove')
                 )}
               </Button>
             </div>
@@ -1076,10 +1068,10 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
             </div>
             <div className="text-center">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                RFX Under Review
+                {t('rfxs.candidates_revisionTitle')}
               </h3>
               <p className="text-sm text-gray-600">
-                Candidates cannot be modified during the RFX review process. Please wait until the review is complete (this process usually takes just a few hours).
+                {t('rfxs.candidates_revisionDesc')}
               </p>
             </div>
             <div className="flex gap-3 w-full">
@@ -1087,7 +1079,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 className="flex-1 bg-[#22183a] hover:bg-[#22183a]/90 text-white"
                 onClick={() => setShowRevisionModal(false)}
               >
-                Understood
+                {t('rfxs.candidates_understood')}
               </Button>
             </div>
           </div>
@@ -1100,23 +1092,23 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-gray-500" />
-              RFX Archived
+              {t('rfxs.specs_rfxArchived')}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm leading-relaxed space-y-3 pt-2">
               <p>
-                This RFX has been archived by the project creator.
+                {t('rfxs.candidates_archivedDesc')}
               </p>
               <div className="bg-[#f1f1f1] border-l-4 border-l-gray-400 rounded-lg p-4 space-y-2">
                 <p className="font-medium text-[#22183a]">
-                  While archived:
+                  {t('rfxs.candidates_whileArchived')}
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-2">
-                  <li>You cannot modify candidates</li>
-                  <li>Invited suppliers cannot upload documents</li>
-                  <li>The RFX is read-only for all users</li>
+                  <li>{t('rfxs.candidates_archivedBullet1')}</li>
+                  <li>{t('rfxs.candidates_archivedBullet2')}</li>
+                  <li>{t('rfxs.candidates_archivedBullet3')}</li>
                 </ul>
                 <p className="text-sm text-gray-700 mt-3">
-                  Only the project creator can unarchive it from the RFX list.
+                  {t('rfxs.candidates_onlyCreatorUnarchive')}
                 </p>
               </div>
             </AlertDialogDescription>
@@ -1130,13 +1122,13 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
               }}
               className="w-full sm:w-auto"
             >
-              Back to RFX List
+              {t('rfxs.candidates_backToRfxList')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => setShowArchivedModal(false)}
               className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
             >
-              View Only
+              {t('rfxs.candidates_viewOnly')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

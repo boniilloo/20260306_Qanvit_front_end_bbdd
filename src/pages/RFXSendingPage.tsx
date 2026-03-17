@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Download, FileText, CheckCircle, Loader2, Send, ExternalLink, Users, ChevronDown, ChevronUp, ClipboardCheck, AlertCircle, Info, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,6 +55,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
   const params = useParams<{ rfxId?: string; id?: string }>();
   const rfxId = params.rfxId || params.id;
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   
   // Use public crypto for public RFXs, private crypto otherwise
@@ -364,8 +366,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
 
         if (publicError || !publicData) {
           toast({
-            title: 'Access Denied',
-            description: 'This RFX is not available as a public example.',
+            title: t('rfxs.sending_toast_accessDenied'),
+            description: t('rfxs.sending_toast_notPublicExample'),
             variant: 'destructive',
           });
           navigate('/');
@@ -381,8 +383,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
 
         if (error || !data) {
           toast({
-            title: 'Error',
-            description: 'Public RFX example not found',
+            title: t('rfxs.sending_toast_error'),
+            description: t('rfxs.sending_toast_publicNotFound'),
             variant: 'destructive',
           });
           navigate('/');
@@ -398,8 +400,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
       
       if (!user) {
         toast({
-          title: 'Error',
-          description: 'You must be logged in',
+          title: t('rfxs.sending_toast_error'),
+          description: t('rfxs.sending_toast_mustLogin'),
           variant: 'destructive',
         });
         navigate('/rfxs');
@@ -419,8 +421,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
 
       if (!data) {
         toast({
-          title: 'Error',
-          description: 'RFX not found',
+          title: t('rfxs.sending_toast_error'),
+          description: t('rfxs.sending_toast_rfxNotFound'),
           variant: 'destructive',
         });
         navigate('/rfxs');
@@ -439,8 +441,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
         
         if (!memberRow) {
           toast({
-            title: 'Access denied',
-            description: 'You do not have access to this RFX',
+            title: t('rfxs.sending_toast_accessDenied'),
+            description: t('rfxs.sending_toast_noAccess'),
             variant: 'destructive',
           });
           navigate('/rfxs');
@@ -458,8 +460,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
     } catch (err: any) {
       console.error('❌ [RFX Sending Page] Error fetching RFX:', err);
       toast({
-        title: 'Error',
-        description: 'Failed to load RFX',
+        title: t('rfxs.sending_toast_error'),
+        description: t('rfxs.sending_toast_failedLoadRfx'),
         variant: 'destructive',
       });
       // In public mode, send user to home; in private, back to list
@@ -614,8 +616,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
     // Check if there are selected candidates
     if (selectedCandidates.length === 0) {
       toast({
-        title: 'No candidates selected',
-        description: 'Please select candidates before validating',
+        title: t('rfxs.sending_toast_noCandidates'),
+        description: t('rfxs.sending_toast_selectCandidatesFirst'),
         variant: 'destructive',
       });
       return;
@@ -638,8 +640,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
   const handleSaveVersionAndContinue = async () => {
     if (!versionName.trim()) {
       toast({
-        title: 'Version name required',
-        description: 'Please enter a version name',
+        title: t('rfxs.sending_toast_versionNameRequired'),
+        description: t('rfxs.sending_toast_enterVersionName'),
         variant: 'destructive',
       });
       return;
@@ -666,16 +668,16 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
         setShowValidationIntro(true);
       } else {
         toast({
-          title: 'Error',
-          description: 'Failed to save version',
+          title: t('rfxs.sending_toast_error'),
+          description: t('rfxs.sending_toast_failedSaveVersion'),
           variant: 'destructive',
         });
       }
     } catch (error) {
       console.error('Error saving version:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to save version',
+        title: t('rfxs.sending_toast_error'),
+        description: t('rfxs.sending_toast_failedSaveVersion'),
         variant: 'destructive',
       });
     } finally {
@@ -705,8 +707,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
     } catch (error) {
       console.error('Error generating specs PDF:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to generate PDF preview',
+        title: t('rfxs.sending_toast_error'),
+        description: t('rfxs.sending_toast_failedPdfPreview'),
         variant: 'destructive',
       });
     } finally {
@@ -725,8 +727,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
     if (!approved) {
       setShowSpecsValidation(false);
       toast({
-        title: 'Validation cancelled',
-        description: 'You rejected the RFX specifications',
+        title: t('rfxs.sending_toast_validationCancelled'),
+        description: t('rfxs.sending_toast_rejectedSpecs'),
       });
       return;
     }
@@ -741,8 +743,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
     if (!approved) {
       setShowCandidatesValidation(false);
       toast({
-        title: 'Validation cancelled',
-        description: 'You rejected the candidates selection',
+        title: t('rfxs.sending_toast_validationCancelled'),
+        description: t('rfxs.sending_toast_rejectedCandidates'),
       });
       return;
     }
@@ -838,8 +840,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
       
       if (!commitIdToSend) {
         toast({
-          title: 'Error',
-          description: 'No version has been validated. Please validate the RFX before sending.',
+          title: t('rfxs.sending_toast_error'),
+          description: t('rfxs.sending_toast_noVersionValidated'),
           variant: 'destructive',
         });
         setShowSendConfirm(false);
@@ -953,8 +955,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             if (insertError) {
               console.error('❌ [RFX Sending] Error inserting new invitations:', insertError);
               toast({
-                title: 'Warning',
-                description: 'RFX updated but some suppliers may not have been notified. Please check manually.',
+                title: t('rfxs.sending_toast_error'),
+                description: t('rfxs.sending_toast_warningSuppliersNotified'),
                 variant: 'destructive',
               });
             } else {
@@ -1008,10 +1010,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
         const hasNewInvitations = newInvitations.length > 0;
         
         toast({
-          title: hasNewInvitations ? 'Suppliers invited and notified' : 'Suppliers notified',
+          title: hasNewInvitations ? t('rfxs.sending_toast_suppliersInvited') : t('rfxs.sending_toast_suppliersNotified'),
           description: hasNewInvitations 
-            ? `${newInvitations.length} new supplier(s) invited. All suppliers have been notified about the specification updates.`
-            : 'All suppliers have been notified about the specification updates.',
+            ? t('rfxs.sending_toast_suppliersInvitedDesc', { count: newInvitations.length })
+            : t('rfxs.sending_toast_suppliersNotifiedDesc'),
         });
         shouldNavigate = true;
       } else {
@@ -1061,16 +1063,16 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
           console.error('❌ [RFX Sending] Error distributing encryption keys to developers:', keyDistError);
           // Don't block the sending flow, encryption is important but not critical for the review
           toast({
-            title: 'Warning',
-            description: 'RFX sent for review but there was an issue with encryption keys. Some developers may not be able to access encrypted content.',
+            title: t('rfxs.sending_toast_error'),
+            description: t('rfxs.sending_toast_warningEncryption'),
             variant: 'default',
           });
         }
         
         console.log('RFX sent to FQ review and then to suppliers', { sent_commit_id: commitIdToSend });
         toast({
-          title: 'RFX in review',
-          description: 'The RFX has been sent to Qanvit reviewers. After validation, it will be sent to suppliers.',
+          title: t('rfxs.sending_toast_rfxInReview'),
+          description: t('rfxs.sending_toast_rfxInReviewDesc'),
         });
         
         // Fire-and-forget: invoke generic email sender with server-side filter
@@ -1085,7 +1087,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
       }
     } catch (e) {
       console.error('❌ Error marking RFX as sent:', e);
-      toast({ title: 'Error', description: 'Failed to mark RFX as sent', variant: 'destructive' });
+      toast({ title: t('rfxs.sending_toast_error'), description: t('rfxs.sending_toast_failedMarkSent'), variant: 'destructive' });
     } finally {
       setShowSendConfirm(false);
       setShowNDAWarning(false);
@@ -1163,8 +1165,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
     } catch (error) {
       console.error('Error generating specs PDF:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to generate PDF',
+        title: t('rfxs.sending_toast_error'),
+        description: t('rfxs.sending_toast_failedGeneratePdf'),
         variant: 'destructive',
       });
     }
@@ -1207,7 +1209,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             <div className="flex items-start md:items-center justify-between gap-3">
               <div className="min-w-0">
                 <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight truncate">
-                  {rfx.name} - Validation & Sending
+                  {rfx.name} - {t('rfxs.sending_pageTitle')}
                 </h1>
                 {rfx.description && (
                   <p className="mt-1 text-sm md:text-base text-gray-600 leading-relaxed max-w-3xl font-inter line-clamp-2">
@@ -1222,7 +1224,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
+                  {t('rfxs.sending_back')}
                 </Button>
               </div>
             </div>
@@ -1236,10 +1238,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 </div>
                 <div>
                   <CardTitle className="text-3xl font-semibold text-[#22183a] font-intro">
-                    Launch RFX
+                    {t('rfxs.sending_launchRfx')}
                   </CardTitle>
                   <CardDescription className="text-base mt-1">
-                    Complete the RFX process and generate final documentation
+                    {t('rfxs.sending_launchRfxDesc')}
                   </CardDescription>
                 </div>
               </div>
@@ -1266,9 +1268,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                       <div className="flex items-center gap-3">
                         <FileText className="h-6 w-6 text-[#22183a]" />
                         <div className="text-left">
-                          <h3 className="text-xl font-semibold text-[#22183a]">Final Documentation</h3>
+                          <h3 className="text-xl font-semibold text-[#22183a]">{t('rfxs.sending_finalDocs')}</h3>
                           <p className="text-sm text-gray-600">
-                            Generate comprehensive PDF documents with RFX specifications and candidate results.
+                            {t('rfxs.sending_finalDocsDesc')}
                           </p>
                         </div>
                       </div>
@@ -1284,9 +1286,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     {/* Generate Specs PDF Button */}
                     <Card className={`${hasSpecsContent() ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}>
                       <CardHeader>
-                        <CardTitle className="text-lg">RFX Specifications</CardTitle>
+                        <CardTitle className="text-lg">{t('rfxs.sending_specsCardTitle')}</CardTitle>
                         <CardDescription>
-                          Download the complete specifications document
+                          {t('rfxs.sending_specsCardDesc')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -1298,18 +1300,18 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                           {isGeneratingSpecsPdf ? (
                             <>
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Generating...
+                              {t('rfxs.sending_generating')}
                             </>
                           ) : (
                             <>
                               <Download className="h-4 w-4 mr-2" />
-                              Generate Specs PDF
+                              {t('rfxs.sending_generateSpecsPdf')}
                             </>
                           )}
                         </Button>
                         {(!hasSpecsContent() || !isSpecsCompleted) && (
                           <p className="text-xs text-red-500 mt-2 text-center">
-                            {!isSpecsCompleted ? 'Complete RFX specifications first' : 'No specifications available'}
+                            {!isSpecsCompleted ? t('rfxs.sending_completeSpecsFirst') : t('rfxs.sending_noSpecsAvailable')}
                           </p>
                         )}
                       </CardContent>
@@ -1318,9 +1320,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     {/* Generate Candidates PDF Button */}
                     <Card className={`${hasCandidates ? 'border-green-200 bg-green-50' : 'border-gray-200'}`}>
                       <CardHeader>
-                        <CardTitle className="text-lg">Candidate Results</CardTitle>
+                        <CardTitle className="text-lg">{t('rfxs.sending_candidateResults')}</CardTitle>
                         <CardDescription>
-                          Download the candidate evaluation report
+                          {t('rfxs.sending_candidateResultsDesc')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -1333,21 +1335,21 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                             <>
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                               {pdfProgress ? (
-                                <>Candidate {pdfProgress.current} of {pdfProgress.total}</>
+                                <>{t('rfxs.sending_candidateXofY', { current: pdfProgress.current, total: pdfProgress.total })}</>
                               ) : (
-                                <>Generating...</>
+                                <>{t('rfxs.sending_generating')}</>
                               )}
                             </>
                           ) : (
                             <>
                               <Download className="h-4 w-4 mr-2" />
-                              Generate Candidates PDF
+                              {t('rfxs.sending_generateCandidatesPdf')}
                             </>
                           )}
                         </Button>
                         {(!hasCandidates || !isSpecsCompleted) && (
                           <p className="text-xs text-red-500 mt-2 text-center">
-                            {!isSpecsCompleted ? 'Complete RFX specifications first' : 'No candidates evaluated yet'}
+                            {!isSpecsCompleted ? t('rfxs.sending_completeSpecsFirst') : t('rfxs.sending_noCandidatesYet')}
                           </p>
                         )}
                       </CardContent>
@@ -1370,10 +1372,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                             <Users className="h-5 w-5 text-[#22183a]" />
                             <div className="text-left">
                               <h4 className="text-lg font-semibold text-[#22183a]">
-                                Selected Candidates
+                                {t('rfxs.sending_selectedCandidates')}
                               </h4>
                               <p className="text-sm text-gray-600">
-                                {selectedCandidates.length} candidate{selectedCandidates.length !== 1 ? 's' : ''} selected for this RFX
+                                {t('rfxs.sending_selectedCandidatesDesc', { count: selectedCandidates.length })}
                               </p>
                             </div>
                           </div>
@@ -1469,21 +1471,21 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                               {!isManual ? (
                                                 <div className="flex gap-3 flex-shrink-0">
                                                   <div className="text-center">
-                                                    <div className="text-xs text-gray-500 mb-1">Overall</div>
+                                                    <div className="text-xs text-gray-500 mb-1">{t('rfxs.sending_overall')}</div>
                                                     <div className="text-2xl font-bold text-[#22183a]">{overallMatch}%</div>
                                                   </div>
                                                   <div className="text-center">
-                                                    <div className="text-xs text-gray-500 mb-1">Tech</div>
+                                                    <div className="text-xs text-gray-500 mb-1">{t('rfxs.sending_tech')}</div>
                                                     <div className="text-lg font-semibold text-gray-700">{technicalMatch}%</div>
                                                   </div>
                                                   <div className="text-center">
-                                                    <div className="text-xs text-gray-500 mb-1">Company</div>
+                                                    <div className="text-xs text-gray-500 mb-1">{t('rfxs.sending_company')}</div>
                                                     <div className="text-lg font-semibold text-gray-700">{companyMatch}%</div>
                                                   </div>
                                                 </div>
                                               ) : (
                                                 <div className="flex items-center justify-center px-3 py-2 rounded-md bg-[#f1f1f1] text-[#22183a] text-sm font-medium flex-shrink-0">
-                                                  Manually selected
+                                                  {t('rfxs.sending_manuallySelected')}
                                                 </div>
                                               )}
 
@@ -1496,8 +1498,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                                       window.open(websiteUrl, '_blank', 'noopener,noreferrer');
                                                     } else {
                                                       toast({
-                                                        title: "No website available",
-                                                        description: "This candidate doesn't have a website URL",
+                                                        title: t('rfxs.sending_toast_noWebsite'),
+                                                        description: t('rfxs.sending_toast_noWebsiteDesc'),
                                                         variant: "destructive",
                                                       });
                                                     }
@@ -1505,7 +1507,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                                   className="px-4 py-2 border border-gray-300 rounded-lg text-[#22183a] hover:bg-gray-50 transition-colors flex items-center gap-2"
                                                 >
                                                   <ExternalLink size={16} />
-                                                  View Website
+                                                  {t('rfxs.sending_viewWebsite')}
                                                 </button>
                                               </div>
                                             </div>
@@ -1518,7 +1520,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                     {totalPages > 1 && (
                                       <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
                                         <div className="text-sm text-gray-600">
-                                          Showing {startIndex + 1} to {Math.min(endIndex, selectedCandidates.length)} of {selectedCandidates.length} candidates
+                                          {t('rfxs.sending_showingXtoYofZ', { from: startIndex + 1, to: Math.min(endIndex, selectedCandidates.length), total: selectedCandidates.length })}
                                         </div>
                                         <div className="flex items-center gap-2">
                                           <Button
@@ -1527,7 +1529,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                             disabled={currentPage === 1}
                                           >
-                                            Previous
+                                            {t('rfxs.sending_previous')}
                                           </Button>
                                           
                                           <div className="flex items-center gap-1">
@@ -1562,7 +1564,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                             disabled={currentPage === totalPages}
                                           >
-                                            Next
+                                            {t('rfxs.sending_next')}
                                           </Button>
                                         </div>
                                       </div>
@@ -1591,9 +1593,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                       <div className="flex items-center gap-3">
                         <ClipboardCheck className="h-6 w-6 text-[#22183a]" />
                         <div className="text-left">
-                          <h3 className="text-xl font-semibold text-[#22183a]">Final Review & Validation</h3>
+                          <h3 className="text-xl font-semibold text-[#22183a]">{t('rfxs.sending_finalReview')}</h3>
                           <p className="text-sm text-gray-600">
-                            All RFX members must review and validate the specifications and candidate selection before sending.
+                            {t('rfxs.sending_finalReviewDesc')}
                           </p>
                         </div>
                       </div>
@@ -1608,36 +1610,36 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   
                   {/* Validation Status */}
                   <div className="bg-white rounded-lg p-4 mb-4">
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Validation Status</h4>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3">{t('rfxs.sending_validationStatus')}</h4>
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Your Validation</span>
+                        <span className="text-sm text-gray-600">{t('rfxs.sending_yourValidation')}</span>
                         <span className={`text-sm font-medium flex items-center gap-1 ${readOnly || currentUserValidation?.is_valid ? 'text-green-600' : 'text-amber-600'}`}>
                           {readOnly || currentUserValidation?.is_valid ? (
                             <>
                               <CheckCircle className="h-4 w-4" />
-                              Validated
+                              {t('rfxs.sending_validated')}
                             </>
                           ) : (
                             <>
                               <AlertCircle className="h-4 w-4" />
-                              Pending
+                              {t('rfxs.sending_pending')}
                             </>
                           )}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">All Members</span>
+                        <span className="text-sm text-gray-600">{t('rfxs.sending_allMembers')}</span>
                         <span className={`text-sm font-medium flex items-center gap-1 ${allMembersValidated ? 'text-green-600' : 'text-amber-600'}`}>
                           {allMembersValidated ? (
                             <>
                               <CheckCircle className="h-4 w-4" />
-                              All Validated ({readOnly ? (members.length || 1) : validations.filter(v => v.is_valid).length}/{readOnly ? (members.length || 1) : members.length})
+                              {t('rfxs.sending_allValidated', { valid: readOnly ? (members.length || 1) : validations.filter(v => v.is_valid).length, total: readOnly ? (members.length || 1) : members.length })}
                             </>
                           ) : (
                             <>
                               <AlertCircle className="h-4 w-4" />
-                              Pending ({validations.filter(v => v.is_valid).length}/{members.length})
+                              {t('rfxs.sending_pending')} ({validations.filter(v => v.is_valid).length}/{members.length})
                             </>
                           )}
                         </span>
@@ -1655,7 +1657,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                           <div className="flex items-center gap-2">
                             <Users className="h-4 w-4 text-gray-500" />
                             <span className="text-sm font-medium text-gray-700">
-                              Member Details ({validations.filter(v => v.is_valid).length}/{members.length} validated)
+                              {t('rfxs.sending_memberDetails', { valid: validations.filter(v => v.is_valid).length, total: members.length })}
                             </span>
                           </div>
                           {isMembersValidationOpen ? (
@@ -1670,7 +1672,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                             const info = membersInfo[member.user_id];
                             const displayName = info?.name && info?.surname 
                               ? `${info.name} ${info.surname}`
-                              : info?.email || 'Unknown User';
+                              : info?.email || t('rfxs.sending_unknownUser');
                             
                             return (
                               <div 
@@ -1692,7 +1694,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                     {info?.email}
                                   </p>
                                   <p className={`text-xs font-medium mt-1 ${memberValidation ? 'text-green-600' : 'text-amber-600'}`}>
-                                    {memberValidation ? '✓ Validated' : 'Pending validation'}
+                                    {memberValidation ? t('rfxs.sending_validatedShort') : t('rfxs.sending_pendingValidation')}
                                   </p>
                                 </div>
                               </div>
@@ -1707,10 +1709,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                           <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
                           <div className="flex-1">
                             <p className="text-sm font-medium text-gray-900">
-                              All members validated (Read-Only Example)
+                              {t('rfxs.sending_allValidatedReadOnly')}
                             </p>
                             <p className="text-xs text-gray-600 mt-1">
-                              In this public example, all validations are shown as complete.
+                              {t('rfxs.sending_readOnlyValidationsHint')}
                             </p>
                           </div>
                         </div>
@@ -1725,7 +1727,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     className="w-full mb-4 bg-[#22183a] hover:bg-[#22183a]/90 text-white font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                   >
                     <ClipboardCheck className="h-4 w-4 mr-2" />
-                    {readOnly ? 'Validation Complete (Read-Only)' : (currentUserValidation?.is_valid ? 'Review Validation' : 'Start Validation Process')}
+                    {readOnly ? t('rfxs.sending_validationComplete') : (currentUserValidation?.is_valid ? t('rfxs.sending_reviewValidation') : t('rfxs.sending_startValidation'))}
                   </Button>
                   </CollapsibleContent>
                 </Collapsible>
@@ -1743,8 +1745,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                       <div className="flex items-center gap-3">
                         <FileText className="h-6 w-6 text-[#22183a]" />
                         <div className="text-left">
-                          <h3 className="text-xl font-semibold text-[#22183a]">Non-Disclosure Agreement (NDA)</h3>
-                          <p className="text-sm text-gray-600">Upload and manage the NDA required before sending.</p>
+                          <h3 className="text-xl font-semibold text-[#22183a]">{t('rfxs.sending_ndaTitle')}</h3>
+                          <p className="text-sm text-gray-600">{t('rfxs.sending_ndaDesc')}</p>
                         </div>
                       </div>
                       {isNDAOpen ? (
@@ -1772,8 +1774,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                       <div className="flex items-center gap-3">
                         <Send className="h-6 w-6 text-[#22183a]" />
                         <div className="text-left">
-                          <h3 className="text-xl font-semibold text-[#22183a]">Send RFX to Suppliers</h3>
-                          <p className="text-sm text-gray-600">Send the RFX to the selected suppliers.</p>
+                          <h3 className="text-xl font-semibold text-[#22183a]">{t('rfxs.sending_sendToSuppliersCard')}</h3>
+                          <p className="text-sm text-gray-600">{t('rfxs.sending_sendToSuppliersCardDesc')}</p>
                         </div>
                       </div>
                       {isSendOpen ? (
@@ -1800,13 +1802,13 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                                   className="w-full bg-[#22183a] hover:bg-[#22183a]/90 text-white font-bold shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                                 >
                                   <Send className="h-4 w-4 mr-2" />
-                                  {readOnly ? 'Read-Only Mode' : 'Send to Suppliers'}
+                                  {readOnly ? t('rfxs.sending_readOnlyMode') : t('rfxs.sending_sendToSuppliersBtn')}
                                 </Button>
                               </div>
                             </TooltipTrigger>
                             {isRevisionRequested && (
                               <TooltipContent>
-                                <p>La RFX está en proceso de revisión y de momento no se pueden enviar las ediciones.</p>
+                                <p>{t('rfxs.sending_tooltipRevision')}</p>
                               </TooltipContent>
                             )}
                           </Tooltip>
@@ -1816,7 +1818,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     {!allMembersValidated && (
                       <div className="flex items-center justify-center gap-3 mt-2">
                         <p className="text-xs text-amber-600">
-                          All members must validate before sending
+                          {t('rfxs.sending_allMustValidate')}
                         </p>
                         <Button
                           variant="outline"
@@ -1824,7 +1826,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                           onClick={handleGoToValidationSection}
                           className="border-[#22183a] text-[#22183a] hover:bg-[#22183a]/10 text-xs h-7"
                         >
-                          Go to validation section
+                          {t('rfxs.sending_goToValidation')}
                         </Button>
                       </div>
                     )}
@@ -1843,10 +1845,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
                 <Info className="h-5 w-5 text-[#22183a]" />
-                Save Version Before Validation
+                {t('rfxs.sending_saveVersionTitle')}
               </DialogTitle>
               <DialogDescription>
-                Before starting the validation process, you need to save your changes as a version.
+                {t('rfxs.sending_saveVersionDesc')}
               </DialogDescription>
             </DialogHeader>
             
@@ -1854,15 +1856,15 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
               <Alert className="bg-blue-50 border-blue-200">
                 <Info className="h-4 w-4 text-blue-600" />
                 <AlertDescription className="text-blue-800">
-                  Please enter a version name to version your current changes before proceeding with the validation process.
+                  {t('rfxs.sending_saveVersionAlert')}
                 </AlertDescription>
               </Alert>
               
               <div className="space-y-2">
-                <Label htmlFor="versionName">Version Name *</Label>
+                <Label htmlFor="versionName">{t('rfxs.sending_versionNameLabel')}</Label>
                 <Input
                   id="versionName"
-                  placeholder="e.g., Updated technical requirements"
+                  placeholder={t('rfxs.sending_versionNamePlaceholder')}
                   value={versionName}
                   onChange={(e) => setVersionName(e.target.value)}
                   onKeyDown={(e) => {
@@ -1884,7 +1886,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 }}
                 disabled={isSavingVersion}
               >
-                Cancel
+                {t('rfxs.sending_cancel')}
               </Button>
               <Button
                 onClick={handleSaveVersionAndContinue}
@@ -1894,10 +1896,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 {isSavingVersion ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
+                    {t('rfxs.sending_saving')}
                   </>
                 ) : (
-                  'Save Version & Continue'
+                  t('rfxs.sending_saveVersionContinue')
                 )}
               </Button>
             </DialogFooter>
@@ -1910,16 +1912,16 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-2xl">
                 <Info className="h-6 w-6 text-[#22183a]" />
-                Final Validation Process
+                {t('rfxs.sending_validationIntroTitle')}
               </DialogTitle>
               <DialogDescription>
-                Review and approve the RFX before sending to suppliers
+                {t('rfxs.sending_validationIntroDesc')}
               </DialogDescription>
             </DialogHeader>
             
             <div className="space-y-4 py-4">
               <p className="text-gray-700">
-                You are about to start the final validation process for this RFX. This process consists of two validation steps:
+                {t('rfxs.sending_validationIntroParagraph')}
               </p>
               
               <div className="bg-[#f1f1f1] border border-[#f4a9aa] rounded-lg p-4 space-y-3">
@@ -1928,9 +1930,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     1
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">RFX Specifications</h4>
+                    <h4 className="font-semibold text-gray-900">{t('rfxs.sending_step1Title')}</h4>
                     <p className="text-sm text-gray-600">
-                      You will review the PDF of the RFX specifications from the current version. You must approve or reject this document.
+                      {t('rfxs.sending_step1Desc')}
                     </p>
                   </div>
                 </div>
@@ -1940,9 +1942,9 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     2
                   </div>
                   <div>
-                    <h4 className="font-semibold text-gray-900">Candidate Selection</h4>
+                    <h4 className="font-semibold text-gray-900">{t('rfxs.sending_step2Title')}</h4>
                     <p className="text-sm text-gray-600">
-                      You will review the list of selected candidates. You must approve or reject this selection.
+                      {t('rfxs.sending_step2Desc')}
                     </p>
                   </div>
                 </div>
@@ -1951,7 +1953,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Important:</strong> You are validating the content of version "{commitStatus.baseCommit?.commit_message}" and the current candidate selection. If changes are made later, you will need to validate again.
+                  {t('rfxs.sending_importantVersion', { message: commitStatus.baseCommit?.commit_message || '' })}
                 </AlertDescription>
               </Alert>
               
@@ -1959,7 +1961,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 <Alert className="bg-amber-50 border-amber-200">
                   <Info className="h-4 w-4 text-amber-600" />
                   <AlertDescription className="text-amber-800">
-                    You have already validated this RFX. You can review and update your validation, or remove it if you want to invalidate your approval.
+                    {t('rfxs.sending_alreadyValidated')}
                   </AlertDescription>
                 </Alert>
               )}
@@ -1967,7 +1969,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             
             <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setShowValidationIntro(false)}>
-                Cancel
+                {t('rfxs.sending_cancel')}
               </Button>
               {currentUserValidation?.is_valid && (
                 <Button 
@@ -1981,11 +1983,11 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   className="border-red-300 text-red-600 hover:bg-red-50"
                 >
                   <XCircle className="h-4 w-4 mr-2" />
-                  Remove My Validation
+                  {t('rfxs.sending_removeMyValidation')}
                 </Button>
               )}
               <Button onClick={handleValidationIntroConfirm} className="bg-[#22183a] hover:bg-[#22183a]/90 text-white">
-                {currentUserValidation?.is_valid ? 'Review & Update Validation' : 'Start Validation'}
+                {currentUserValidation?.is_valid ? t('rfxs.sending_reviewUpdateValidation') : t('rfxs.sending_startValidationBtn')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -2002,7 +2004,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             }
           }}
           pdfUrl={specsPdfUrl}
-          title="RFX Specifications PDF"
+          title={t('rfxs.sending_specsPdfTitle')}
         />
 
         {/* Candidates PDF Preview Modal (reused) */}
@@ -2023,12 +2025,12 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
         <Dialog open={showSendConfirm} onOpenChange={setShowSendConfirm}>
           <DialogContent className="max-w-xl">
             <DialogHeader>
-              <DialogTitle className="text-2xl text-[#22183a]">Send RFX to Suppliers</DialogTitle>
+              <DialogTitle className="text-2xl text-[#22183a]">{t('rfxs.sending_sendConfirmTitle')}</DialogTitle>
               <DialogDescription>
                 {rfx?.status === 'draft' ? (
-                  'The RFX will be sent to Qanvit reviewers for validation. After this process, you will be notified and the RFX will be sent to the selected suppliers.'
+                  t('rfxs.sending_sendConfirmDescDraft')
                 ) : (
-                  'Suppliers will be notified that some aspects of the specifications have been updated. The new version will be sent to them.'
+                  t('rfxs.sending_sendConfirmDescUpdate')
                 )}
               </DialogDescription>
             </DialogHeader>
@@ -2046,10 +2048,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">
-                      All members validated
+                      {t('rfxs.sending_allMembersValidated')}
                     </p>
                     <p className={`text-sm mt-1 ${allMembersValidated ? 'text-green-600' : 'text-amber-600'}`}>
-                      {validations.filter(v => v.is_valid).length}/{members.length} validated
+                      {t('rfxs.sending_validatedCount', { valid: validations.filter(v => v.is_valid).length, total: members.length })}
                     </p>
                   </div>
                   <Button
@@ -2058,7 +2060,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     onClick={handleGoToValidationSection}
                     className="flex-shrink-0 border-[#22183a] text-[#22183a] hover:bg-[#22183a]/10"
                   >
-                    Go to validation section
+                    {t('rfxs.sending_goToValidationSection')}
                   </Button>
                 </div>
                 
@@ -2075,10 +2077,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">
-                      NDA uploaded
+                      {t('rfxs.sending_ndaUploaded')}
                     </p>
                     <p className={`text-sm mt-1 ${hasNDA ? 'text-green-600' : 'text-red-600'}`}>
-                      {loadingNDAStatus ? 'Checking...' : hasNDA ? 'NDA is ready' : 'NDA not uploaded'}
+                      {loadingNDAStatus ? t('rfxs.sending_checking') : hasNDA ? t('rfxs.sending_ndaReady') : t('rfxs.sending_ndaNotUploaded')}
                     </p>
                   </div>
                   <Button
@@ -2087,7 +2089,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                     onClick={handleGoToNDASection}
                     className="flex-shrink-0 border-[#22183a] text-[#22183a] hover:bg-[#22183a]/10"
                   >
-                    Go to NDA uploading
+                    {t('rfxs.sending_goToNda')}
                   </Button>
                 </div>
               </div>
@@ -2097,7 +2099,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 <Alert className="bg-amber-50 border-amber-200">
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                   <AlertDescription className="text-amber-800">
-                    <strong>Warning:</strong> The NDA is necessary to protect your information before sending it to suppliers. We recommend to upload an NDA before proceeding.
+                    {t('rfxs.sending_ndaWarningInModal')}
                   </AlertDescription>
                 </Alert>
               )}
@@ -2108,7 +2110,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 onClick={() => setShowSendConfirm(false)}
                 disabled={isSending}
               >
-                Cancel
+                {t('rfxs.sending_cancel')}
               </Button>
               <Button 
                 onClick={confirmSendToFQReview} 
@@ -2118,10 +2120,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 {isSending ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sending...
+                    {t('rfxs.sending_sending')}
                   </>
                 ) : (
-                  'Confirm Send'
+                  t('rfxs.sending_confirmSend')
                 )}
               </Button>
             </DialogFooter>
@@ -2134,17 +2136,17 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             <DialogHeader>
               <DialogTitle className="text-2xl text-[#22183a] flex items-center gap-2">
                 <AlertCircle className="h-6 w-6 text-amber-600" />
-                NDA Not Uploaded
+                {t('rfxs.sending_ndaWarningTitle')}
               </DialogTitle>
               <DialogDescription>
-                You are about to send the RFX without an NDA document.
+                {t('rfxs.sending_ndaWarningDesc')}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-2">
               <Alert className="bg-amber-50 border-amber-200">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
                 <AlertDescription className="text-amber-800">
-                  <strong>Warning:</strong> If you send the RFX without an NDA, your information may not be protected. We recommend uploading an NDA to protect your information before proceeding.
+                  {t('rfxs.sending_ndaWarningAlert')}
                 </AlertDescription>
               </Alert>
             </div>
@@ -2156,7 +2158,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   className="w-full sm:w-auto border-[#22183a] text-[#22183a] hover:bg-[#22183a]/10"
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  Upload NDA
+                  {t('rfxs.sending_uploadNda')}
                 </Button>
               </div>
               <div className="flex gap-2 w-full sm:w-auto">
@@ -2166,7 +2168,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   className="flex-1 sm:flex-initial"
                   disabled={isSending}
                 >
-                  Cancel
+                  {t('rfxs.sending_cancel')}
                 </Button>
                 <Button 
                   onClick={handleSendAnyway}
@@ -2176,10 +2178,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                   {isSending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Sending...
+                      {t('rfxs.sending_sending')}
                     </>
                   ) : (
-                    'Send Anyway'
+                    t('rfxs.sending_sendAnyway')
                   )}
                 </Button>
               </div>
@@ -2200,10 +2202,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
                 <FileText className="h-5 w-5 text-[#22183a]" />
-                Step 1: Validate RFX Specifications
+                {t('rfxs.sending_step1ValidateTitle')}
               </DialogTitle>
               <DialogDescription>
-                Review the RFX specifications PDF and approve or reject
+                {t('rfxs.sending_step1ValidateDesc')}
               </DialogDescription>
             </DialogHeader>
             
@@ -2211,7 +2213,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
               <Alert className="bg-blue-50 border-blue-200 flex-shrink-0">
                 <Info className="h-4 w-4 text-blue-600" />
                 <AlertDescription className="text-blue-800">
-                  You are reviewing version: <strong>"{commitStatus.baseCommit?.commit_message}"</strong>
+                  {t('rfxs.sending_reviewingVersion')} <strong>"{commitStatus.baseCommit?.commit_message}"</strong>
                 </AlertDescription>
               </Alert>
               
@@ -2220,18 +2222,18 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 {isLoadingSpecsPdf ? (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                     <Loader2 className="h-8 w-8 animate-spin text-[#22183a]" />
-                    <p className="text-sm text-gray-600">Generating PDF preview...</p>
+                    <p className="text-sm text-gray-600">{t('rfxs.sending_generatingPdfPreview')}</p>
                   </div>
                 ) : specsPdfUrl ? (
                   <iframe
                     src={specsPdfUrl}
                     className="w-full h-full border-0 rounded-lg"
-                    title="RFX Specifications PDF"
+                    title={t('rfxs.sending_specsPdfTitle')}
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
                     <FileText className="h-12 w-12 mb-2 opacity-50" />
-                    <p>Failed to load PDF preview</p>
+                    <p>{t('rfxs.sending_failedLoadPdf')}</p>
                   </div>
                 )}
               </div>
@@ -2244,7 +2246,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 className="border-red-300 text-red-600 hover:bg-red-50"
                 disabled={isLoadingSpecsPdf}
               >
-                Reject
+                {t('rfxs.sending_reject')}
               </Button>
               <Button 
                 onClick={() => handleSpecsValidation(true)}
@@ -2252,7 +2254,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 disabled={isLoadingSpecsPdf}
               >
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Approve Specifications
+                {t('rfxs.sending_approveSpecs')}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -2277,10 +2279,10 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl">
                 <Users className="h-5 w-5 text-[#22183a]" />
-                Step 2: Validate Candidate Selection
+                {t('rfxs.sending_step2ValidateTitle')}
               </DialogTitle>
               <DialogDescription>
-                Review the selected candidates and approve or reject
+                {t('rfxs.sending_step2ValidateDesc')}
               </DialogDescription>
             </DialogHeader>
             
@@ -2288,7 +2290,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
               <Alert className="bg-blue-50 border-blue-200">
                 <Info className="h-4 w-4 text-blue-600" />
                 <AlertDescription className="text-blue-800">
-                  You are reviewing {selectedCandidates.length} selected candidate{selectedCandidates.length !== 1 ? 's' : ''}
+                  {t('rfxs.sending_reviewingCandidates', { count: selectedCandidates.length })}
                 </AlertDescription>
               </Alert>
               
@@ -2338,21 +2340,21 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                         {!isManual ? (
                           <div className="flex gap-2 flex-shrink-0">
                             <div className="text-center">
-                              <div className="text-xs text-gray-500">Overall</div>
+                              <div className="text-xs text-gray-500">{t('rfxs.sending_overall')}</div>
                               <div className="text-lg font-bold text-[#22183a]">{overallMatch}%</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-xs text-gray-500">Tech</div>
+                              <div className="text-xs text-gray-500">{t('rfxs.sending_tech')}</div>
                               <div className="text-sm font-semibold text-gray-700">{technicalMatch}%</div>
                             </div>
                             <div className="text-center">
-                              <div className="text-xs text-gray-500">Company</div>
+                              <div className="text-xs text-gray-500">{t('rfxs.sending_company')}</div>
                               <div className="text-sm font-semibold text-gray-700">{companyMatch}%</div>
                             </div>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center px-3 py-2 rounded-md bg-[#f1f1f1] text-[#22183a] text-sm font-medium flex-shrink-0">
-                            Manually selected
+                            {t('rfxs.sending_manuallySelected')}
                           </div>
                         )}
                         
@@ -2365,8 +2367,8 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                               window.open(websiteUrl, '_blank');
                             } else {
                               toast({
-                                title: 'No Website',
-                                description: 'No website URL available for this candidate',
+                                title: t('rfxs.sending_toast_noWebsite'),
+                                description: t('rfxs.sending_toast_noWebsiteDesc'),
                                 variant: 'destructive',
                               });
                             }
@@ -2374,7 +2376,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                           className="flex-shrink-0"
                         >
                           <ExternalLink className="h-3 w-3 mr-1" />
-                          View Website
+                          {t('rfxs.sending_viewWebsite')}
                         </Button>
                       </div>
                     );
@@ -2390,7 +2392,7 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 className="border-red-300 text-red-600 hover:bg-red-50"
                 disabled={isApprovingCandidates}
               >
-                Reject
+                {t('rfxs.sending_reject')}
               </Button>
               <Button 
                 onClick={() => handleCandidatesValidation(true)}
@@ -2400,12 +2402,12 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 {isApprovingCandidates ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Approving...
+                    {t('rfxs.sending_approving')}
                   </>
                 ) : (
                   <>
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Approve Candidates
+                    {t('rfxs.sending_approveCandidates')}
                   </>
                 )}
               </Button>
@@ -2419,23 +2421,23 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-gray-500" />
-                RFX Archived
+                {t('rfxs.sending_archivedTitle')}
               </AlertDialogTitle>
               <AlertDialogDescription className="text-sm leading-relaxed space-y-3 pt-2">
                 <p>
-                  This RFX has been archived by the project creator.
+                  {t('rfxs.sending_archivedDesc')}
                 </p>
                 <div className="bg-[#f1f1f1] border-l-4 border-l-gray-400 rounded-lg p-4 space-y-2">
                   <p className="font-medium text-[#22183a]">
-                    While archived:
+                    {t('rfxs.sending_archivedWhile')}
                   </p>
                   <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-2">
-                    <li>You cannot send the RFX</li>
-                    <li>Invited suppliers cannot upload documents</li>
-                    <li>The RFX is read-only for all users</li>
+                    <li>{t('rfxs.sending_archivedCannotSend')}</li>
+                    <li>{t('rfxs.sending_archivedSuppliersNoUpload')}</li>
+                    <li>{t('rfxs.sending_archivedReadOnly')}</li>
                   </ul>
                   <p className="text-sm text-gray-700 mt-3">
-                    Only the project creator can unarchive it from the RFX list.
+                    {t('rfxs.sending_archivedOnlyCreator')}
                   </p>
                 </div>
               </AlertDialogDescription>
@@ -2449,13 +2451,13 @@ const RFXSendingPage: React.FC<RFXSendingPageProps> = ({
                 }}
                 className="w-full sm:w-auto"
               >
-                Back to RFX List
+                {t('rfxs.sending_backToRfxList')}
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={() => setShowArchivedModal(false)}
                 className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
               >
-                View Only
+                {t('rfxs.sending_viewOnly')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

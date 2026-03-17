@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Youtube, Linkedin, Twitter, FileText, Shield } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const RFXFooter = () => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [isConfidentialityModalOpen, setIsConfidentialityModalOpen] = useState(false);
   
@@ -37,12 +39,12 @@ const RFXFooter = () => {
 
                 {/* Columna 2 - Legal */}
                 <div className="flex flex-col gap-1.5 items-center text-center">
-                  <h3 className="text-sm font-bold text-gray-700">Legal</h3>
+                  <h3 className="text-sm font-bold text-gray-700">{t('footer.legal')}</h3>
                   <button
                     onClick={() => setIsConfidentialityModalOpen(true)}
                     className="text-sm text-gray-600 hover:text-[#22183a] transition-colors cursor-pointer bg-transparent border-0 p-0"
                   >
-                    Confidentiality
+                    {t('footer.confidentiality')}
                   </button>
                   <a
                     href="https://fqsource.com/terms"
@@ -50,7 +52,7 @@ const RFXFooter = () => {
                     rel="noopener noreferrer"
                     className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
-                    Terms & Conditions
+                    {t('footer.termsConditions')}
                   </a>
                   <a
                     href="https://fqsource.com/privacy"
@@ -58,13 +60,13 @@ const RFXFooter = () => {
                     rel="noopener noreferrer"
                     className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
-                    Privacy Policy
+                    {t('footer.privacyPolicy')}
                   </a>
                 </div>
 
                 {/* Columna 3 - About Qanvit */}
                 <div className="flex flex-col gap-1.5 items-center text-center">
-                  <h3 className="text-sm font-bold text-gray-700">About Qanvit</h3>
+                  <h3 className="text-sm font-bold text-gray-700">{t('footer.aboutQanvit')}</h3>
                   <a
                     href="https://github.com/boniilloo/FQ-Source-Cybersecurity-20251202"
                     target="_blank"
@@ -72,7 +74,7 @@ const RFXFooter = () => {
                     className="text-sm text-gray-600 hover:text-[#22183a] transition-colors flex items-center gap-1"
                   >
                     <Shield className="h-3 w-3" />
-                    Cybersecurity Audit
+                    {t('footer.cybersecurityAudit')}
                   </a>
                   <a
                     href="https://fqsource.com/community"
@@ -80,7 +82,7 @@ const RFXFooter = () => {
                     rel="noopener noreferrer"
                     className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
-                    Community
+                    {t('footer.community')}
                   </a>
                   <a
                     href="https://fqsource.com/faq"
@@ -88,7 +90,7 @@ const RFXFooter = () => {
                     rel="noopener noreferrer"
                     className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
-                    FAQ
+                    {t('footer.faq')}
                   </a>
                   <a
                     href="https://fqsource.com/faq"
@@ -96,7 +98,7 @@ const RFXFooter = () => {
                     rel="noopener noreferrer"
                     className="text-sm text-gray-600 hover:text-[#22183a] transition-colors"
                   >
-                    Help
+                    {t('footer.help')}
                   </a>
                 </div>
 
@@ -140,14 +142,14 @@ const RFXFooter = () => {
             {/* Frase y botón centrado debajo de las columnas */}
             <div className="flex flex-col items-center justify-center mt-1.5 pt-1.5 border-t border-gray-200">
               <p className="text-gray-700 text-xs">
-                Want to get help?{' '}
+                {t('footer.wantHelp')}{' '}
                 <a
                   href="https://fqsource.com/book-demo"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#22183a] hover:underline transition-colors font-medium"
                 >
-                  Book a meeting with our experts!
+                  {t('footer.bookMeeting')}
                 </a>
               </p>
             </div>
@@ -162,14 +164,14 @@ const RFXFooter = () => {
         <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-[#22183a]" />
-            Confidentiality Commitment
+            {t('footer.confidentialityTitle')}
           </DialogTitle>
         </DialogHeader>
         <div className="flex-1 min-h-0 px-6 pb-6">
           <iframe
             src={confidentialityPdfUrl}
             className="w-full h-full rounded-lg border border-gray-200"
-            title="Confidentiality Commitment"
+            title={t('footer.confidentialityCommitment')}
           />
         </div>
       </DialogContent>

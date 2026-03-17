@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +12,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [user, setUser] = useState<User | null>(null);
@@ -90,21 +92,21 @@ const Auth = () => {
 
       if (error) {
         toast({
-          title: "Error signing in",
+          title: t('auth.errorSigningIn'),
           description: error.message,
           variant: "destructive",
         });
       } else if (data.user) {
         toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
+          title: t('auth.welcomeBack'),
+          description: t('auth.signedInSuccess'),
         });
         // Navigation will be handled by the auth state change listener
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('auth.error'),
+        description: t('auth.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -117,8 +119,8 @@ const Auth = () => {
     
     if (password !== confirmPassword) {
       toast({
-        title: "Error",
-        description: "Passwords do not match.",
+        title: t('auth.error'),
+        description: t('auth.passwordsDoNotMatch'),
         variant: "destructive",
       });
       return;
@@ -139,14 +141,14 @@ const Auth = () => {
 
       if (error) {
         toast({
-          title: "Error signing up",
+          title: t('auth.errorSigningUp'),
           description: error.message,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Account created!",
-          description: "Please check your email to confirm your account.",
+          title: t('auth.accountCreated'),
+          description: t('auth.checkEmailConfirm'),
         });
         // Clear form
         setEmail('');
@@ -155,8 +157,8 @@ const Auth = () => {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('auth.error'),
+        description: t('auth.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -167,8 +169,8 @@ const Auth = () => {
   const handleForgotPassword = async () => {
     if (!email) {
       toast({
-        title: "Error",
-        description: "Please enter your email address first.",
+        title: t('auth.error'),
+        description: t('auth.enterEmailFirst'),
         variant: "destructive",
       });
       return;
@@ -183,20 +185,20 @@ const Auth = () => {
 
       if (error) {
         toast({
-          title: "Error",
+          title: t('auth.error'),
           description: error.message,
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Password reset email sent",
-          description: "Please check your email for the password reset link.",
+          title: t('auth.passwordResetSent'),
+          description: t('auth.checkEmailReset'),
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('auth.error'),
+        description: t('auth.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -218,7 +220,7 @@ const Auth = () => {
 
       if (error) {
         toast({
-          title: "Error signing in with LinkedIn",
+          title: t('auth.errorSigningInLinkedIn'),
           description: error.message,
           variant: "destructive",
         });
@@ -226,8 +228,8 @@ const Auth = () => {
       // Navigation will be handled by the auth state change listener
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('auth.error'),
+        description: t('auth.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -247,15 +249,15 @@ const Auth = () => {
       });
       if (error) {
         toast({
-          title: "Error signing in with Google",
+          title: t('auth.errorSigningInGoogle'),
           description: error.message,
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: t('auth.error'),
+        description: t('auth.unexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -274,7 +276,7 @@ const Auth = () => {
           className="text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Qanvit
+          {t('auth.backToQanvit')}
         </Button>
       </div>
       <Card className="w-full max-w-md">
@@ -288,26 +290,26 @@ const Auth = () => {
               />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">Welcome to Qanvit</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t('auth.welcomeToQanvit')}</CardTitle>
           <CardDescription>
-            Sign in to your account or create a new one
+            {t('auth.signInOrCreate')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue={searchParams.get('tab') === 'signup' ? 'signup' : 'signin'} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">{t('auth.signIn')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('auth.signUp')}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin" className="space-y-4">
               <form key={`signin-${formKey}`} onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-email">{t('auth.email')}</Label>
                   <Input
                     id="signin-email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t('auth.enterEmail')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -315,12 +317,12 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="signin-password">{t('auth.password')}</Label>
                   <div className="relative">
                     <Input
                       id="signin-password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
+                      placeholder={t('auth.enterPassword')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -343,11 +345,11 @@ const Auth = () => {
                      disabled={forgotPasswordLoading}
                      className="text-sm text-primary hover:underline disabled:opacity-50"
                    >
-                     {forgotPasswordLoading ? "Sending..." : "Forgot password?"}
+                     {forgotPasswordLoading ? t('auth.sending') : t('auth.forgotPassword')}
                    </button>
                  </div>
                   <Button type="submit" className="w-full" disabled={loading}>
-                   {loading ? "Signing in..." : "Sign In"}
+                   {loading ? t('auth.signingIn') : t('auth.signIn')}
                  </Button>
                </form>
                
@@ -356,11 +358,11 @@ const Auth = () => {
             <TabsContent value="signup" className="space-y-4">
               <form key={`signup-${formKey}`} onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t('auth.email')}</Label>
                   <Input
                     id="signup-email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t('auth.enterEmail')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -368,12 +370,12 @@ const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t('auth.password')}</Label>
                   <div className="relative">
                     <Input
                       id="signup-password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a password"
+                      placeholder={t('auth.createPassword')}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -390,12 +392,12 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
+                  <Label htmlFor="confirm-password">{t('auth.confirmPassword')}</Label>
                   <div className="relative">
                     <Input
                       id="confirm-password"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
+                      placeholder={t('auth.confirmPasswordPlaceholder')}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
@@ -412,7 +414,7 @@ const Auth = () => {
                   </div>
                 </div>
                   <Button type="submit" className="w-full" disabled={loading}>
-                   {loading ? "Creating account..." : "Sign Up"}
+                   {loading ? t('auth.creatingAccount') : t('auth.signUp')}
                  </Button>
                </form>
                
@@ -431,18 +433,18 @@ const Auth = () => {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              Continue with Google
+              {t('auth.continueWithGoogle')}
             </Button>
           </div>
           
           <div className="mt-6 text-center text-xs text-muted-foreground">
-            By continuing, you are indicating that you accept our{" "}
-            <a href="#" className="underline hover:text-primary">
-              terms of service
+            {t('auth.termsPrefix')}{" "}
+            <a href="https://fqsource.com/terms" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+              {t('auth.termsOfService')}
             </a>{" "}
-            and{" "}
-            <a href="#" className="underline hover:text-primary">
-              privacy policy
+            {t('auth.and')}{" "}
+            <a href="https://fqsource.com/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+              {t('auth.privacyPolicy')}
             </a>
           </div>
         </CardContent>

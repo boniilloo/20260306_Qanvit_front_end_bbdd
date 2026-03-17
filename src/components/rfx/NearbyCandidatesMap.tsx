@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { getFaviconUrl } from '@/utils/logoUtils';
+import { useTranslation } from 'react-i18next';
 
 export type NearbyCandidateMapItem = {
   id: string;
@@ -28,6 +29,7 @@ export default function NearbyCandidatesMap({
   onOpenMatchReasoning,
   isLoading = false,
 }: Props) {
+  const { t } = useTranslation();
   const mapRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const leafletRef = useRef<any>(null);
@@ -157,8 +159,8 @@ export default function NearbyCandidatesMap({
 
       const popupLines = [
         `<strong>${escapeHtml(c.name)}</strong>`,
-        dist !== null ? `Distance: ${dist} km` : null,
-        match !== null ? `Match: ${match}%` : null,
+        dist !== null ? t('rfxs.cand_mapDistance', { dist }) : null,
+        match !== null ? `${t('rfxs.cand_mapMatch')}: ${match}%` : null,
       ].filter(Boolean);
 
       const buttonHtml = onOpenMatchReasoning
@@ -179,7 +181,7 @@ export default function NearbyCandidatesMap({
                 cursor: pointer;
               "
             >
-              See Qanvit Match Reasoning
+              ${t('rfxs.cand_seeMatchReasoning')}
             </button>
           </div>
         `
@@ -221,7 +223,7 @@ export default function NearbyCandidatesMap({
     } else {
       map.setView([20, 0], 2);
     }
-  }, [isReady, normalizedCandidates, selected, onOpenMatchReasoning]);
+  }, [isReady, normalizedCandidates, selected, onOpenMatchReasoning, t]);
 
   useEffect(() => {
     return () => {
@@ -247,7 +249,7 @@ export default function NearbyCandidatesMap({
 
       {/* Legend */}
       <div className="absolute top-3 right-3 z-[500] rounded-lg border border-gray-200 bg-white/95 px-3 py-2 shadow-sm">
-        <div className="text-[11px] font-semibold text-[#22183a] mb-1">Match</div>
+        <div className="text-[11px] font-semibold text-[#22183a] mb-1">{t('rfxs.cand_mapMatch')}</div>
         <div className="space-y-1 text-[11px] text-gray-700">
           <LegendRow color="#dc2626" label="< 50%" />
           <LegendRow color="#f59e0b" label="50–65%" />
@@ -260,8 +262,8 @@ export default function NearbyCandidatesMap({
         <div className="absolute inset-0 z-[450] flex items-center justify-center bg-white/70 backdrop-blur-[1px]">
           <div className="rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm">
             <div className="h-2 w-40 rounded bg-gray-200 animate-pulse mb-2" />
-            <div className="text-sm font-semibold text-[#22183a]">Generating map...</div>
-            <div className="text-xs text-gray-600 mt-1">Fetching company locations from Supabase</div>
+            <div className="text-sm font-semibold text-[#22183a]">{t('rfxs.cand_mapGenerating')}</div>
+            <div className="text-xs text-gray-600 mt-1">{t('rfxs.cand_mapFetching')}</div>
           </div>
         </div>
       )}

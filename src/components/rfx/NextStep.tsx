@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowRight, FileText, Users, CheckCircle, Send, Check, BarChart3, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,7 @@ const NextStep: React.FC<NextStepProps> = ({
   versionMismatchWarning,
   forceButtonsEnabled = false
 }) => {
+  const { t } = useTranslation();
   // Calculate all states at once using useMemo to avoid progressive state changes
   const stepConfig = useMemo(() => {
     // Calculate specs completion status
@@ -189,11 +191,11 @@ const NextStep: React.FC<NextStepProps> = ({
         const specsVisualStatus = getItemVisualStatus('specs');
         return {
           id: 'specs',
-          title: 'Define RFX Specifications',
-          description: 'Define your project scope, technical requirements, and evaluation criteria.\nThis step sets the foundation for supplier selection and the entire sourcing workflow.\n\nOutputs:\n  • Complete RFX specifications and documentation.\n  • Defined criteria for evaluation and scoring.\n  • Ready to identify matching suppliers.',
+          title: t('rfxs.todo_specs_title'),
+          description: t('rfxs.nextStep_specs_desc'),
           icon: <FileText className="h-6 w-6" />,
           action: onGoToSpecs,
-          buttonText: 'Go to RFX Specs',
+          buttonText: t('rfxs.nextStep_goToSpecs'),
           status: specsVisualStatus,
           progress: specsProgress,
           total: 3
@@ -203,11 +205,11 @@ const NextStep: React.FC<NextStepProps> = ({
         const visualStatus = getItemVisualStatus('candidates');
         return {
           id: 'candidates',
-          title: 'Select Candidates',
-          description: 'Search, review, and shortlist suppliers aligned with your RFX requirements.\nCompare technical capabilities, reliability, and company profiles before moving to launch.\n\nOutputs:\n  • Verified and qualified supplier shortlist.\n  • Comparison of technical and commercial fit.\n  • Ready for validation and RFX launch.',
+          title: t('rfxs.todo_candidates_title'),
+          description: t('rfxs.nextStep_candidates_desc'),
           icon: <Users className="h-6 w-6" />,
           action: onGoToCandidates,
-          buttonText: 'Go to Candidates',
+          buttonText: t('rfxs.nextStep_goToCandidates'),
           status: visualStatus,
           progress: progressCount,
           total: 2
@@ -219,11 +221,11 @@ const NextStep: React.FC<NextStepProps> = ({
           : getItemVisualStatus('validation');
         return {
           id: 'validation',
-          title: 'Launch RFX',
-          description: 'Review all data, validate specs, upload NDAs, and send RFX documents to selected suppliers.\nInitiate the official sourcing round, track and analyze responses in real time (coming soon).\n\nOutputs:\n  • RFX package validated.\n  • NDA uploaded and supplier selection completed.\n  • Proposal and evaluation process activated.',
+          title: t('rfxs.todo_validation_title'),
+          description: t('rfxs.nextStep_validation_desc'),
           icon: <Send className="h-6 w-6" />,
           action: onGoToSending,
-          buttonText: 'Go to Validation & Sending',
+          buttonText: t('rfxs.nextStep_goToValidation'),
           status: validationVisualStatus,
           progress: validationProgressCount,
           total: 2
@@ -232,10 +234,10 @@ const NextStep: React.FC<NextStepProps> = ({
         const fqValidationVisualStatus = getItemVisualStatus('fq_validation');
         return {
           id: 'fq_validation',
-          title: 'Validating by Qanvit',
-          description: 'Our Qanvit team is carefully reviewing all details to ensure everything is correct.\n\nThis step includes:\n  • Final validation of RFX specifications\n  • Review of selected suppliers\n  • Preparation of sending logistics\n  • Quality assurance checks\n\nYou will be notified once validation is complete and the RFX is ready to be sent to suppliers.',
+          title: t('rfxs.todo_fq_validation_title'),
+          description: t('rfxs.nextStep_fq_validation_desc'),
           icon: <Send className="h-6 w-6" />,
-          action: undefined, // No action needed - passive step
+          action: undefined,
           buttonText: undefined,
           status: fqValidationVisualStatus,
           progress: fqValidationVisualStatus === 'completed' ? 1 : 0,
@@ -245,17 +247,16 @@ const NextStep: React.FC<NextStepProps> = ({
         const responsesVisualStatus = getItemVisualStatus('responses');
         return {
           id: 'responses',
-          title: 'Responses and Analysis',
-          description: 'Review and analyze supplier responses to your RFX.\n\nThis step includes:\n  • Supplier proposal review and evaluation\n  • Comparative analysis of responses\n  • Decision making and supplier selection\n\nOutputs:\n  • Analyzed supplier proposals\n  • Comparative evaluation results\n  • Final supplier selection decision',
+          title: t('rfxs.todo_responses_title'),
+          description: t('rfxs.nextStep_responses_desc'),
           icon: <BarChart3 className="h-6 w-6" />,
           action: onGoToResponses,
-          buttonText: 'View responses and analysis',
+          buttonText: t('rfxs.nextStep_viewResponses'),
           status: responsesVisualStatus,
           progress: responsesVisualStatus === 'in_progress' ? 1 : 0,
           total: 1
         };
       default:
-        // Fallback to specs
         return getStepConfig('specs');
       }
     };
@@ -265,20 +266,20 @@ const NextStep: React.FC<NextStepProps> = ({
     const nextStep = getStepConfig(stepToShow);
     
     return nextStep;
-  }, [specsCompletion, candidatesCompletion, candidatesProgress, validationProgress, rfxStatus, selectedItem, versionMismatchWarning, onGoToSpecs, onGoToCandidates, onGoToSending, onGoToResponses]);
+  }, [specsCompletion, candidatesCompletion, candidatesProgress, validationProgress, rfxStatus, selectedItem, versionMismatchWarning, onGoToSpecs, onGoToCandidates, onGoToSending, onGoToResponses, t]);
 
   const getStatusBadge = (status: TodoStatus) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">Completed</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">{t('rfxs.todo_badge_completed')}</Badge>;
       case 'in_progress':
-        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">In Progress</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">{t('rfxs.todo_badge_inProgress')}</Badge>;
       case 'warning':
-        return <Badge className="bg-orange-100 text-orange-800 border-orange-300">Warning</Badge>;
+        return <Badge className="bg-orange-100 text-orange-800 border-orange-300">{t('rfxs.todo_badge_warning')}</Badge>;
       case 'coming_soon':
-        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">Coming Soon</Badge>;
+        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">{t('rfxs.todo_badge_comingSoon')}</Badge>;
       default:
-        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">Next Step</Badge>;
+        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">{t('rfxs.nextStep_badge_nextStep')}</Badge>;
     }
   };
 
@@ -287,7 +288,7 @@ const NextStep: React.FC<NextStepProps> = ({
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold">
-            {stepConfig.title} Details
+            {stepConfig.title} {t('rfxs.nextStep_details')}
           </CardTitle>
           {getStatusBadge(stepConfig.status as TodoStatus)}
         </div>
@@ -331,7 +332,7 @@ const NextStep: React.FC<NextStepProps> = ({
               {stepConfig.id === 'specs' && stepConfig.status !== 'completed' && (
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="text-xs text-gray-600">Progress ({stepConfig.progress}/3):</div>
+                    <div className="text-xs text-gray-600">{t('rfxs.nextStep_progressLabel', { current: stepConfig.progress })}</div>
                     <div className="flex gap-1">
                       <div className={`px-2 py-1 rounded text-xs text-center font-medium flex items-center gap-1 cursor-default ${
                         specsCompletion.description 
@@ -339,7 +340,7 @@ const NextStep: React.FC<NextStepProps> = ({
                           : 'bg-[#f1f1f1] text-gray-500 border border-gray-200'
                       }`}>
                         {specsCompletion.description && <Check className="h-3 w-3 text-[#f4a9aa]" />}
-                        Project Description
+                        {t('rfxs.nextStep_projectDescription')}
                       </div>
                       <div className={`px-2 py-1 rounded text-xs text-center font-medium flex items-center gap-1 cursor-default ${
                         specsCompletion.technical_requirements 
@@ -347,7 +348,7 @@ const NextStep: React.FC<NextStepProps> = ({
                           : 'bg-[#f1f1f1] text-gray-500 border border-gray-200'
                       }`}>
                         {specsCompletion.technical_requirements && <Check className="h-3 w-3 text-[#f4a9aa]" />}
-                        Technical Requirements
+                        {t('rfxs.nextStep_technicalRequirements')}
                       </div>
                       <div className={`px-2 py-1 rounded text-xs text-center font-medium flex items-center gap-1 cursor-default ${
                         specsCompletion.company_requirements 
@@ -355,7 +356,7 @@ const NextStep: React.FC<NextStepProps> = ({
                           : 'bg-[#f1f1f1] text-gray-500 border border-gray-200'
                       }`}>
                         {specsCompletion.company_requirements && <Check className="h-3 w-3 text-[#f4a9aa]" />}
-                        Company Requirements
+                        {t('rfxs.nextStep_companyRequirements')}
                       </div>
                     </div>
                   </div>
@@ -381,7 +382,7 @@ const NextStep: React.FC<NextStepProps> = ({
                     </TooltipTrigger>
                     {!forceButtonsEnabled && stepConfig.status === 'pending' && (
                       <TooltipContent>
-                        <p>Complete the previous steps to unlock this action</p>
+                        <p>{t('rfxs.nextStep_completePreviousToUnlock')}</p>
                       </TooltipContent>
                     )}
                   </Tooltip>
@@ -397,13 +398,13 @@ const NextStep: React.FC<NextStepProps> = ({
                     <div className="flex-1">
                       <p className="text-sm font-medium text-orange-900 mb-1">
                         {versionMismatchWarning.hasDifferentCommit
-                          ? 'A different version has been activated or created'
-                          : 'There are uncommitted changes that have not been sent to suppliers'}
+                          ? t('rfxs.nextStep_versionDifferentActivated')
+                          : t('rfxs.nextStep_uncommittedChanges')}
                       </p>
                       <p className="text-sm text-orange-700">
                         {versionMismatchWarning.hasDifferentCommit
-                          ? 'The version currently active is different from the one sent to suppliers. Please go to Validation & Sending to send the latest version to suppliers.'
-                          : 'There are changes in the specifications that have not been saved as a version and have not been sent to suppliers. Please go to Validation & Sending to save the latest version and send it to suppliers.'}
+                          ? t('rfxs.nextStep_versionDifferentDesc')
+                          : t('rfxs.nextStep_uncommittedDesc')}
                       </p>
                     </div>
                   </div>

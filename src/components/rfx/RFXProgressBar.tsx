@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Check } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -7,50 +8,15 @@ interface RFXProgressBarProps {
 }
 
 export const RFXProgressBar: React.FC<RFXProgressBarProps> = ({ progressStep }) => {
-  // Define the steps with tooltips
+  const { t } = useTranslation();
+  // Step keys for i18n (labels and tooltips come from rfxs.progress_<key>_line1/line2/tooltip)
   const steps = [
-    { 
-      label: 'specs', 
-      line1: 'Specs',
-      line2: 'defined',
-      key: 'specs',
-      tooltip: 'The RFX specifications have been defined, including description, technical requirements, and company requirements.'
-    },
-    { 
-      label: 'candidates', 
-      line1: 'Candidates',
-      line2: 'selected',
-      key: 'candidates',
-      tooltip: 'Supplier candidates have been selected and evaluated for the RFX.'
-    },
-    { 
-      label: 'RFX sent', 
-      line1: 'RFX sent',
-      line2: null,
-      key: 'review',
-      tooltip: 'The RFX has been sent to Qanvit for review and validation before being sent to suppliers.'
-    },
-    { 
-      label: 'validated', 
-      line1: 'RFX',
-      line2: 'validated',
-      key: 'validation',
-      tooltip: 'Qanvit has validated the RFX and it is ready to be sent to the selected suppliers.'
-    },
-    { 
-      label: 'supplier proposals', 
-      line1: 'Proposals',
-      line2: 'received',
-      key: 'proposals',
-      tooltip: 'Suppliers have submitted their proposals in response to the RFX.'
-    },
-    { 
-      label: 'proposals analyzed', 
-      line1: 'Proposals',
-      line2: 'analyzed',
-      key: 'analysis',
-      tooltip: 'Qanvit\'s AI will analyze the received proposals and provide recommendations to help make a final decision. This feature is under development.'
-    }
+    { key: 'specs' as const },
+    { key: 'candidates' as const },
+    { key: 'review' as const },
+    { key: 'validation' as const },
+    { key: 'proposals' as const },
+    { key: 'analysis' as const }
   ];
 
   // Determine step status based on progress_step
@@ -154,13 +120,13 @@ export const RFXProgressBar: React.FC<RFXProgressBarProps> = ({ progressStep }) 
                         ${isCompleted || isNextActive ? 'text-[#22183a]' : 'text-gray-400'}
                       `}
                     >
-                      {step.line2 ? (
+                      {t(`rfxs.progress_${step.key}_line2`) ? (
                         <div className="flex flex-col leading-tight">
-                          <span>{step.line1}</span>
-                          <span>{step.line2}</span>
+                          <span>{t(`rfxs.progress_${step.key}_line1`)}</span>
+                          <span>{t(`rfxs.progress_${step.key}_line2`)}</span>
                         </div>
                       ) : (
-                        <span className="whitespace-nowrap flex items-center justify-center h-full">{step.line1}</span>
+                        <span className="whitespace-nowrap flex items-center justify-center h-full">{t(`rfxs.progress_${step.key}_line1`)}</span>
                       )}
                     </div>
                   </div>
@@ -169,7 +135,7 @@ export const RFXProgressBar: React.FC<RFXProgressBarProps> = ({ progressStep }) 
                   side="top" 
                   className="max-w-xs text-xs leading-relaxed p-3 z-50"
                 >
-                  <p>{step.tooltip}</p>
+                  <p>{t(`rfxs.progress_${step.key}_tooltip`)}</p>
                 </TooltipContent>
               </Tooltip>
             );

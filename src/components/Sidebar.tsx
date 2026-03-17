@@ -1,7 +1,8 @@
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate, NavLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Sidebar as UISidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator, SidebarTrigger, useSidebar } from './ui/sidebar';
-import { MessageCircle, Users, Building2, FileText, Settings, LogOut, Plus, MoreHorizontal, Pencil, Trash2, User, Database, BarChart3, ChevronDown, Code, UserPlus, MessageSquare, Send, Activity, Bell, CheckCircle, Circle, GraduationCap, Volume2, VolumeX, Mail, CreditCard } from 'lucide-react';
+import { MessageCircle, Users, Building2, FileText, Settings, LogOut, Plus, MoreHorizontal, Pencil, Trash2, User, Database, BarChart3, ChevronDown, Code, UserPlus, MessageSquare, Send, Activity, Bell, CheckCircle, Circle, GraduationCap, Volume2, VolumeX, Mail, CreditCard, Globe } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
@@ -28,8 +29,14 @@ import { usePendingNDAValidation } from '@/hooks/usePendingNDAValidation';
 import { useNotifications } from '@/contexts/NotificationsContext';
 
 const Sidebar = () => {
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const { navigateWithConfirmation, triggerInputHighlight, navigateWithHighlight } = useNavigation();
+
+  const changeLanguage = useCallback((lng: 'es' | 'en') => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem('language', lng);
+  }, [i18n]);
   const {
     user
   } = useAuth();
@@ -66,7 +73,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [planLabel, setPlanLabel] = useState('Free Plan');
+  const [planLabelKey, setPlanLabelKey] = useState<'freePlan' | 'proPlan' | 'proPlanSeatCeded'>('freePlan');
   const [isPaidPlan, setIsPaidPlan] = useState(false);
   const [notificationSoundEnabled, setNotificationSoundEnabled] = useState(() => {
     // Cargar preferencia del localStorage
@@ -110,143 +117,68 @@ const Sidebar = () => {
     id: string;
   };
 
-  // Generate menu items based on user state
+  // Generate menu items based on user state (use nameKey for i18n)
   const menuItems = useMemo(() => {
-    const baseItems = [];
+    const baseItems: Array<{ nameKey: string; icon: typeof FileText; path: string; tooltipKey: string; tooltipKeyGuest?: string; disabled: boolean }> = [];
 
-    // RFX Agent - always first (for all users, authenticated or not)
     baseItems.push({
-      name: 'RFX Agent',
+      nameKey: 'rfxAgent',
       icon: FileText,
       path: '/rfxs',
-      tooltip: 'RFX Agent',
+      tooltipKey: 'rfxAgent',
       disabled: false
     });
-    
-    // Buyers
     baseItems.push({
-      name: 'Supplier Search',
-      icon: Users,
-      path: '/supplier-search',
-      tooltip: user ? 'Search for suppliers' : 'Log in to access this module',
-      disabled: !user
-    });
-    baseItems.push({
-      name: 'My Subscription',
+      nameKey: 'mySubscription',
       icon: CreditCard,
       path: '/my-subscription',
-      tooltip: user ? 'View your active subscription' : 'Log in to access this module',
+      tooltipKey: 'mySubscriptionTooltip',
+      tooltipKeyGuest: 'supplierSearchTooltipGuest',
       disabled: !user
     });
-
-    // Suppliers
     baseItems.push({
-      name: 'My Company',
+      nameKey: 'myCompany',
       icon: Building2,
       path: '/my-company',
-      tooltip: user ? 'Manage your company profile' : 'Log in to access this module',
+      tooltipKey: 'myCompanyTooltip',
+      tooltipKeyGuest: 'supplierSearchTooltipGuest',
       disabled: !user
     });
-
-    // General
     baseItems.push({
-      name: 'Your Feedback',
+      nameKey: 'yourFeedback',
       icon: Send,
       path: '/feedback',
-      tooltip: user ? 'Share your feedback with us' : 'Log in to access this module',
+      tooltipKey: 'yourFeedbackTooltip',
+      tooltipKeyGuest: 'supplierSearchTooltipGuest',
       disabled: !user
     }, {
-      name: 'Add Company to DB',
+      nameKey: 'addCompanyToDB',
       icon: Plus,
       path: '/add-company',
-      tooltip: user ? 'Request to add company to database' : 'Log in to access this module',
+      tooltipKey: 'addCompanyToDBTooltip',
+      tooltipKeyGuest: 'supplierSearchTooltipGuest',
       disabled: !user
     });
     return baseItems;
   }, [user, userProfile?.company_id, isApprovedAdmin, companySlug]);
 
-  // Generate developer menu items
+  // Generate developer menu items (use nameKey for i18n)
   const developerItems = useMemo(() => {
     if (!isDeveloper || developerLoading) return [];
     
     return [
-      {
-        name: 'RFX Management',
-        icon: FileText,
-        path: '/rfx-management',
-        tooltip: 'Validate RFX content before sending'
-      },
-      {
-        name: 'Feedback Review',
-        icon: MessageSquare,
-        path: '/developer-feedback',
-        tooltip: 'Review user feedback',
-        badge: pendingFeedbackCount > 0 ? pendingFeedbackCount : undefined
-      },
-      {
-        name: 'Database Company Requests',
-        icon: Building2,
-        path: '/database-company-requests',
-        tooltip: 'Review company addition requests',
-        badge: pendingCompanyRequestsCount > 0 ? pendingCompanyRequestsCount : undefined
-      },
-      {
-        name: 'Create Company Manual',
-        icon: Plus,
-        path: '/create-company-manual',
-        tooltip: 'Create a new company manually'
-      },
-      {
-        name: 'Subscriptions & Seats',
-        icon: CreditCard,
-        path: '/developer-subscriptions',
-        tooltip: 'Manage subscriptions and paid seats'
-      },
-      {
-        name: 'Settings',
-        icon: Settings,
-        path: '/settings',
-        tooltip: 'Application settings'
-      },
-      {
-        name: 'Database Manager',
-        icon: Database,
-        path: '/database-manager',
-        tooltip: 'Database management tools'
-      },
-      {
-        name: 'Conversations',
-        icon: MessageCircle,
-        path: '/conversations',
-        tooltip: 'View user conversations',
-        badge: pendingErrorReportsCount > 0 ? pendingErrorReportsCount : undefined
-      },
-      {
-        name: 'Embedding Analytics',
-        icon: BarChart3,
-        path: '/embedding-analytics',
-        tooltip: 'Advanced embedding analytics'
-      },
-      {
-        name: 'Admin Requests',
-        icon: UserPlus,
-        path: '/admin-requests',
-        tooltip: 'Review company admin requests',
-        badge: pendingCount > 0 ? pendingCount : undefined
-      },
-      {
-        name: 'Mail all members',
-        icon: Mail,
-        path: '/developer-mail-all-members',
-        tooltip: 'Send an email to all members'
-      },
-      {
-        name: 'Traffic',
-        icon: Activity,
-        path: '/traffic',
-        tooltip: 'View user traffic and statistics',
-        badge: userCount > 0 ? userCount : undefined
-      }
+      { nameKey: 'rfxManagement', icon: FileText, path: '/rfx-management', tooltipKey: 'rfxManagementTooltip' },
+      { nameKey: 'feedbackReview', icon: MessageSquare, path: '/developer-feedback', tooltipKey: 'feedbackReviewTooltip', badge: pendingFeedbackCount > 0 ? pendingFeedbackCount : undefined },
+      { nameKey: 'databaseCompanyRequests', icon: Building2, path: '/database-company-requests', tooltipKey: 'databaseCompanyRequestsTooltip', badge: pendingCompanyRequestsCount > 0 ? pendingCompanyRequestsCount : undefined },
+      { nameKey: 'createCompanyManual', icon: Plus, path: '/create-company-manual', tooltipKey: 'createCompanyManualTooltip' },
+      { nameKey: 'subscriptionsSeats', icon: CreditCard, path: '/developer-subscriptions', tooltipKey: 'subscriptionsSeatsTooltip' },
+      { nameKey: 'settings', icon: Settings, path: '/settings', tooltipKey: 'settingsTooltip' },
+      { nameKey: 'databaseManager', icon: Database, path: '/database-manager', tooltipKey: 'databaseManagerTooltip' },
+      { nameKey: 'conversations', icon: MessageCircle, path: '/conversations', tooltipKey: 'conversationsTooltip', badge: pendingErrorReportsCount > 0 ? pendingErrorReportsCount : undefined },
+      { nameKey: 'embeddingAnalytics', icon: BarChart3, path: '/embedding-analytics', tooltipKey: 'embeddingAnalyticsTooltip' },
+      { nameKey: 'adminRequests', icon: UserPlus, path: '/admin-requests', tooltipKey: 'adminRequestsTooltip', badge: pendingCount > 0 ? pendingCount : undefined },
+      { nameKey: 'mailAllMembers', icon: Mail, path: '/developer-mail-all-members', tooltipKey: 'mailAllMembersTooltip' },
+      { nameKey: 'traffic', icon: Activity, path: '/traffic', tooltipKey: 'trafficTooltip', badge: userCount > 0 ? userCount : undefined }
     ];
   }, [isDeveloper, developerLoading, pendingCount, pendingFeedbackCount, pendingErrorReportsCount, pendingCompanyRequestsCount, userCount]);
 
@@ -282,18 +214,18 @@ const Sidebar = () => {
       window.dispatchEvent(new CustomEvent('restart-onboarding'));
 
       toast({
-        title: "Onboarding started",
-        description: "The onboarding tour will start shortly."
+        title: t('sidebar.onboardingStarted'),
+        description: t('sidebar.onboardingStartedDesc')
       });
     } catch (error) {
       console.error('Error restarting onboarding:', error);
       toast({
-        title: "Error",
-        description: "Failed to start onboarding. Please try again.",
+        title: t('sidebar.error'),
+        description: t('sidebar.errorOnboarding'),
         variant: "destructive"
       });
     }
-  }, [user]);
+  }, [user, t]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -313,19 +245,19 @@ const Sidebar = () => {
 
       await signOutPromise;
       toast({
-        title: "Logged out",
-        description: "You have been successfully logged out."
+        title: t('sidebar.loggedOut'),
+        description: t('sidebar.loggedOutDesc')
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to logout. Please try again.",
+        title: t('sidebar.error'),
+        description: t('sidebar.errorLogout'),
         variant: "destructive"
       });
     } finally {
       setIsLoggingOut(false);
     }
-  }, [navigateWithConfirmation, isMobile, setOpenMobile]);
+  }, [navigateWithConfirmation, isMobile, setOpenMobile, t]);
 
 
   // Handler for toggling RFX dropdown (chevron only)
@@ -388,7 +320,7 @@ const Sidebar = () => {
   useEffect(() => {
     const loadPlanLabel = async () => {
       if (!user?.id) {
-        setPlanLabel('Free Plan');
+        setPlanLabelKey('freePlan');
         setIsPaidPlan(false);
         return;
       }
@@ -399,7 +331,7 @@ const Sidebar = () => {
         });
 
         if (error || data?.error) {
-          setPlanLabel('Free Plan');
+          setPlanLabelKey('freePlan');
           setIsPaidPlan(false);
           return;
         }
@@ -407,10 +339,10 @@ const Sidebar = () => {
         const isPaid = !!data?.is_paid_member;
         const hasActivePaidSub = !!(data?.active_subscription_id && data?.tier_code && data.tier_code !== 'free');
         const seatCeded = hasActivePaidSub && !isPaid;
-        setPlanLabel(isPaid ? 'Pro Plan' : seatCeded ? 'Pro Plan (seat ceded)' : 'Free Plan');
+        setPlanLabelKey(isPaid ? 'proPlan' : seatCeded ? 'proPlanSeatCeded' : 'freePlan');
         setIsPaidPlan(isPaid);
       } catch {
-        setPlanLabel('Free Plan');
+        setPlanLabelKey('freePlan');
         setIsPaidPlan(false);
       }
     };
@@ -778,10 +710,9 @@ const Sidebar = () => {
       return {
         icon: Circle,
         color: '#f4a9aa',
-        tooltip: 'Draft'
+        tooltip: t('sidebar.draft')
       };
     }
-    // For all other statuses, use green CheckCircle
     return {
       icon: CheckCircle,
       color: '#f4a9aa',
@@ -802,24 +733,55 @@ const Sidebar = () => {
     >
       {/* Header */}
       <SidebarHeader className={`border-b border-white/10 py-2 px-3 relative group min-h-0 ${sidebarState === "collapsed" ? "h-16" : ""}`}>
-        <div className="flex items-center gap-2">
-          <button onClick={handleLogoClick} className="hover:opacity-80 transition-opacity flex-shrink-0">
-            <img src="/branding/LOGOTIPOH_2-02.png" alt="Qanvit Logo" className="w-28 h-16 object-contain object-left" />
-          </button>
-        </div>
-        
+        {sidebarState === "expanded" && (
+          <div className="flex items-center gap-2">
+            <button onClick={handleLogoClick} className="hover:opacity-80 transition-opacity flex-shrink-0">
+              <img src="/branding/LOGOTIPOH_2-02.png" alt="Qanvit Logo" className="w-28 h-16 object-contain object-left" />
+            </button>
+          </div>
+        )}
+
         {/* Notifications + Sidebar trigger - only show on desktop */}
         {!isMobile && (
           <div
             className={`absolute flex items-center gap-2 ${sidebarState === "collapsed" ? "flex-col" : "flex-row"} ${sidebarState === "expanded" ? "top-1/2 right-1 -translate-y-1/2" : "bottom-1 left-1/2 -translate-x-1/2"}`}
           >
+            {/* Language selector - left of bell, same row, only when expanded */}
+            {sidebarState === "expanded" && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-medium text-[#f1e8f4]/90 hover:bg-white/10 transition-colors"
+                    aria-label={t('sidebar.language')}
+                  >
+                    <Globe className="w-4 h-4 text-[#f1e8f4]/70" />
+                    {i18n.language === 'es' ? 'ES' : 'EN'}
+                    <ChevronDown className="w-3.5 h-3.5 text-[#f1e8f4]/60" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[160px] bg-[#22183a] border border-white/10 text-[#f1e8f4] shadow-none">
+                  <DropdownMenuItem
+                    onClick={() => changeLanguage('es')}
+                    className={`cursor-pointer ${i18n.language === 'es' ? 'bg-[#f4a9aa]/20 text-[#f4a9aa]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'}`}
+                  >
+                    {t('sidebar.spanish')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => changeLanguage('en')}
+                    className={`cursor-pointer ${i18n.language === 'en' ? 'bg-[#f4a9aa]/20 text-[#f4a9aa]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'}`}
+                  >
+                    {t('sidebar.english')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
             {/* Notifications bell */}
             {user && sidebarState === "expanded" && (
               <DropdownMenu open={notificationsOpen} onOpenChange={setNotificationsOpen}>
                 <DropdownMenuTrigger asChild>
                   <button 
                     className="text-[#f1e8f4] hover:bg-white/10 w-8 h-8 rounded-md flex items-center justify-center relative"
-                    title="Notifications"
+                    title={t('sidebar.notifications')}
                   >
                     <Bell className="w-5 h-5 text-[#f1e8f4]" />
                     {unreadCount > 0 && (
@@ -832,7 +794,7 @@ const Sidebar = () => {
                 <DropdownMenuContent align="end" className="w-80 bg-[#22183a] border border-white/10 text-[#f1e8f4] shadow-none">
                   <div className="px-3 py-2 border-b border-white/10">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-[#f1e8f4]/90">Notifications</span>
+                      <span className="text-sm font-semibold text-[#f1e8f4]/90">{t('sidebar.notifications')}</span>
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -842,7 +804,7 @@ const Sidebar = () => {
                                 toggleNotificationSound();
                               }}
                               className="text-[#f1e8f4]/70 hover:text-[#f1e8f4] hover:bg-white/10 w-7 h-7 rounded flex items-center justify-center transition-colors"
-                              aria-label={notificationSoundEnabled ? "Disable notification sound" : "Enable notification sound"}
+                              aria-label={notificationSoundEnabled ? t('sidebar.disableSound') : t('sidebar.enableSound')}
                             >
                               {notificationSoundEnabled ? (
                                 <Volume2 className="w-4 h-4" />
@@ -853,7 +815,7 @@ const Sidebar = () => {
                           </TooltipTrigger>
                           <TooltipContent side="left" className="bg-[#22183a] text-[#f1e8f4] border-white/10">
                             <p className="text-xs">
-                              {notificationSoundEnabled ? "Sound enabled" : "Sound disabled"}
+                              {notificationSoundEnabled ? t('sidebar.soundEnabled') : t('sidebar.soundDisabled')}
                             </p>
                           </TooltipContent>
                         </Tooltip>
@@ -862,7 +824,7 @@ const Sidebar = () => {
                   </div>
                   <div className="max-h-80 overflow-y-auto">
                     {notifications.length === 0 ? (
-                      <div className="px-3 py-4 text-sm text-[#f1e8f4]/60">No notifications</div>
+                      <div className="px-3 py-4 text-sm text-[#f1e8f4]/60">{t('sidebar.noNotifications')}</div>
                     ) : (
                       notifications.map(n => (
                         <div key={n.id} className="px-3 py-3 border-t border-white/10 first:border-t-0">
@@ -877,7 +839,7 @@ const Sidebar = () => {
                                 }}
                                 className="text-xs px-2 py-1 bg-[#f4a9aa] text-[#22183a] rounded hover:opacity-90"
                               >
-                                Go to
+                                {t('sidebar.goTo')}
                               </button>
                             )}
                             <span className="text-[10px] text-[#f1e8f4]/50 ml-auto">
@@ -893,7 +855,7 @@ const Sidebar = () => {
                       onClick={openNotificationsCenter}
                       className="w-full text-left px-3 py-2 text-sm text-[#f4a9aa] hover:bg-white/10"
                     >
-                      Open Notifications Center
+                      {t('sidebar.openNotificationsCenter')}
                     </button>
                   </div>
                 </DropdownMenuContent>
@@ -908,13 +870,13 @@ const Sidebar = () => {
         {/* Navigation Menu */}
         <SidebarGroup>
           <SidebarGroupLabel className="text-[#f4a9aa] text-xs uppercase tracking-wider">
-            {sidebarState === "expanded" ? "Buyers" : ""}
+            {sidebarState === "expanded" ? t('sidebar.buyers') : ""}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {/* RFX Agent with expandable section */}
               {(() => {
-                const rfxItem = menuItems.find(item => item.name === 'RFX Agent');
+                const rfxItem = menuItems.find(item => item.nameKey === 'rfxAgent');
                 return (
                   <>
                     {rfxItem && (
@@ -925,7 +887,7 @@ const Sidebar = () => {
                               isActive={isActivePath(rfxItem.path)}
                               onClick={() => handleMenuItemClick(rfxItem.path)}
                               className={`flex items-center transition-colors cursor-pointer ${sidebarState === "collapsed" ? 'w-full' : 'flex-1'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(rfxItem.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'}`}
-                              title={sidebarState === "collapsed" ? rfxItem.tooltip : ""}
+                              title={sidebarState === "collapsed" ? t(`sidebar.${rfxItem.tooltipKey}`) : ""}
                             >
                               <div className="flex items-center w-full">
                                 <div className="flex items-center gap-3">
@@ -937,7 +899,7 @@ const Sidebar = () => {
                                   </div>
                                   {sidebarState === "expanded" && (
                                     <span className="font-medium">
-                                      {rfxItem.name}
+                                      {t(`sidebar.${rfxItem.nameKey}`)}
                                     </span>
                                   )}
                                 </div>
@@ -947,8 +909,8 @@ const Sidebar = () => {
                               <button
                                 onClick={handleRfxToggle}
                                 className={`flex items-center justify-center w-8 h-8 rounded-md transition-colors ${isActivePath(rfxItem.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4] hover:bg-[#f4a9aa]/90' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'}`}
-                                title={rfxExpanded ? "Collapse RFX list" : "Expand RFX list"}
-                                aria-label={rfxExpanded ? "Collapse RFX list" : "Expand RFX list"}
+                                title={rfxExpanded ? t('sidebar.collapseRfxList') : t('sidebar.expandRfxList')}
+                                aria-label={rfxExpanded ? t('sidebar.collapseRfxList') : t('sidebar.expandRfxList')}
                               >
                                 <ChevronDown
                                   className={`w-4 h-4 transition-transform ${rfxExpanded ? 'rotate-180' : ''}`}
@@ -969,12 +931,12 @@ const Sidebar = () => {
                               >
                                 {loadingRfxSidebar && rfxSidebarItems.length === 0 && (
                                   <div className="text-[#f1e8f4]/50 text-xs px-1 py-1">
-                                    Loading RFXs...
+                                    {t('sidebar.loadingRfxs')}
                                   </div>
                                 )}
                                 {!loadingRfxSidebar && rfxSidebarItems.length === 0 && (
                                   <div className="text-[#f1e8f4]/50 text-xs px-1 py-1">
-                                    No RFXs yet
+                                    {t('sidebar.noRfxsYet')}
                                   </div>
                                 )}
                                 {rfxSidebarItems.map(rfx => {
@@ -986,7 +948,7 @@ const Sidebar = () => {
                                     onClick={() => handleMenuItemClick(`/rfxs/${rfx.id}`)}
                                     className="w-full text-left text-xs text-[#f1e8f4]/80 hover:text-[#f1e8f4] hover:bg-white/10 rounded-md px-2 py-1 flex items-center justify-between gap-2"
                                   >
-                                    <span className="truncate">{rfx.name}</span>
+                                    <span className="truncate">{rfx.name || t('sidebar.untitledRfx')}</span>
                                     <TooltipProvider delayDuration={50}>
                                       <Tooltip>
                                         <TooltipTrigger asChild>
@@ -1011,7 +973,7 @@ const Sidebar = () => {
                                   disabled={loadingMoreRfxSidebar}
                                   className="w-full text-center text-[11px] text-[#f4a9aa] hover:text-[#f1e8f4] hover:bg-white/10 rounded-md px-2 py-1"
                                 >
-                                  {loadingMoreRfxSidebar ? 'Loading more...' : 'Load more RFXs'}
+                                  {loadingMoreRfxSidebar ? t('sidebar.loadingMore') : t('sidebar.loadMoreRfxs')}
                                 </button>
                               )}
                               </div>
@@ -1026,9 +988,9 @@ const Sidebar = () => {
 
               {/* Buyers section items (without RFX Agent) */}
               {menuItems
-                .filter(item => item.name === 'Supplier Search' || item.name === 'My Subscription')
+                .filter(item => item.nameKey === 'mySubscription')
                 .map(item => (
-                  <SidebarMenuItem key={item.name}>
+                  <SidebarMenuItem key={item.nameKey}>
                     <TooltipProvider delayDuration={50}>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -1038,17 +1000,17 @@ const Sidebar = () => {
                               disabled={item.disabled}
                               onClick={() => handleMenuItemClick(item.path, item.disabled)}
                               className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
-                              title={sidebarState === "collapsed" ? item.tooltip : ""}
+                              title={sidebarState === "collapsed" ? (item.tooltipKeyGuest && item.disabled ? t(`sidebar.${item.tooltipKeyGuest}`) : t(`sidebar.${item.tooltipKey}`)) : ""}
                             >
                               <div className="flex items-center w-full">
                                 <div className="flex items-center gap-3">
                                   <div className="relative">
                                     <item.icon className={sidebarState === "collapsed" ? "w-5 h-5" : "w-5 h-5"} />
-                                    {item.name === 'My Company' && user && isApprovedAdmin && (pendingForCompany > 0 || pendingRfxForCompany > 0) && (
+                                    {item.nameKey === 'myCompany' && user && isApprovedAdmin && (pendingForCompany > 0 || pendingRfxForCompany > 0) && (
                                       <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
                                     )}
                                   </div>
-                                  {sidebarState === "expanded" && <span className="font-medium">{item.name}</span>}
+                                  {sidebarState === "expanded" && <span className="font-medium">{t(`sidebar.${item.nameKey}`)}</span>}
                                 </div>
                               </div>
                             </SidebarMenuButton>
@@ -1056,7 +1018,7 @@ const Sidebar = () => {
                         </TooltipTrigger>
                         {item.disabled && (
                           <TooltipContent>
-                            <p>{item.tooltip}</p>
+                            <p>{item.tooltipKeyGuest && item.disabled ? t(`sidebar.${item.tooltipKeyGuest}`) : t(`sidebar.${item.tooltipKey}`)}</p>
                           </TooltipContent>
                         )}
                       </Tooltip>
@@ -1067,11 +1029,11 @@ const Sidebar = () => {
               {/* Suppliers section */}
               {sidebarState === "expanded" && (
                 <div className="px-3 pt-2 pb-1 text-[#f4a9aa] text-xs uppercase tracking-wider">
-                  Suppliers
+                  {t('sidebar.suppliers')}
                 </div>
               )}
-              {menuItems.filter(item => item.name === 'My Company').map(item => (
-                <SidebarMenuItem key={item.name}>
+              {menuItems.filter(item => item.nameKey === 'myCompany').map(item => (
+                <SidebarMenuItem key={item.nameKey}>
                   <TooltipProvider delayDuration={50}>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -1081,17 +1043,17 @@ const Sidebar = () => {
                             disabled={item.disabled}
                             onClick={() => handleMenuItemClick(item.path, item.disabled)}
                             className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
-                            title={sidebarState === "collapsed" ? item.tooltip : ""}
+                            title={sidebarState === "collapsed" ? (item.tooltipKeyGuest && item.disabled ? t(`sidebar.${item.tooltipKeyGuest}`) : t(`sidebar.${item.tooltipKey}`)) : ""}
                           >
                             <div className="flex items-center w-full">
                               <div className="flex items-center gap-3">
                                 <div className="relative">
                                   <item.icon className={sidebarState === "collapsed" ? "w-5 h-5" : "w-5 h-5"} />
-                                  {item.name === 'My Company' && user && isApprovedAdmin && (pendingForCompany > 0 || pendingRfxForCompany > 0) && (
+                                  {item.nameKey === 'myCompany' && user && isApprovedAdmin && (pendingForCompany > 0 || pendingRfxForCompany > 0) && (
                                     <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full"></div>
                                   )}
                                 </div>
-                                {sidebarState === "expanded" && <span className="font-medium">{item.name}</span>}
+                                {sidebarState === "expanded" && <span className="font-medium">{t(`sidebar.${item.nameKey}`)}</span>}
                               </div>
                             </div>
                           </SidebarMenuButton>
@@ -1099,7 +1061,7 @@ const Sidebar = () => {
                       </TooltipTrigger>
                       {item.disabled && (
                         <TooltipContent>
-                          <p>{item.tooltip}</p>
+                          <p>{item.tooltipKeyGuest && item.disabled ? t(`sidebar.${item.tooltipKeyGuest}`) : t(`sidebar.${item.tooltipKey}`)}</p>
                         </TooltipContent>
                       )}
                     </Tooltip>
@@ -1110,11 +1072,11 @@ const Sidebar = () => {
               {/* General section */}
               {sidebarState === "expanded" && (
                 <div className="px-3 pt-2 pb-1 text-[#f4a9aa] text-xs uppercase tracking-wider">
-                  General
+                  {t('sidebar.general')}
                 </div>
               )}
-              {menuItems.filter(item => item.name === 'Your Feedback' || item.name === 'Add Company to DB').map(item => (
-                <SidebarMenuItem key={item.name}>
+              {menuItems.filter(item => item.nameKey === 'yourFeedback' || item.nameKey === 'addCompanyToDB').map(item => (
+                <SidebarMenuItem key={item.nameKey}>
                   <TooltipProvider delayDuration={50}>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -1124,22 +1086,22 @@ const Sidebar = () => {
                             disabled={item.disabled}
                             onClick={() => handleMenuItemClick(item.path, item.disabled)}
                             className={`flex items-center transition-colors ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg'} ${isActivePath(item.path) ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'} ${item.disabled ? 'hover:bg-transparent' : ''}`}
-                            title={sidebarState === "collapsed" ? item.tooltip : ""}
-                          >
-                            <div className="flex items-center w-full">
-                              <div className="flex items-center gap-3">
-                                <div className="relative">
-                                  <item.icon className={sidebarState === "collapsed" ? "w-5 h-5" : "w-5 h-5"} />
+title={sidebarState === "collapsed" ? (item.tooltipKeyGuest && item.disabled ? t(`sidebar.${item.tooltipKeyGuest}`) : t(`sidebar.${item.tooltipKey}`)) : ""}
+                            >
+                              <div className="flex items-center w-full">
+                                <div className="flex items-center gap-3">
+                                  <div className="relative">
+                                    <item.icon className={sidebarState === "collapsed" ? "w-5 h-5" : "w-5 h-5"} />
+                                  </div>
+                                  {sidebarState === "expanded" && <span className="font-medium">{t(`sidebar.${item.nameKey}`)}</span>}
                                 </div>
-                                {sidebarState === "expanded" && <span className="font-medium">{item.name}</span>}
                               </div>
-                            </div>
-                          </SidebarMenuButton>
+                            </SidebarMenuButton>
                         </div>
                       </TooltipTrigger>
                       {item.disabled && (
                         <TooltipContent>
-                          <p>{item.tooltip}</p>
+                          <p>{item.tooltipKeyGuest && item.disabled ? t(`sidebar.${item.tooltipKeyGuest}`) : t(`sidebar.${item.tooltipKey}`)}</p>
                         </TooltipContent>
                       )}
                     </Tooltip>
@@ -1155,7 +1117,7 @@ const Sidebar = () => {
                       <SidebarMenuButton 
                         isActive={isAnyDeveloperItemActive()}
                         className={`flex items-center transition-colors cursor-pointer ${isMobile ? 'mobile-nav-item' : ''} ${sidebarState === "collapsed" ? 'justify-center p-3 rounded-lg' : 'gap-3 px-3 py-2.5 rounded-lg justify-between'} ${isAnyDeveloperItemActive() ? 'bg-[#f4a9aa]/80 text-[#f1e8f4]' : 'text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]'}`}
-                        title={sidebarState === "collapsed" ? "Developer tools" : ""}
+                        title={sidebarState === "collapsed" ? t('sidebar.developerTools') : ""}
                       >
                         <div className="flex items-center w-full">
                           <div className="flex items-center gap-3">
@@ -1169,7 +1131,7 @@ const Sidebar = () => {
                                    </div>
                                  )}
                             </div>
-                            {sidebarState === "expanded" && <span className="font-medium">Developers</span>}
+                            {sidebarState === "expanded" && <span className="font-medium">{t('sidebar.developers')}</span>}
                           </div>
                           {sidebarState === "expanded" && (
                              <div className="flex items-center gap-2">
@@ -1191,33 +1153,33 @@ const Sidebar = () => {
                     >
                       {developerItems.map(item => (
                         <DropdownMenuItem
-                          key={item.name}
+                          key={item.nameKey}
                           onClick={() => handleDeveloperItemClick(item.path)}
                           className={`flex items-center justify-between px-3 py-2 cursor-pointer transition-colors hover:bg-white/10 ${isActivePath(item.path) ? 'bg-[#f4a9aa]/20 text-[#f4a9aa]' : 'text-[#f1e8f4]/80 hover:text-[#f1e8f4]'}`}
                         >
                           <div className="flex items-center gap-3">
                             <div className="relative">
                               <item.icon className="w-4 h-4" />
-                                 {((item.name === 'Admin Requests' && pendingCount > 0) || 
-                                   (item.name === 'Feedback Review' && pendingFeedbackCount > 0) ||
-                                   (item.name === 'Conversations' && pendingErrorReportsCount > 0) ||
-                                   (item.name === 'Database Company Requests' && pendingCompanyRequestsCount > 0) ||
-                                   (item.name === 'RFX Management' && (pendingRfxValidation > 0 || pendingNDAValidation > 0))) && (
+                                 {((item.nameKey === 'adminRequests' && pendingCount > 0) || 
+                                   (item.nameKey === 'feedbackReview' && pendingFeedbackCount > 0) ||
+                                   (item.nameKey === 'conversations' && pendingErrorReportsCount > 0) ||
+                                   (item.nameKey === 'databaseCompanyRequests' && pendingCompanyRequestsCount > 0) ||
+                                   (item.nameKey === 'rfxManagement' && (pendingRfxValidation > 0 || pendingNDAValidation > 0))) && (
                                    <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
                                  )}
                             </div>
-                            <span>{item.name}</span>
+                            <span>{t(`sidebar.${item.nameKey}`)}</span>
                           </div>
-                             {((item.name === 'Admin Requests' && pendingCount > 0) || 
-                               (item.name === 'Feedback Review' && pendingFeedbackCount > 0) ||
-                               (item.name === 'Conversations' && pendingErrorReportsCount > 0) ||
-                               (item.name === 'Database Company Requests' && pendingCompanyRequestsCount > 0) ||
-                               (item.name === 'RFX Management' && (pendingRfxValidation > 0 || pendingNDAValidation > 0))) && (
+                             {((item.nameKey === 'adminRequests' && pendingCount > 0) || 
+                               (item.nameKey === 'feedbackReview' && pendingFeedbackCount > 0) ||
+                               (item.nameKey === 'conversations' && pendingErrorReportsCount > 0) ||
+                               (item.nameKey === 'databaseCompanyRequests' && pendingCompanyRequestsCount > 0) ||
+                               (item.nameKey === 'rfxManagement' && (pendingRfxValidation > 0 || pendingNDAValidation > 0))) && (
                                <Badge variant="destructive" className="text-xs px-1.5 py-0.5 min-w-[20px] h-5">
-                                 {item.name === 'Admin Requests' ? pendingCount : 
-                                  item.name === 'Feedback Review' ? pendingFeedbackCount : 
-                                  item.name === 'Conversations' ? pendingErrorReportsCount :
-                                  item.name === 'Database Company Requests' ? pendingCompanyRequestsCount :
+                                 {item.nameKey === 'adminRequests' ? pendingCount : 
+                                  item.nameKey === 'feedbackReview' ? pendingFeedbackCount : 
+                                  item.nameKey === 'conversations' ? pendingErrorReportsCount :
+                                  item.nameKey === 'databaseCompanyRequests' ? pendingCompanyRequestsCount :
                                   pendingRfxValidation + pendingNDAValidation}
                                </Badge>
                              )}
@@ -1232,8 +1194,8 @@ const Sidebar = () => {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Qanvit Platform Onboarding Button - At the bottom before footer */}
-      <div className="border-t border-white/10 px-3 py-2">
+      {/* Qanvit Platform Onboarding - At the bottom before footer */}
+      <div className="border-t border-white/10 px-3 py-2 space-y-1">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -1241,15 +1203,15 @@ const Sidebar = () => {
                 variant="ghost"
                 onClick={handleRestartOnboarding}
                 className={`w-full flex items-center transition-colors cursor-pointer ${sidebarState === "collapsed" ? 'justify-center p-2' : 'justify-start gap-3 px-3 py-2'} text-[#f1e8f4]/80 hover:bg-white/10 hover:text-[#f1e8f4]`}
-                title={sidebarState === "collapsed" ? "Qanvit Platform Onboarding" : ""}
+                title={sidebarState === "collapsed" ? t('sidebar.onboarding') : ""}
               >
                 <GraduationCap className={sidebarState === "collapsed" ? "w-5 h-5" : "w-4 h-4"} />
-                {sidebarState === "expanded" && <span className="text-sm font-medium">Qanvit Platform Onboarding</span>}
+                {sidebarState === "expanded" && <span className="text-sm font-medium">{t('sidebar.onboarding')}</span>}
               </Button>
             </TooltipTrigger>
             {sidebarState === "collapsed" && (
               <TooltipContent>
-                <p>Qanvit Platform Onboarding</p>
+                <p>{t('sidebar.onboarding')}</p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -1272,10 +1234,10 @@ const Sidebar = () => {
                     </Avatar>
                     <div className="flex-1 min-w-0 text-left">
                       <div className="text-sm font-medium text-[#f1e8f4] truncate">
-                        {userProfile?.name && userProfile?.surname ? `${userProfile.name} ${userProfile.surname}` : user?.email || 'User'}
+                        {userProfile?.name && userProfile?.surname ? `${userProfile.name} ${userProfile.surname}` : user?.email || t('sidebar.user')}
                       </div>
                       <div className="text-xs text-[#f1e8f4]/60 truncate">
-                        {planLabel}
+                        {t(`sidebar.${planLabelKey}`)}
                       </div>
                     </div>
                   </div>
@@ -1286,7 +1248,7 @@ const Sidebar = () => {
                     className="flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors text-[#f1e8f4]/80 hover:text-[#f1e8f4] hover:bg-white/10"
                   >
                     <User className="w-4 h-4" />
-                    Configure Profile
+                    {t('sidebar.configureProfile')}
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={isLoggingOut ? undefined : handleLogout} 
@@ -1299,7 +1261,7 @@ const Sidebar = () => {
                       ) : (
                         <LogOut className="w-4 h-4 mr-2" />
                       )}
-                      <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
+                      <span>{isLoggingOut ? t('sidebar.loggingOut') : t('sidebar.logout')}</span>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -1319,7 +1281,7 @@ const Sidebar = () => {
                 onClick={isLoggingOut ? undefined : handleLogout} 
                 disabled={isLoggingOut}
                 className="text-[#f1e8f4]/60 hover:text-[#f1e8f4] hover:bg-white/10 disabled:opacity-60 disabled:cursor-not-allowed" 
-                title="Sign out"
+                title={t('sidebar.signOut')}
               >
                 {isLoggingOut ? (
                   <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
@@ -1339,7 +1301,7 @@ const Sidebar = () => {
             >
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" />
-                {sidebarState === "expanded" && <span>Login</span>}
+                {sidebarState === "expanded" && <span>{t('sidebar.login')}</span>}
               </div>
             </Button>
             
@@ -1351,7 +1313,7 @@ const Sidebar = () => {
             >
               <div className="flex items-center gap-2">
                 <UserPlus className="w-4 h-4" />
-                {sidebarState === "expanded" && <span>Sign up</span>}
+                {sidebarState === "expanded" && <span>{t('sidebar.signUp')}</span>}
               </div>
             </Button>
           </div>

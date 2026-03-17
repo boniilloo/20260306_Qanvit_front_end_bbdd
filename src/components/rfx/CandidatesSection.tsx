@@ -21,6 +21,7 @@ import { useRFXCrypto } from '@/hooks/useRFXCrypto';
 import AskFQAgentScopeModal, { type AskFQAgentScope } from '@/components/rfx/AskFQAgentScopeModal';
 import NearbyCandidatesMap from '@/components/rfx/NearbyCandidatesMap';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTranslation } from 'react-i18next';
 
 interface PublicCryptoContext {
   encrypt: (text: string) => Promise<string>;
@@ -59,6 +60,7 @@ interface WebSocketMessage {
 
 const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpecs, onResultsUpdated, evaluationResults = [], viewMode = 'all', rfxStatus, archived = false, publicCrypto }) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { user } = useAuth();
   
   // Use publicCrypto if provided, otherwise use private crypto
@@ -2433,7 +2435,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-indigo-600" />
-              Qanvit recommended candidates{recommendedCandidates.length > 0 ? ` (${recommendedCandidates.length})` : ''}
+              {t('rfxs.cand_recommendedTitle')}{recommendedCandidates.length > 0 ? ` (${recommendedCandidates.length})` : ''}
             </CardTitle>
             <div className="flex items-center gap-3">
               {databaseCandidates.length > 0 && !selectionMode && (
@@ -2442,26 +2444,27 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                     <TooltipTrigger asChild>
                       <div>
                         <Button
+                          data-onboarding-target="select-candidates-for-rfx"
                           onClick={() => setSelectionMode(true)}
                           variant="outline"
                           disabled={rfxStatus === 'revision requested by buyer' || archived}
                           className="bg-green-50 border-green-300 text-green-700 hover:bg-green-100 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <CheckSquare className="h-4 w-4 mr-2" />
-                          Select Candidates for RFX
+                          {t('rfxs.cand_selectCandidatesForRfx')}
                         </Button>
                       </div>
                     </TooltipTrigger>
                     {rfxStatus === 'revision requested by buyer' || archived && (
                       <TooltipContent>
-                        <p>Suppliers cannot be modified during the RFX review process</p>
+                        <p>{t('rfxs.candidates_reviewNoModify')}</p>
                       </TooltipContent>
                     )}
                   </Tooltip>
                 </TooltipProvider>
               )}
               <span className="text-sm text-gray-600">
-                {databaseCandidates.length > 0 ? 'Do you want to reevaluate options?' : 'Looking for a curated recommendation?'}
+                {databaseCandidates.length > 0 ? t('rfxs.cand_reevaluateQuestion') : t('rfxs.cand_lookingForRecommendation')}
               </span>
               <TooltipProvider delayDuration={100}>
                 <Tooltip>
@@ -2474,13 +2477,13 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                         className="bg-navy hover:bg-navy/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Bot className="h-4 w-4 mr-2" />
-                        {isConnecting ? 'Connecting...' : 'Ask Qanvit Agent'}
+                        {isConnecting ? t('rfxs.cand_connecting') : t('rfxs.cand_askQanvitAgent')}
                       </Button>
                     </div>
                   </TooltipTrigger>
                   {rfxStatus === 'revision requested by buyer' || archived && (
                     <TooltipContent>
-                      <p>Suppliers cannot be modified during the RFX review process</p>
+                      <p>{t('rfxs.candidates_reviewNoModify')}</p>
                     </TooltipContent>
                   )}
                 </Tooltip>
@@ -2493,7 +2496,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             <div className="flex items-center justify-center py-12">
               <div className="flex flex-col items-center gap-3">
                 <Loader2 className="h-8 w-8 animate-spin text-[#f4a9aa]" />
-                <p className="text-sm text-gray-600">Loading and decrypting candidates...</p>
+                <p className="text-sm text-gray-600">{t('rfxs.cand_loadingDecryptingCandidates')}</p>
               </div>
             </div>
           ) : databaseCandidates.length > 0 ? (
@@ -2507,26 +2510,26 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                       <div className="flex-1 space-y-3">
                         <div className="flex items-center gap-2 mb-2">
                           <Filter className="h-4 w-4 text-indigo-600" />
-                          <h3 className="font-semibold text-gray-900">Auto-Select by Threshold</h3>
+                          <h3 className="font-semibold text-gray-900">{t('rfxs.cand_autoSelectByThreshold')}</h3>
                         </div>
                         
                         <RadioGroup value={thresholdType} onValueChange={(value: 'count' | 'percentage') => setThresholdType(value)} disabled={rfxStatus === 'revision requested by buyer' || archived || archived}>
                           <div className="flex items-center gap-6">
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="count" id="count" disabled={rfxStatus === 'revision requested by buyer' || archived || archived} />
-                              <Label htmlFor="count" className={rfxStatus === 'revision requested by buyer' || archived || archived ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}>Top N companies</Label>
+                              <Label htmlFor="count" className={rfxStatus === 'revision requested by buyer' || archived || archived ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}>{t('rfxs.cand_topNCompanies')}</Label>
                             </div>
                             <div className="flex items-center space-x-2">
                               <RadioGroupItem value="percentage" id="percentage" disabled={rfxStatus === 'revision requested by buyer' || archived || archived} />
                               <Label htmlFor="percentage" className={rfxStatus === 'revision requested by buyer' || archived || archived ? 'cursor-not-allowed opacity-50' : 'cursor-pointer flex items-center gap-1'}>
-                                Min % match
+                                {t('rfxs.cand_minPercentMatch')}
                                 <TooltipProvider delayDuration={100}>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
                                       <HelpCircle className="h-4 w-4 text-gray-500 cursor-help" />
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      Selects only candidates with overall match greater than or equal to the entered percentage.
+                                      {t('rfxs.cand_minPercentMatchTooltip')}
                                     </TooltipContent>
                                   </Tooltip>
                                 </TooltipProvider>
@@ -2557,7 +2560,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                     className="bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     <Filter className="h-4 w-4 mr-2" />
-                                    Apply Threshold
+                                    {t('rfxs.cand_applyThreshold')}
                                   </Button>
                                 </div>
                               </TooltipTrigger>
@@ -2576,7 +2579,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                         <div className="flex items-center gap-2 mb-2">
                           <CheckSquare className="h-4 w-4 text-indigo-600" />
                           <span className="font-semibold text-gray-900">
-                            {recommendedSelectedCount} selected
+                            {t('rfxs.cand_selectedCount', { count: recommendedSelectedCount })}
                           </span>
                         </div>
                         
@@ -2592,7 +2595,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                     disabled={rfxStatus === 'revision requested by buyer' || archived}
                                     className="bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
-                                    Select All
+                                    {t('rfxs.cand_selectAll')}
                                   </Button>
                                 </div>
                               </TooltipTrigger>
@@ -2614,7 +2617,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                     disabled={rfxStatus === 'revision requested by buyer' || archived}
                                     className="bg-white disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
-                                    Clear All
+                                    {t('rfxs.cand_clearAll')}
                                   </Button>
                                 </div>
                               </TooltipTrigger>
@@ -2646,13 +2649,13 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                           value="global"
                           className="rounded-lg px-4 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
                         >
-                          Global ({recommendedCandidates.length})
+                          {t('rfxs.cand_globalTab', { count: recommendedCandidates.length })}
                         </TabsTrigger>
                         <TabsTrigger
                           value="nearby"
                           className="rounded-lg px-4 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
                         >
-                          Close to selected location ({nearbyRecommendedCandidates.length})
+                          {t('rfxs.cand_nearbyTab', { count: nearbyRecommendedCandidates.length })}
                         </TabsTrigger>
                       </TabsList>
                     </Tabs>
@@ -2810,15 +2813,15 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                       {/* Match Scores */}
                       <div className="flex gap-3 flex-shrink-0">
                         <div className="text-center">
-                          <div className="text-xs text-gray-500 mb-1">Overall</div>
+                          <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_overall')}</div>
                           <div className="text-2xl font-bold text-navy">{overallMatch}%</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-xs text-gray-500 mb-1">Tech</div>
+                          <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_tech')}</div>
                           <div className="text-lg font-semibold text-gray-700">{technicalMatch}%</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-xs text-gray-500 mb-1">Company</div>
+                          <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_company')}</div>
                           <div className="text-lg font-semibold text-gray-700">{companyMatch}%</div>
                         </div>
                       </div>
@@ -2833,7 +2836,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                           data-onboarding-target="see-fq-match-justification"
                           className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
                         >
-                          See Qanvit Match Reasoning
+                          {t('rfxs.cand_seeMatchReasoning')}
                         </button>
                         
                         <button 
@@ -2852,7 +2855,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                           className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2"
                         >
                           <ExternalLink size={16} />
-                          View Website
+                          {t('rfxs.cand_viewWebsite')}
                         </button>
                       </div>
                     </div>
@@ -3021,15 +3024,15 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                             {/* Match Scores */}
                             <div className="flex gap-3 flex-shrink-0">
                               <div className="text-center">
-                                <div className="text-xs text-gray-500 mb-1">Overall</div>
+                                <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_overall')}</div>
                                 <div className="text-2xl font-bold text-navy">{overallMatch}%</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-xs text-gray-500 mb-1">Tech</div>
+                                <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_tech')}</div>
                                 <div className="text-lg font-semibold text-gray-700">{technicalMatch}%</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-xs text-gray-500 mb-1">Company</div>
+                                <div className="text-xs text-gray-500 mb-1">{t('rfxs.candidates_company')}</div>
                                 <div className="text-lg font-semibold text-gray-700">{companyMatch}%</div>
                               </div>
                             </div>
@@ -3044,7 +3047,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                 data-onboarding-target="see-fq-match-justification"
                                 className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
                               >
-                                See Qanvit Match Justification
+                                {t('rfxs.cand_seeMatchReasoning')}
                               </button>
                               
                               <button 
@@ -3063,7 +3066,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                 className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2"
                               >
                                 <ExternalLink size={16} />
-                                View Website
+                                {t('rfxs.cand_viewWebsite')}
                               </button>
                             </div>
                           </div>
@@ -3162,8 +3165,8 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                 <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-navy/10 text-navy">
                   <Bot className="h-7 w-7" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900">Ready to get tailored candidates?</h3>
-                <p className="text-sm text-gray-600">Ask Qanvit Agent to analyze your RFX and surface curated options.</p>
+                <h3 className="text-lg font-semibold text-gray-900">{t('rfxs.cand_readyTailored')}</h3>
+                <p className="text-sm text-gray-600">{t('rfxs.cand_askAgentToAnalyze')}</p>
                 <div>
                   <TooltipProvider delayDuration={100}>
                     <Tooltip>
@@ -3175,7 +3178,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                             className="bg-navy hover:bg-navy/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Bot className="h-4 w-4 mr-2" />
-                            {isConnecting ? 'Connecting...' : 'Ask Qanvit Agent'}
+                            {isConnecting ? t('rfxs.cand_connecting') : t('rfxs.cand_askQanvitAgent')}
                           </Button>
                         </div>
                       </TooltipTrigger>
@@ -3193,7 +3196,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                     onClick={() => setShowHowItWorks(true)}
                     className="mt-2 text-sm text-gray-500 hover:text-gray-700 underline"
                   >
-                    How it works
+                    {t('rfxs.cand_howItWorks')}
                   </button>
                 </div>
               </div>
@@ -3207,12 +3210,12 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       {(viewMode === 'all' || viewMode === 'manual') && (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2" data-scroll-target="manual-search">
             <Search className="h-5 w-5 text-indigo-600" />
-            Add Companies or Products
+            {t('rfxs.cand_addCompaniesOrProducts')}
           </CardTitle>
           <CardDescription>
-            Search for specific companies or products in the Qanvit database and add them to your RFX candidates
+            {t('rfxs.cand_searchManualDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -3221,7 +3224,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
               {manuallyAddedCandidates.length > 0 && (
               <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="font-semibold text-gray-900">Manually selected candidates ({manuallyAddedCandidates.length})</h4>
+                  <h4 className="font-semibold text-gray-900">{t('rfxs.cand_manuallySelected', { count: manuallyAddedCandidates.length })}</h4>
                 </div>
                 <div className="space-y-3">
                   {manuallyAddedCandidates.map((candidate, index) => {
@@ -3244,8 +3247,8 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                               window.open(websiteUrl, '_blank', 'noopener,noreferrer');
                             } else {
                               toast({
-                                title: 'No website available',
-                                description: "This candidate doesn't have a website URL",
+                                title: t('rfxs.cand_toast_noWebsite'),
+                                description: t('rfxs.cand_toast_noWebsiteDesc'),
                                 variant: 'destructive',
                               });
                             }
@@ -3253,7 +3256,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                           className="px-3 py-2 border border-gray-300 rounded-lg text-[#22183a] hover:bg-gray-50 transition-colors flex items-center gap-2 text-xs"
                         >
                           <ExternalLink size={14} />
-                          Visit Website
+                          {t('rfxs.cand_visitWebsite')}
                         </button>
                         {/* Remove */}
                         <TooltipProvider delayDuration={100}>
@@ -3410,7 +3413,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             <div className="flex gap-3">
               <div className="flex-1">
                 <Input
-                  placeholder="Search by company name or product name..."
+                  placeholder={t('rfxs.cand_searchPlaceholder')}
                   value={manualSearchQuery}
                   onChange={(e) => setManualSearchQuery(e.target.value)}
                   onKeyDown={(e) => {
@@ -3429,12 +3432,12 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                 {isSearching ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Searching...
+                    {t('rfxs.cand_searching')}
                   </>
                 ) : (
                   <>
                     <Search className="h-4 w-4 mr-2" />
-                    Search
+                    {t('rfxs.cand_search')}
                   </>
                 )}
               </Button>
@@ -3764,9 +3767,9 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white shadow-sm text-indigo-600 mb-4">
                   <Search className="h-8 w-8" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Search the Qanvit Database</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('rfxs.cand_searchQanvitDb')}</h3>
                 <p className="text-sm text-gray-600 mb-4 max-w-md mx-auto">
-                  Find and add specific companies or products directly from our curated database to your RFX candidates
+                  {t('rfxs.cand_findAndAddDesc')}
                 </p>
                 {/* Badges removed per request */}
               </div>
@@ -3892,7 +3895,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                     <div className="flex items-center gap-2 mb-3">
                       <CheckCircle className="h-5 w-5 text-[#f4a9aa]" />
                       <h3 className="font-semibold text-gray-900">
-                        Overall Match Distribution ({evaluatedCandidates.length} proposals)
+                        {t('rfxs.cand_overallMatchDistribution', { count: evaluatedCandidates.length })}
                       </h3>
                     </div>
                     <div className="border rounded-lg p-4 bg-gray-50">
@@ -4087,7 +4090,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       <Dialog open={showHowItWorks} onOpenChange={setShowHowItWorks}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>How it works</DialogTitle>
+            <DialogTitle>{t('rfxs.cand_howItWorks')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-sm text-gray-700">
             <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { AlertCircle, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 interface TodoWarningProps {
   todoCount: number;
@@ -8,6 +9,7 @@ interface TodoWarningProps {
 }
 
 const TodoWarning: React.FC<TodoWarningProps> = ({ todoCount, onNavigateToTodo }) => {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(true);
   const [hasBeenManuallyClosed, setHasBeenManuallyClosed] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(0);
@@ -120,7 +122,7 @@ const TodoWarning: React.FC<TodoWarningProps> = ({ todoCount, onNavigateToTodo }
           <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
-              <h4 className="font-semibold text-orange-900">Pending TODOs</h4>
+              <h4 className="font-semibold text-orange-900">{t('rfxs.todoWarning_title')}</h4>
               <Button
                 variant="ghost"
                 size="sm"
@@ -131,9 +133,7 @@ const TodoWarning: React.FC<TodoWarningProps> = ({ todoCount, onNavigateToTodo }
               </Button>
             </div>
             <p className="text-sm text-orange-800">
-              {todoCount === 1 
-                ? 'There is 1 TODO that requires your attention' 
-                : `There are ${todoCount} TODOs that may require your attention`}
+              {t('rfxs.todoWarning', { count: todoCount })}
             </p>
           </div>
         </div>

@@ -29,6 +29,7 @@ import { encryptAndUploadImage, encryptAndUploadDocument, decryptImageToBase64 }
 import RFXFileUploadPreview from './RFXFileUploadPreview';
 import RFXEncryptedImage from './RFXEncryptedImage';
 import RFXEncryptedDocument from './RFXEncryptedDocument';
+import { useTranslation } from 'react-i18next';
 
 // La línea sin comentar es la URL que se usa (producción = Vercel; local = dev).
 //const RFX_AGENT_WS_URL = 'ws://localhost:8000/ws-rfx-agent';
@@ -126,6 +127,7 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
   publicCrypto,
 }) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   // Use private crypto by default, or public crypto for public RFXs
   const privateCrypto = useRFXCrypto(publicCrypto ? null : rfxId); // Don't load private crypto if public is provided
   
@@ -405,8 +407,8 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
       const imageFiles = filterImageFiles(files);
       if (imageFiles.length === 0) {
         toast({
-          title: "No valid images",
-          description: "Please select valid image files (JPEG, PNG, GIF, WebP).",
+          title: t('rfxs.chat_toast_noValidImages'),
+          description: t('rfxs.chat_toast_noValidImagesDesc'),
           variant: "destructive",
         });
         return;
@@ -421,8 +423,8 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
     } catch (error) {
       console.error('Error processing images:', error);
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process images",
+        title: t('rfxs.error'),
+        description: error instanceof Error ? error.message : t('rfxs.chat_toast_failedProcessImages'),
         variant: "destructive",
       });
     } finally {
@@ -442,8 +444,8 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
       const documentFiles = filterDocumentFiles(files);
       if (documentFiles.length === 0) {
         toast({
-          title: "No valid documents",
-          description: "Please select valid documents (PDF, DOC, DOCX, etc.).",
+          title: t('rfxs.chat_toast_noValidDocuments'),
+          description: t('rfxs.chat_toast_noValidDocumentsDesc'),
           variant: "destructive",
         });
         return;
@@ -458,8 +460,8 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
     } catch (error) {
       console.error('Error processing documents:', error);
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to process documents",
+        title: t('rfxs.error'),
+        description: error instanceof Error ? error.message : t('rfxs.chat_toast_failedProcessDocuments'),
         variant: "destructive",
       });
     } finally {
@@ -515,11 +517,11 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
     const documentFiles = filterDocumentFiles(files);
     
     if (imageFiles.length === 0 && documentFiles.length === 0) {
-      toast({
-        title: "No valid files",
-        description: "Please drop valid images or documents",
-        variant: "destructive"
-      });
+toast({
+      title: t('rfxs.chat_toast_noValidFiles'),
+      description: t('rfxs.chat_toast_noValidFilesDesc'),
+      variant: "destructive"
+    });
       return;
     }
 
@@ -567,8 +569,8 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
     } catch (error) {
       console.error('Error processing dropped files:', error);
       toast({
-        title: "Error processing files",
-        description: error instanceof Error ? error.message : "Unknown error",
+        title: t('rfxs.chat_toast_errorProcessFiles'),
+        description: error instanceof Error ? error.message : t('rfxs.chat_toast_unknownError'),
         variant: "destructive"
       });
     } finally {
@@ -581,8 +583,8 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
     if (typeof content !== 'string') return content;
     // Replace backend placeholders with user-friendly text
     return content
-      .replace(/_USER_IMAGE_/g, 'Sent file')
-      .replace(/_USER_DOCUMENT_/g, 'Sent file')
+      .replace(/_USER_IMAGE_/g, t('rfxs.chat_sentFile'))
+      .replace(/_USER_DOCUMENT_/g, t('rfxs.chat_sentFile'))
       .trim();
   };
 
@@ -841,9 +843,7 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
           setMessages([{
             id: '1',
             type: 'assistant',
-            content: `Hello! I'm your specialized RFX assistant for industrial computer vision systems. I'm here to help you create a complete and professional RFX for the "${rfxName}" project. 
-
-Let's begin building the projects specs, tell me briefly what are the key details of the project`,
+            content: t('rfxs.chat_welcomeMessage', { rfxName: rfxName || '' }),
             timestamp: new Date(),
           }]);
         }
@@ -865,8 +865,8 @@ Let's begin building the projects specs, tell me briefly what are the key detail
       } catch (error) {
         console.error('❌ [RFX Chat] Error loading RFX conversation history:', error);
         toast({
-          title: "Error",
-          description: "Could not load conversation history",
+          title: t('rfxs.error'),
+          description: t('rfxs.chat_toast_couldNotLoadHistory'),
           variant: "destructive",
         });
         
@@ -874,9 +874,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
         setMessages([{
           id: '1',
           type: 'assistant',
-          content: `Hello! I'm your specialized RFX assistant for industrial computer vision systems. I'm here to help you create a complete and professional RFX for the "${rfxName}" project. 
-
-Let's begin building the projects specs, tell me briefly what are the key details of the project`,
+          content: t('rfxs.chat_welcomeMessage', { rfxName: rfxName || '' }),
           timestamp: new Date(),
         }]);
       } finally {
@@ -1030,9 +1028,9 @@ Let's begin building the projects specs, tell me briefly what are the key detail
 
           // Backend requires symmetric_key for secure storage; fail fast on frontend for clearer UX.
           if (!symmetricKeyBase64) {
-            const msg = 'Encryption key not available. Please reload and try again.';
+            const msg = t('rfxs.chat_toast_encryptionKeyMissing');
             setConnectionError(msg);
-            toast({ title: 'Cannot connect', description: msg, variant: 'destructive' });
+            toast({ title: t('rfxs.chat_toast_cannotConnect'), description: msg, variant: 'destructive' });
             try { ws.close(); } catch {}
             reject(new Error(msg));
             return;
@@ -1091,13 +1089,13 @@ Let's begin building the projects specs, tell me briefly what are the key detail
 
         ws.onerror = (error) => {
           console.error('❌ [WebSocket] Connection error:', error);
-          setConnectionError('Connection error with agent');
+          setConnectionError(t('rfxs.chat_connectionError'));
           setIsConnected(false);
           reject(error);
         };
       } catch (error) {
         console.error('❌ [WebSocket] Error connecting:', error);
-        setConnectionError('Could not connect to agent');
+        setConnectionError(t('rfxs.chat_couldNotConnect'));
         reject(error);
       }
     });
@@ -1165,8 +1163,8 @@ Let's begin building the projects specs, tell me briefly what are the key detail
     } catch (error) {
       console.error('❌ [RFX Reset] Error:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to reset conversation. Please try again.',
+        title: t('rfxs.error'),
+        description: t('rfxs.chat_toast_failedResetConversation'),
         variant: 'destructive',
       });
     } finally {
@@ -1354,7 +1352,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                   if (i !== runningIdx) return m;
                   return {
                     ...m,
-                    content: 'Generating proposals',
+                    content: t('rfxs.chat_statusGeneratingProposals'),
                     statusDetail: appendProposeEditsProgress(m.statusDetail || '', incomingText),
                   };
                 });
@@ -1363,7 +1361,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
               const statusMsg: Message = {
                 id: `status-propose-${Date.now()}`,
                 type: 'status',
-                content: 'Generating proposals',
+                content: t('rfxs.chat_statusGeneratingProposals'),
                 timestamp: new Date(),
                 statusKey: 'propose_edits',
                 statusState: 'running',
@@ -1383,7 +1381,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
             }, 2000);
             setMessages(prev => prev.map(m => {
               if (m.type === 'status' && m.statusKey === 'propose_edits') {
-                return { ...m, content: 'Tool executed', statusState: 'success' };
+                return { ...m, content: t('rfxs.chat_statusToolExecuted'), statusState: 'success' };
               }
               return m;
             }));
@@ -1398,7 +1396,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
               const statusMsg: Message = {
                 id: `status-read-rfx-${Date.now()}`,
                 type: 'status',
-                content: 'Reading RFX',
+                content: t('rfxs.chat_statusReadingRfx'),
                 timestamp: new Date(),
                 statusKey: 'read_rfx_state',
                 statusState: 'running'
@@ -1414,7 +1412,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
             }, 2000);
             setMessages(prev => prev.map(m => {
               if (m.type === 'status' && m.statusKey === 'read_rfx_state') {
-                return { ...m, content: 'Proposal read', statusState: 'success' };
+                return { ...m, content: t('rfxs.chat_statusProposalRead'), statusState: 'success' };
               }
               return m;
             }));
@@ -1456,7 +1454,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
             onSuggestionsChange?.(arr, isResumedMsg);
             setMessages(prev => prev.map(m => {
               if (m.type === 'status' && m.statusKey === 'propose_edits') {
-                return { ...m, content: 'Proposals generated', statusState: 'success' };
+                return { ...m, content: t('rfxs.chat_statusProposalsGenerated'), statusState: 'success' };
               }
               return m;
             }));
@@ -1468,7 +1466,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
           }
         } catch (e) {
           console.error('❌ [RFX Chat] Error handling tool_propose_edits_result:', e);
-          toast({ title: 'Error', description: 'Failed to process proposed edits', variant: 'destructive' });
+          toast({ title: t('rfxs.error'), description: t('rfxs.chat_toast_failedProcessEdits'), variant: 'destructive' });
         } finally {
           setIsGeneratingProposals(false);
           setIsLoading(false); // Clear loading indicator when proposals are received
@@ -1485,7 +1483,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
               // Mark status as success
               setMessages(prev => prev.map(m => {
                 if (m.type === 'status' && m.statusKey === 'propose_edits') {
-                  return { ...m, content: 'Proposals generated', statusState: 'success' };
+                  return { ...m, content: t('rfxs.chat_statusProposalsGenerated'), statusState: 'success' };
                 }
                 return m;
               }));
@@ -1493,7 +1491,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
           }
         } catch (e) {
           console.error('❌ [RFX Chat] Error parsing suggestions:', e);
-          toast({ title: 'Error', description: 'Failed to parse proposed edits', variant: 'destructive' });
+          toast({ title: t('rfxs.error'), description: t('rfxs.chat_toast_failedParseEdits'), variant: 'destructive' });
         } finally {
           setIsGeneratingProposals(false);
           setIsLoading(false); // Clear loading indicator when proposals are processed
@@ -1559,7 +1557,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
           const cancelMsg: Message = {
             id: `cancelled-${Date.now()}`,
             type: 'status',
-            content: 'Response stopped',
+            content: t('rfxs.chat_statusResponseStopped'),
             timestamp: new Date(),
             statusKey: 'cancelled',
             statusState: 'success'
@@ -1651,7 +1649,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
     const userMessage: Message = {
       id: `msg-${Date.now()}`,
       type: 'user',
-      content: messageContent || "Sent files",
+      content: messageContent || t('rfxs.chat_sentFiles'),
       timestamp: messageSentAt,
       images: messageImages.length > 0 ? messageImages : undefined,
       documents: messageDocuments.length > 0 ? messageDocuments : undefined,
@@ -1702,7 +1700,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
         // connectWebSocket() now resolves on handshake (memory_loaded)
         sendMessageToAgent(messageContent, messageImages, messageDocuments);
       } catch (error) {
-        setConnectionError('Could not connect to agent');
+        setConnectionError(t('rfxs.chat_couldNotConnect'));
         setIsLoading(false);
         setAgentReady(true);
         agentReadyRef.current = true;
@@ -1761,8 +1759,8 @@ Let's begin building the projects specs, tell me briefly what are the key detail
           } catch (error) {
             console.error('Error decrypting images for agent:', error);
             toast({
-              title: 'Error',
-              description: 'Failed to decrypt images for sending',
+              title: t('rfxs.error'),
+              description: t('rfxs.chat_toast_failedDecryptImages'),
               variant: 'destructive'
             });
           }
@@ -1797,11 +1795,11 @@ Let's begin building the projects specs, tell me briefly what are the key detail
         setAgentReady(false);
       } catch (error) {
         console.error('❌ [WebSocket] Error sending message:', error);
-        setConnectionError('Error sending message');
+        setConnectionError(t('rfxs.chat_errorSendingMessage'));
         setIsLoading(false);
       }
     } else {
-      setConnectionError('No connection with agent');
+      setConnectionError(t('rfxs.chat_noConnection'));
       setIsLoading(false);
     }
   };
@@ -1926,7 +1924,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
             animation: 'pulse 1.2s ease-in-out 1',
             animationFillMode: 'forwards'
           } : {}}
-          title="Open RFX Assistant"
+          title={t('rfxs.chat_title')}
         >
           <MessageCircle 
             className="h-6 w-6" 
@@ -2000,7 +1998,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                     isConnected ? 'bg-green-500' : 'bg-gray-400'
                   }`} />
                   <span className="text-xs text-gray-500">
-                    {isConnected ? 'Connected' : 'Ready'}
+                    {isConnected ? t('rfxs.chat_connected') : t('rfxs.chat_ready')}
                   </span>
                 </div>
               </div>
@@ -2013,7 +2011,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                 size="sm"
                 onClick={() => setShowResetConfirmDialog(true)}
                 className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
-                title="Reset conversation"
+                title={t('rfxs.chat_resetConversation')}
                 disabled={isResettingMemory}
               >
                 <RotateCcw className={`h-4 w-4 ${isResettingMemory ? 'animate-spin' : ''}`} />
@@ -2043,10 +2041,10 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                   </div>
                   <p className="text-xs text-gray-500">
                     {isCryptoLoading && !hasLoadedHistoryRef.current 
-                      ? 'Loading encryption keys...' 
+                      ? t('rfxs.chat_loadingKeys') 
                       : isDecryptingMessages || showLoadingState
-                        ? 'Decrypting RFX Agent conversation...' 
-                        : 'Loading conversation history...'}
+                        ? t('rfxs.chat_decrypting') 
+                        : t('rfxs.chat_loadingHistory')}
                   </p>
                 </div>
               </div>
@@ -2211,10 +2209,10 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-amber-800">
-                        Resuming previous response
+                        {t('rfxs.chat_resumingResponse')}
                       </p>
                       <p className="text-xs text-amber-600 mt-1">
-                        A response was being generated when the page reloaded. Please wait for it to complete or stop it.
+                        {t('rfxs.chat_resumingResponseDesc')}
                       </p>
                     </div>
                   </div>
@@ -2224,7 +2222,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
               {isThinking && !isGeneratingProposals && !workflowInProgress && (
                 <div className="w-full bg-white rounded-lg px-3 py-2">
                   <div className="flex items-center space-x-1 text-gray-600 text-sm">
-                    <span>Thinking</span>
+                    <span>{t('rfxs.chat_thinking')}</span>
                     <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
                     <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }} />
                     <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
@@ -2277,7 +2275,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
               <div className="absolute inset-0 bg-blue-50/80 backdrop-blur-sm rounded-lg flex items-center justify-center z-10 pointer-events-none">
                 <div className="flex flex-col items-center gap-2 text-blue-600">
                   <Upload className="w-8 h-8" />
-                  <span className="text-sm font-medium">Drop files here</span>
+                  <span className="text-sm font-medium">{t('rfxs.chat_dropFilesHere')}</span>
                 </div>
               </div>
             )}
@@ -2293,32 +2291,32 @@ Let's begin building the projects specs, tell me briefly what are the key detail
               <div className="mb-3 flex flex-wrap gap-2">
                 <button
                   onClick={() => {
-                    const projectName = rfxName?.trim() || 'Untitled project';
-                    const projectDescription = rfxDescription?.trim() || 'No description provided.';
-                    setInputValue(`Make an RFX for a project called "${projectName}". Further details: ${projectDescription}.`);
+                    const projectName = rfxName?.trim() || t('rfxs.chat_untitledProject');
+                    const projectDescription = rfxDescription?.trim() || t('rfxs.chat_noDescription');
+                    setInputValue(t('rfxs.chat_promptMakeRfx', { name: projectName, description: projectDescription }));
                     inputRef.current?.focus();
                   }}
                   className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full border border-gray-200 transition-colors"
                 >
-                  Make an RFX for a project called...
+                  {t('rfxs.chat_quickPromptProject')}
                 </button>
                 <button
                   onClick={() => {
-                    setInputValue('Fill in all the buyer-related TODO fields with reasonable values based on the context.');
+                    setInputValue(t('rfxs.chat_promptAutofill'));
                     inputRef.current?.focus();
                   }}
                   className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full border border-gray-200 transition-colors"
                 >
-                  Autofill TODO
+                  {t('rfxs.chat_quickPromptAutofill')}
                 </button>
                 <button
                   onClick={() => {
-                    setInputValue('Generate the final RFX now. Use the your dedicated tool without asking more questions.');
+                    setInputValue(t('rfxs.chat_promptGenerateNow'));
                     inputRef.current?.focus();
                   }}
                   className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full border border-gray-200 transition-colors"
                 >
-                  Generate RFX now
+                  {t('rfxs.chat_quickPromptGenerate')}
                 </button>
               </div>
             )}
@@ -2347,7 +2345,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
-                placeholder="Type your question..."
+                placeholder={t('rfxs.chat_placeholder')}
                 disabled={isLoading || isProcessingFiles}
                 className="flex-1 resize-none min-h-[40px] max-h-[120px] overflow-y-auto"
                 rows={1}
@@ -2364,7 +2362,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                   ${images.length > 0 ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-300' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}
                   ${isProcessingFiles ? 'opacity-50' : ''}
                 `}
-                aria-label="Select images"
+                aria-label={t('rfxs.chat_selectImages')}
               >
                 <ImageIcon className="w-4 h-4" />
                 {images.length > 0 && (
@@ -2385,7 +2383,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                   ${documents.length > 0 ? 'bg-green-100 text-green-600 ring-2 ring-green-300' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}
                   ${isProcessingFiles ? 'opacity-50' : ''}
                 `}
-                aria-label="Select documents"
+                aria-label={t('rfxs.chat_selectDocuments')}
               >
                 <FileText className="w-4 h-4" />
                 {documents.length > 0 && (
@@ -2406,7 +2404,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
                       ? 'bg-gray-500 hover:bg-gray-600' 
                       : 'bg-gray-300 cursor-not-allowed'
                   }`}
-                  title={canCancel ? "Stop response" : "Please wait..."}
+                  title={canCancel ? t('rfxs.chat_stopResponse') : t('rfxs.chat_pleaseWait')}
                 >
                   <Square className="h-4 w-4 fill-current" />
                 </Button>
@@ -2428,7 +2426,7 @@ Let's begin building the projects specs, tell me briefly what are the key detail
           </div>
         ) : (
           <div className="p-3 border-t bg-gray-50 text-xs text-gray-500 text-center">
-            Conversation with the RFX Agent is read-only in public examples.
+            {t('rfxs.chat_readOnly')}
           </div>
         )}
       </Card>
@@ -2437,14 +2435,13 @@ Let's begin building the projects specs, tell me briefly what are the key detail
       <AlertDialog open={showResetConfirmDialog} onOpenChange={setShowResetConfirmDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Reset conversation?</AlertDialogTitle>
+            <AlertDialogTitle>{t('rfxs.chat_resetDialogTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will clear the entire conversation history and memory with the RFX Assistant. 
-              You will start fresh with a new conversation. This action cannot be undone.
+              {t('rfxs.chat_resetDialogDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isResettingMemory}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isResettingMemory}>{t('rfxs.chat_cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleResetMemory}
               disabled={isResettingMemory}
@@ -2453,10 +2450,10 @@ Let's begin building the projects specs, tell me briefly what are the key detail
               {isResettingMemory ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Resetting...
+                  {t('rfxs.chat_resetting')}
                 </>
               ) : (
-                'Reset conversation'
+                t('rfxs.chat_resetConversation')
               )}
             </AlertDialogAction>
           </AlertDialogFooter>

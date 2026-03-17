@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import AgentHelperDialog from './AgentHelperDialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 
 export type ProposalSuggestion = {
   id: string;
@@ -281,6 +282,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
   publicCrypto
 }, ref) => {
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   // Use private crypto by default, or public crypto for public RFXs
   const privateCrypto = useRFXCrypto(publicCrypto ? null : rfxId);
@@ -328,7 +330,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
   // Flag para controlar si ya se inicializó el estado de expansión
   const [hasInitializedExpansion, setHasInitializedExpansion] = useState(false);
   
-  // Loading state for "Accept all in section" buttons — key is `${proposalId}:${fieldName}`
+  // Loading state for "{t('rfxs.specs_acceptAllInSection')}" buttons — key is `${proposalId}:${fieldName}`
   const [acceptingProposal, setAcceptingProposal] = useState<string | null>(null);
 
   // Estado para el diálogo de ayuda del agente
@@ -1510,7 +1512,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
                             ) : (
                               <Check className="h-3 w-3 mr-1" />
                             )}
-                            Accept all in section
+                            {t('rfxs.specs_acceptAllInSection')}
                           </Button>
                           <Button
                             size="sm"
@@ -1520,7 +1522,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
                             className="border-red-300 text-red-600 hover:bg-red-50"
                           >
                             <X className="h-3 w-3 mr-1" />
-                            Hide
+                            {t('rfxs.specs_hide')}
                           </Button>
                         </div>
                       </div>
@@ -1545,7 +1547,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
             className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
           >
             <Eye className="h-3 w-3 mr-2" />
-            Show {hiddenProps.length} hidden proposal{hiddenProps.length > 1 ? 's' : ''}
+            {t('rfxs.specs_showHiddenProposals', { count: hiddenProps.length })}
           </Button>
         )}
       </div>
@@ -1604,13 +1606,13 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl" data-onboarding-target="rfx-specs-fields">
             <div className="text-left flex items-center justify-between w-full pr-4">
               <div>
-                <h3 className="font-semibold text-black">📋 Project Description</h3>
-                <p className="text-sm text-gray-500">Define the objectives and scope of your RFX</p>
+                <h3 className="font-semibold text-black">📋 {t('rfxs.specs_projectDescription')}</h3>
+                <p className="text-sm text-gray-500">{t('rfxs.specs_projectDescriptionSub')}</p>
               </div>
               {descriptionProposals.length > 0 && (
                 <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                   <AlertCircle className="h-4 w-4" />
-                  <span className="text-xs font-medium">{descriptionProposals.length} pending</span>
+                  <span className="text-xs font-medium">{descriptionProposals.length} {descriptionProposals.length === 1 ? t('rfxs.specs_pending') : t('rfxs.specs_pending_other')}</span>
                 </div>
               )}
             </div>
@@ -1620,9 +1622,9 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
               <GeneratingTextSkeleton />
             ) : (
               <>
-                {renderPendingProposals('description', 'Project Description', description)}
+                {renderPendingProposals('description', t('rfxs.specs_projectDescription'), description)}
                 <MarkdownEditor
-                  placeholder="Describe the main objectives, project scope, and any important context that suppliers need to know..."
+                  placeholder={t('rfxs.specs_descriptionPlaceholder')}
                   value={description}
                   onChange={(newValue) => {
                     // Durante la carga inicial (incluido restore de versiones) ignoramos onChange del editor
@@ -1662,13 +1664,13 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
             <div className="text-left flex items-center justify-between w-full pr-4">
               <div>
-                <h3 className="font-semibold text-black">⚙️ Technical Specifications</h3>
-                <p className="text-sm text-gray-500">Detail all technical requirements and standards</p>
+                <h3 className="font-semibold text-black">⚙️ {t('rfxs.specs_technicalSpecs')}</h3>
+                <p className="text-sm text-gray-500">{t('rfxs.specs_technicalSpecsSub')}</p>
               </div>
               {technicalProposals.length > 0 && (
                 <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                   <AlertCircle className="h-4 w-4" />
-                  <span className="text-xs font-medium">{technicalProposals.length} pending</span>
+                  <span className="text-xs font-medium">{technicalProposals.length} {technicalProposals.length === 1 ? t('rfxs.specs_pending') : t('rfxs.specs_pending_other')}</span>
                 </div>
               )}
             </div>
@@ -1678,11 +1680,11 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
               <GeneratingTextSkeleton />
             ) : (
               <>
-                {renderPendingProposals('technical_specifications', 'Technical Specifications', technicalRequirements)}
+                {renderPendingProposals('technical_specifications', t('rfxs.specs_technicalSpecs'), technicalRequirements)}
                 <div className="space-y-2">
-                  <Label htmlFor="technical-requirements" className="text-sm font-medium">Detailed Technical Specifications</Label>
+                  <Label htmlFor="technical-requirements" className="text-sm font-medium">{t('rfxs.specs_detailedTechnicalLabel')}</Label>
                   <MarkdownEditor
-                    placeholder={`Include all technical requirements such as:\n• Material specifications and standards\n• Performance requirements and tolerances\n• Required technical certifications\n• Quality standards and testing\n• Environmental and safety requirements\n• Any other technical specifications...`}
+                    placeholder={t('rfxs.specs_technicalPlaceholder')}
                     value={technicalRequirements}
                     onChange={(newValue) => {
                       if (isInitialLoad) {
@@ -1722,13 +1724,13 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
             <div className="text-left flex items-center justify-between w-full pr-4">
               <div>
-                <h3 className="font-semibold text-black">🏢 Company Requirements</h3>
-                <p className="text-sm text-gray-500">Define the required qualifications and experience</p>
+                <h3 className="font-semibold text-black">🏢 {t('rfxs.specs_companyRequirements')}</h3>
+                <p className="text-sm text-gray-500">{t('rfxs.specs_companyRequirementsSub')}</p>
               </div>
               {companyProposals.length > 0 && (
                 <div className="flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                   <AlertCircle className="h-4 w-4" />
-                  <span className="text-xs font-medium">{companyProposals.length} pending</span>
+                  <span className="text-xs font-medium">{companyProposals.length} {companyProposals.length === 1 ? t('rfxs.specs_pending') : t('rfxs.specs_pending_other')}</span>
                 </div>
               )}
             </div>
@@ -1738,11 +1740,11 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
               <GeneratingTextSkeleton />
             ) : (
               <>
-                {renderPendingProposals('company_requirements', 'Company Requirements', companyRequirements)}
+                {renderPendingProposals('company_requirements', t('rfxs.specs_companyRequirements'), companyRequirements)}
                 <div className="space-y-2">
-                  <Label htmlFor="company-requirements" className="text-sm font-medium">Company Qualifications</Label>
+                  <Label htmlFor="company-requirements" className="text-sm font-medium">{t('rfxs.specs_companyQualificationsLabel')}</Label>
                   <MarkdownEditor
-                    placeholder={`Include all company requirements such as:\n• Years of experience in the industry\n• Required certifications and licenses\n• Company size and capabilities\n• Geographic location requirements\n• Financial stability requirements\n• Previous project experience\n• Team qualifications and expertise\n• Any other company-related requirements...`}
+                    placeholder={t('rfxs.specs_companyPlaceholder')}
                     value={companyRequirements}
                     onChange={(newValue) => {
                       if (isInitialLoad) {
@@ -1782,9 +1784,9 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
             <div className="text-left flex items-center justify-between w-full pr-4">
               <div>
-                <h3 className="font-semibold text-black">📎 Related Files</h3>
+                <h3 className="font-semibold text-black">📎 {t('rfxs.specs_relatedFiles')}</h3>
                 <p className="text-sm text-gray-500">
-                  Upload supporting files (max {MAX_RELATED_FILES} files, 15MB each)
+                  {t('rfxs.specs_relatedFilesSub', { max: MAX_RELATED_FILES })}
                 </p>
               </div>
               <div className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">
@@ -1811,7 +1813,7 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
               >
                 <ImageIcon className="w-8 h-8 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground mb-2">
-                  Drag files here or click to select
+                  {t('rfxs.specs_dragOrClick')}
                 </p>
                 <input
                   id="related-files-input"
@@ -1834,32 +1836,32 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
                   {isUploadingRelatedFiles ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Uploading...
+                      {t('rfxs.specs_uploading')}
                     </>
                   ) : (
                     <>
                       <Upload className="w-4 h-4 mr-2" />
-                      Select Files
+                      {t('rfxs.specs_selectFiles')}
                     </>
                   )}
                 </Button>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Maximum {MAX_RELATED_FILES} files • 15MB per file • Any format
+                  {t('rfxs.specs_maxFilesHint', { max: MAX_RELATED_FILES })}
                 </p>
               </div>
               <div className="text-xs text-muted-foreground flex items-center gap-1.5">
                 <Shield className="h-3.5 w-3.5 text-green-600" />
-                End-to-end encrypted files
+                {t('rfxs.specs_encryptedFiles')}
               </div>
 
               {isLoadingRelatedFiles ? (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading related files...
+                  {t('rfxs.specs_loadingRelatedFiles')}
                 </div>
               ) : relatedFiles.length === 0 ? (
                 <div className="text-sm text-gray-500 border border-dashed rounded-lg p-4">
-                  No related files uploaded yet.
+                  {t('rfxs.specs_noRelatedFiles')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -1941,8 +1943,8 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
             <div className="text-left flex items-center justify-between w-full pr-4">
               <div>
-                <h3 className="font-semibold text-black">🗓️ Project Timeline</h3>
-                <p className="text-sm text-gray-500">Define milestones with absolute or relative dates</p>
+                <h3 className="font-semibold text-black">🗓️ {t('rfxs.specs_projectTimeline')}</h3>
+                <p className="text-sm text-gray-500">{t('rfxs.specs_projectTimelineSub')}</p>
               </div>
             </div>
           </AccordionTrigger>
@@ -1959,8 +1961,8 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
             <div className="text-left flex items-center justify-between w-full pr-4">
               <div>
-                <h3 className="font-semibold text-black">🖼️ Images</h3>
-                <p className="text-sm text-gray-500">Manage image categories and uploads</p>
+                <h3 className="font-semibold text-black">🖼️ {t('rfxs.specs_images')}</h3>
+                <p className="text-sm text-gray-500">{t('rfxs.specs_imagesSub')}</p>
               </div>
             </div>
           </AccordionTrigger>
@@ -1980,8 +1982,8 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
             <div className="text-left flex items-center justify-between w-full pr-4">
               <div>
-                <h3 className="font-semibold text-black">🧩 PDF Customization</h3>
-                <p className="text-sm text-gray-500">Header colors, section colors, and logos</p>
+                <h3 className="font-semibold text-black">🧩 {t('rfxs.specs_pdfCustomizationSection')}</h3>
+                <p className="text-sm text-gray-500">{t('rfxs.specs_pdfSub')}</p>
               </div>
             </div>
           </AccordionTrigger>
@@ -2277,12 +2279,12 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           {isGenerating ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#22183a] mr-2"></div>
-              Generating PDF...
+              {t('rfxs.specs_generatingPdf')}
             </>
           ) : (
             <>
               <Download className="h-4 w-4 mr-2" />
-              Download as PDF
+              {t('rfxs.specs_downloadAsPdf')}
             </>
           )}
         </Button>
@@ -2294,12 +2296,12 @@ const RFXSpecs = forwardRef<RFXSpecsRef, RFXSpecsProps>(({
           {saving ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Saving...
+              {t('rfxs.specs_saving')}
             </>
           ) : (
             <>
               <Save className="h-4 w-4 mr-2" />
-              Save Specifications
+              {t('rfxs.specs_saveSpecifications')}
             </>
           )}
         </Button>

@@ -2,6 +2,7 @@ import React from 'react';
 import * as Diff from 'diff';
 import { Button } from '@/components/ui/button';
 import type { Hunk, DiffLine } from '@/lib/unifiedDiff';
+import { useTranslation } from 'react-i18next';
 
 interface HunkDiffListProps {
   hunks: Hunk[];
@@ -104,6 +105,7 @@ const HunkDiffList: React.FC<HunkDiffListProps> = ({
   onRejectHunk,
   rejectedHunks,
 }) => {
+  const { t } = useTranslation();
   const visibleHunks = hunks
     .map((hunk, idx) => ({ hunk, idx }))
     .filter(({ hunk, idx }) => {
@@ -189,7 +191,7 @@ const HunkDiffList: React.FC<HunkDiffListProps> = ({
                   className="border-red-300 text-red-600 hover:bg-red-50"
                   onClick={() => onRejectHunk(idx)}
                 >
-                  Reject
+                  {t('rfxs.specs_reject')}
                 </Button>
               )}
               <Button
@@ -197,7 +199,7 @@ const HunkDiffList: React.FC<HunkDiffListProps> = ({
                 className="bg-green-600 hover:bg-green-700 text-white"
                 onClick={() => onAcceptHunk(idx)}
               >
-                Accept change
+                {t('rfxs.specs_acceptChange')}
               </Button>
             </div>
           </div>

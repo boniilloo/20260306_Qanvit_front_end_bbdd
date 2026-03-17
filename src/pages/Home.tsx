@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FileText, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { usePublicRFXs } from '@/hooks/usePublicRFXs';
@@ -15,6 +16,7 @@ import RFXFooter from '@/components/rfx/RFXFooter';
 import ExampleCard from '@/components/ExampleCard';
 
 const Home = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { publicRfxs, loading: rfxsLoading } = usePublicRFXs();
   const DEFAULT_PUBLIC_RFX_EXAMPLE_ID = 'eac78558-4c3e-4d05-847e-a954c469868a';
@@ -27,10 +29,10 @@ const Home = () => {
           {/* Simplified Header */}
           <div className="text-center mb-4 sm:mb-6 max-w-4xl mx-auto w-full">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#f4a9aa] mb-4 leading-tight">
-              Your AI assistant <span className="text-[#22183a]">for launching industrial sourcing projects</span>
+              {t('landing.title')} <span className="text-[#22183a]">{t('landing.titleHighlight')}</span>
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto mb-6">
-              Define your needs, discover verified suppliers and launch your RFQ, RFP or RFI in just one click
+              {t('landing.subtitle')}
             </p>
             <div className="flex items-center justify-center">
               <button
@@ -38,7 +40,7 @@ const Home = () => {
                 className="group relative px-6 py-3 bg-gradient-to-r from-[#f4a9aa] to-[#f4a9aa] text-white font-semibold text-base rounded-xl shadow-lg hover:shadow-2xl hover:shadow-[#f4a9aa]/50 transition-all duration-300 hover:-translate-y-1 hover:scale-105 active:scale-100 overflow-hidden whitespace-nowrap shrink-0"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  Start a new RFX
+                  {t('landing.cta')}
                   <svg
                     className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
                     fill="none"
@@ -66,10 +68,10 @@ const Home = () => {
               <div className="text-center md:text-left mb-4">
                 <h2 className="text-2xl sm:text-3xl font-bold text-[#22183a] mb-2 flex items-center gap-2 justify-center md:justify-start">
                   <Sparkles className="w-6 h-6 sm:w-7 sm:h-7 text-[#f4a9aa]" />
-                  RFX Agent
+                  {t('landing.rfxAgent')}
                 </h2>
                 <p className="text-base sm:text-lg text-gray-600">
-                  Define, send and manage your RFXs
+                  {t('landing.rfxAgentDesc')}
                 </p>
               </div>
               
@@ -100,14 +102,14 @@ const Home = () => {
                         className="pl-2 basis-full sm:basis-1/2 md:basis-1/3"
                       >
                         <ExampleCard
-                          title={pr.title || pr.rfx?.name || 'RFX Example'}
+                          title={pr.title || pr.rfx?.name || t('landing.rfxExample')}
                           description={pr.description || pr.rfx?.description}
                           imageUrl={pr.image_url}
                           fallbackIcon={<FileText className="w-5 h-5 text-white" />}
                           fallbackGradient="bg-gradient-to-br from-[#f4a9aa] to-[#f4a9aa]"
                           createdAt={new Date(pr.rfx?.created_at || pr.created_at)}
                           badge={{
-                            label: 'Example',
+                            label: t('landing.example'),
                             variant: 'outline',
                             className: 'text-xs bg-blue-50 border-blue-200 text-blue-700'
                           }}

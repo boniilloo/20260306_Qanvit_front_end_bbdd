@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle, Circle, Clock, FileText, Users, Send, BarChart3, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -41,46 +42,17 @@ interface RFXTodoListProps {
 }
 
 const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCompletion, candidatesProgress, validationProgress, rfxStatus, activeItem, onItemClick, versionMismatchWarning, forceAllCompleted = false }) => {
+  const { t } = useTranslation();
   // Calculate all states at once using useMemo to avoid progressive state changes
   const todoItems: TodoItem[] = useMemo(() => {
     // If forceAllCompleted is true, return all items as completed
     if (forceAllCompleted) {
       return [
-        {
-          id: 'specs',
-          title: 'Define RFX Specifications',
-          description: 'Complete the project description, technical requirements, and company requirements',
-          status: 'completed',
-          icon: <FileText className="h-5 w-5" />
-        },
-        {
-          id: 'candidates',
-          title: 'Select Candidates',
-          description: 'Review and select potential suppliers for this RFX',
-          status: 'completed',
-          icon: <Users className="h-5 w-5" />
-        },
-        {
-          id: 'validation',
-          title: 'Launch RFX',
-          description: 'Team validation and final RFX sending to selected suppliers',
-          status: 'completed',
-          icon: <Send className="h-5 w-5" />
-        },
-        {
-          id: 'fq_validation',
-          title: 'Validating by Qanvit',
-          description: 'Our Qanvit team is carefully reviewing all details to ensure everything is correct. You will be notified once validation is complete.',
-          status: 'completed',
-          icon: <Send className="h-5 w-5" />
-        },
-        {
-          id: 'responses',
-          title: 'Responses and Analysis',
-          description: 'Review supplier responses and analyze proposals',
-          status: 'completed',
-          icon: <BarChart3 className="h-5 w-5" />
-        }
+        { id: 'specs', title: t('rfxs.todo_specs_title'), description: t('rfxs.todo_specs_desc'), status: 'completed', icon: <FileText className="h-5 w-5" /> },
+        { id: 'candidates', title: t('rfxs.todo_candidates_title'), description: t('rfxs.todo_candidates_desc'), status: 'completed', icon: <Users className="h-5 w-5" /> },
+        { id: 'validation', title: t('rfxs.todo_validation_title'), description: t('rfxs.todo_validation_desc'), status: 'completed', icon: <Send className="h-5 w-5" /> },
+        { id: 'fq_validation', title: t('rfxs.todo_fq_validation_title'), description: t('rfxs.todo_fq_validation_desc'), status: 'completed', icon: <Send className="h-5 w-5" /> },
+        { id: 'responses', title: t('rfxs.todo_responses_title'), description: t('rfxs.todo_responses_desc'), status: 'completed', icon: <BarChart3 className="h-5 w-5" /> }
       ];
     }
 
@@ -183,43 +155,13 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
     };
 
     return [
-      {
-        id: 'specs',
-        title: 'Define RFX Specifications',
-        description: 'Complete the project description, technical requirements, and company requirements',
-        status: getItemStatus('specs'),
-        icon: <FileText className="h-5 w-5" />
-      },
-      {
-        id: 'candidates',
-        title: 'Select Candidates',
-        description: 'Review and select potential suppliers for this RFX',
-        status: getItemStatus('candidates'),
-        icon: <Users className="h-5 w-5" />
-      },
-      {
-        id: 'validation',
-        title: 'Launch RFX',
-        description: 'Team validation and final RFX sending to selected suppliers',
-        status: getItemStatus('validation'),
-        icon: <Send className="h-5 w-5" />
-      },
-      {
-        id: 'fq_validation',
-        title: 'Validating by Qanvit',
-        description: 'Our Qanvit team is carefully reviewing all details to ensure everything is correct. You will be notified once validation is complete.',
-        status: getItemStatus('fq_validation'),
-        icon: <Send className="h-5 w-5" />
-      },
-      {
-        id: 'responses',
-        title: 'Responses and Analysis',
-        description: 'Review supplier responses and analyze proposals',
-        status: getItemStatus('responses'),
-        icon: <BarChart3 className="h-5 w-5" />
-      }
+      { id: 'specs', title: t('rfxs.todo_specs_title'), description: t('rfxs.todo_specs_desc'), status: getItemStatus('specs'), icon: <FileText className="h-5 w-5" /> },
+      { id: 'candidates', title: t('rfxs.todo_candidates_title'), description: t('rfxs.todo_candidates_desc'), status: getItemStatus('candidates'), icon: <Users className="h-5 w-5" /> },
+      { id: 'validation', title: t('rfxs.todo_validation_title'), description: t('rfxs.todo_validation_desc'), status: getItemStatus('validation'), icon: <Send className="h-5 w-5" /> },
+      { id: 'fq_validation', title: t('rfxs.todo_fq_validation_title'), description: t('rfxs.todo_fq_validation_desc'), status: getItemStatus('fq_validation'), icon: <Send className="h-5 w-5" /> },
+      { id: 'responses', title: t('rfxs.todo_responses_title'), description: t('rfxs.todo_responses_desc'), status: getItemStatus('responses'), icon: <BarChart3 className="h-5 w-5" /> }
     ];
-  }, [specsCompletion, candidatesCompletion, candidatesProgress, validationProgress, rfxStatus, versionMismatchWarning, forceAllCompleted]);
+  }, [specsCompletion, candidatesCompletion, candidatesProgress, validationProgress, rfxStatus, versionMismatchWarning, forceAllCompleted, t]);
 
   const getStatusIcon = (status: TodoStatus) => {
     switch (status) {
@@ -239,15 +181,15 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
   const getStatusBadge = (status: TodoStatus) => {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">Completed</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">{t('rfxs.todo_badge_completed')}</Badge>;
       case 'in_progress':
-        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">In Progress</Badge>;
+        return <Badge className="bg-[#f4a9aa]/20 text-[#22183a] border-[#f4a9aa]">{t('rfxs.todo_badge_inProgress')}</Badge>;
       case 'warning':
-        return <Badge className="bg-orange-100 text-orange-800 border-orange-300">Warning</Badge>;
+        return <Badge className="bg-orange-100 text-orange-800 border-orange-300">{t('rfxs.todo_badge_warning')}</Badge>;
       case 'coming_soon':
-        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">Coming Soon</Badge>;
+        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">{t('rfxs.todo_badge_comingSoon')}</Badge>;
       default:
-        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">Pending</Badge>;
+        return <Badge className="bg-[#f1f1f1] text-[#22183a] border-gray-300">{t('rfxs.todo_badge_pending')}</Badge>;
     }
   };
 
@@ -255,7 +197,7 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">RFX Progress</CardTitle>
+        <CardTitle className="text-lg font-semibold">{t('rfxs.todo_title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

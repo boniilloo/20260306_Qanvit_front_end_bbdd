@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Upload, FileText, X, Eye, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -24,6 +25,7 @@ interface NDAMetadata {
 }
 
 export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, onNDAChange, readOnly = false }) => {
+  const { t } = useTranslation();
   const isRFXSent = rfxStatus && rfxStatus !== 'draft';
   const isDisabled = readOnly || isRFXSent;
   const { toast } = useToast();
@@ -79,10 +81,10 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
 
   const validateFile = (file: File): string | null => {
     if (file.type !== 'application/pdf') {
-      return 'Only PDF files are allowed';
+      return t('rfxs.sending_ndaOnlyPdf');
     }
     if (file.size > 10 * 1024 * 1024) {
-      return 'File size must be less than 10MB';
+      return t('rfxs.sending_ndaFileSize');
     }
     return null;
   };
@@ -93,7 +95,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
     const validationError = validateFile(file);
     if (validationError) {
       toast({
-        title: 'Invalid file',
+        title: t('rfxs.sending_ndaInvalidFile'),
         description: validationError,
         variant: 'destructive',
       });
@@ -159,14 +161,14 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
       }
 
       toast({
-        title: 'NDA uploaded',
-        description: 'The NDA has been uploaded successfully',
+        title: t('rfxs.sending_ndaUploaded'),
+        description: t('rfxs.sending_ndaUploadedDesc'),
       });
     } catch (error: any) {
       console.error('Error uploading NDA:', error);
       toast({
-        title: 'Upload failed',
-        description: error.message || 'Failed to upload NDA',
+        title: t('rfxs.sending_ndaUploadFailed'),
+        description: error.message || t('rfxs.sending_ndaUploadFailedDesc'),
         variant: 'destructive',
       });
     } finally {
@@ -317,17 +319,17 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
                     {isUploading ? (
                       <>
                         <Loader2 className="h-12 w-12 text-indigo-600 animate-spin" />
-                        <p className="text-sm font-medium text-gray-700">Uploading NDA...</p>
+                        <p className="text-sm font-medium text-gray-700">{t('rfxs.sending_ndaUploading')}</p>
                       </>
                     ) : (
                       <>
                         <Upload className="h-12 w-12 text-gray-400" />
                         <div>
                           <p className="text-sm font-medium text-gray-700">
-                            Drop NDA file here or click to upload
+                            {t('rfxs.sending_ndaDropHere')}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
-                            PDF only, max 10MB
+                            {t('rfxs.sending_ndaPdfOnly')}
                           </p>
                         </div>
                       </>
@@ -338,7 +340,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
             </TooltipTrigger>
             {isDisabled && (
               <TooltipContent>
-                <p>{readOnly ? 'This is a read-only public example. Modifications are not allowed.' : 'NDA cannot be modified after the RFX has been sent'}</p>
+                <p>{readOnly ? t('rfxs.sending_ndaReadOnlyTooltip') : t('rfxs.sending_ndaCannotModifyTooltip')}</p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -355,7 +357,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
                   {ndaMetadata.file_name}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {formatFileSize(ndaMetadata.file_size)} • Uploaded {new Date(ndaMetadata.uploaded_at).toLocaleDateString()}
+                  {formatFileSize(ndaMetadata.file_size)} • {t('rfxs.sending_ndaUploadedAt', { date: new Date(ndaMetadata.uploaded_at).toLocaleDateString() })}
                 </p>
                 <div className="flex gap-2 mt-3">
                   <Button
@@ -365,7 +367,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
                     className="text-indigo-600 border-indigo-300 hover:bg-indigo-50"
                   >
                     <Eye className="h-3 w-3 mr-1" />
-                    View
+                    {t('rfxs.sending_ndaView')}
                   </Button>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -378,13 +380,13 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
                           className="text-red-600 border-red-300 hover:bg-red-50"
                         >
                           <X className="h-3 w-3 mr-1" />
-                          Delete
+                          {t('rfxs.sending_ndaDelete')}
                         </Button>
                       </div>
                     </TooltipTrigger>
                     {isRFXSent && (
                       <TooltipContent>
-                        <p>NDA cannot be modified after the RFX has been sent</p>
+                        <p>{t('rfxs.sending_ndaCannotModifyTooltip')}</p>
                       </TooltipContent>
                     )}
                   </Tooltip>
@@ -408,7 +410,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
                           >
                             <span>
                               <Upload className="h-3 w-3 mr-1" />
-                              Replace
+                              {t('rfxs.sending_ndaReplace')}
                             </span>
                           </Button>
                         </label>
@@ -416,7 +418,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
                     </TooltipTrigger>
                     {isRFXSent && (
                       <TooltipContent>
-                        <p>NDA cannot be modified after the RFX has been sent</p>
+                        <p>{t('rfxs.sending_ndaCannotModifyTooltip')}</p>
                       </TooltipContent>
                     )}
                   </Tooltip>
@@ -429,7 +431,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription className="text-sm">
-            The NDA will be sent to suppliers along with the RFX. Make sure it's up to date before sending.
+            {t('rfxs.sending_ndaInfo')}
           </AlertDescription>
         </Alert>
       </div>
@@ -445,7 +447,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
           <DialogHeader className="px-6 pt-6 pb-4">
             <DialogTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-red-600" />
-              NDA Document
+              {t('rfxs.sending_ndaDocument')}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 min-h-0 px-6 pb-6">
@@ -453,7 +455,7 @@ export const RFXNDAUpload: React.FC<RFXNDAUploadProps> = ({ rfxId, rfxStatus, on
               <iframe
                 src={pdfUrl}
                 className="w-full h-full rounded-lg border border-gray-200"
-                title="NDA Document"
+                title={t('rfxs.sending_ndaDocument')}
               />
             ) : (
               <div className="flex items-center justify-center h-full">

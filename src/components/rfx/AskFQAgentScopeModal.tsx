@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { LocateFixed } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export type AskFQAgentScope =
   | {
@@ -181,6 +182,7 @@ function LeafletLocationPicker({
 }
 
 export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: Props) {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<'global' | 'nearby'>('global');
   const [radiusKm, setRadiusKm] = useState<number>(300);
 
@@ -226,9 +228,9 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle className="text-[#22183a]">Where should Qanvit look for candidates?</DialogTitle>
+          <DialogTitle className="text-[#22183a]">{t('rfxs.scopeModal_title')}</DialogTitle>
           <DialogDescription>
-            Choose the geographic scope for the search. Default is global.
+            {t('rfxs.scopeModal_description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -245,8 +247,8 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
               >
                 <RadioGroupItem id="ask-fq-scope-global" value="global" className="mt-1" />
                 <div className="space-y-1">
-                  <div className="text-base font-semibold text-[#22183a]">Globally</div>
-                  <p className="text-sm text-gray-600">Best matches anywhere in the Qanvit database.</p>
+                  <div className="text-base font-semibold text-[#22183a]">{t('rfxs.scopeModal_globally')}</div>
+                  <p className="text-sm text-gray-600">{t('rfxs.scopeModal_globallyDesc')}</p>
                 </div>
               </label>
 
@@ -261,9 +263,9 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
                 <RadioGroupItem id="ask-fq-scope-nearby" value="nearby" className="mt-1" />
                 <div className="space-y-3 w-full">
                   <div className="space-y-1">
-                    <div className="text-base font-semibold text-[#22183a]">Near a location</div>
+                    <div className="text-base font-semibold text-[#22183a]">{t('rfxs.scopeModal_nearLocation')}</div>
                     <p className="text-sm text-gray-600">
-                      Choose a point and a radius — we’ll prioritize suppliers within that area.
+                      {t('rfxs.scopeModal_nearLocationDesc')}
                     </p>
                   </div>
 
@@ -278,9 +280,9 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
                       }}
                     >
                       <LocateFixed className="h-4 w-4 mr-2" />
-                      Use my location
+                      {t('rfxs.scopeModal_useMyLocation')}
                     </Button>
-                    <p className="text-sm text-gray-600">…or click on the map to set a point.</p>
+                    <p className="text-sm text-gray-600">{t('rfxs.scopeModal_clickMapHint')}</p>
                   </div>
 
                   {mode === 'nearby' && (
@@ -304,8 +306,8 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
                         <div className="text-xs text-gray-600 flex items-center justify-between">
                           <span>
                             {picked
-                              ? `Selected: ${picked.lat.toFixed(5)}, ${picked.lng.toFixed(5)}`
-                              : 'No point selected yet'}
+                              ? t('rfxs.scopeModal_selectedPoint', { lat: picked.lat.toFixed(5), lng: picked.lng.toFixed(5) })
+                              : t('rfxs.scopeModal_noPointYet')}
                           </span>
                           {picked && (
                             <Button
@@ -315,14 +317,14 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
                               onClick={() => setPicked(null)}
                               className="text-gray-600"
                             >
-                              Clear
+                              {t('rfxs.scopeModal_clear')}
                             </Button>
                           )}
                         </div>
 
                         <div className="space-y-2">
                           <div className="flex items-center justify-between">
-                            <Label className="text-sm text-[#22183a]">Radius</Label>
+                            <Label className="text-sm text-[#22183a]">{t('rfxs.scopeModal_radius')}</Label>
                             <span className="text-sm font-semibold text-[#22183a]">{radiusKm} km</span>
                           </div>
                           <input
@@ -349,7 +351,7 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
 
           <div className="flex items-center justify-end gap-2 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t('rfxs.scopeModal_cancel')}
             </Button>
             <Button
               type="button"
@@ -357,7 +359,7 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
               disabled={!canConfirm}
               className="bg-navy hover:bg-navy/90 text-white disabled:opacity-50"
             >
-              Continue
+              {t('rfxs.scopeModal_continue')}
             </Button>
           </div>
         </div>

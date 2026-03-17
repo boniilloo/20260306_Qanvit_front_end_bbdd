@@ -29,11 +29,13 @@ import { NDAPdfViewerModal } from '@/components/rfx/NDAPdfViewerModal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { useRFXSpecs } from '@/hooks/useRFXSpecs';
+import { useTranslation } from 'react-i18next';
 
 const RFXSpecsPage = () => {
   const { rfxId } = useParams<{ rfxId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const emitProposalAck = useCallback((detail: {
     rfxId: string;
@@ -418,10 +420,10 @@ const RFXSpecsPage = () => {
       // Only show error notification for non-duplicate key errors
       if (err.code !== '23505') {
         toast({
-          title: 'Auto-save failed',
+          title: t('rfxs.specs_toast_autoSaveFailed'),
           description: err.message === 'Cannot save: Encryption key not available' 
-            ? 'Cannot save securely: Encryption key missing'
-            : 'Changes were applied but not saved. Please use the Save button.',
+            ? t('rfxs.specs_toast_encryptionMissing')
+            : t('rfxs.specs_toast_useSaveButton'),
           variant: 'destructive',
           duration: 3000,
         });
@@ -438,8 +440,8 @@ const RFXSpecsPage = () => {
       
       if (!user) {
         toast({
-          title: 'Error',
-          description: 'You must be logged in',
+          title: t('rfxs.error'),
+          description: t('rfxs.specs_toast_mustBeLoggedIn'),
           variant: 'destructive',
         });
         navigate('/rfxs');
@@ -459,8 +461,8 @@ const RFXSpecsPage = () => {
 
       if (!data) {
         toast({
-          title: 'Error',
-          description: 'RFX not found',
+          title: t('rfxs.error'),
+          description: t('rfxs.specs_toast_rfxNotFound'),
           variant: 'destructive',
         });
         navigate('/rfxs');
@@ -479,8 +481,8 @@ const RFXSpecsPage = () => {
         
         if (!memberRow) {
           toast({
-            title: 'Access denied',
-            description: 'You do not have access to this RFX',
+            title: t('rfxs.specs_toast_accessDeniedTitle'),
+            description: t('rfxs.specs_toast_accessDenied'),
             variant: 'destructive',
           });
           navigate('/rfxs');
@@ -504,8 +506,8 @@ const RFXSpecsPage = () => {
     } catch (err: any) {
       console.error('❌ [RFX Specs Page] Error fetching RFX:', err);
       toast({
-        title: 'Error',
-        description: 'Failed to load RFX',
+        title: t('rfxs.error'),
+        description: t('rfxs.specs_toast_failedToLoadRfx'),
         variant: 'destructive',
       });
       navigate('/rfxs');
@@ -644,8 +646,8 @@ const RFXSpecsPage = () => {
 
       if (!diffText) {
         toast({ 
-          title: 'No changes', 
-          description: 'No changes found for this field.', 
+          title: t('rfxs.specs_toast_noChanges'), 
+          description: t('rfxs.specs_toast_noChangesForField'), 
           variant: 'destructive' 
         });
         return;
@@ -688,8 +690,8 @@ const RFXSpecsPage = () => {
     } catch (e: any) {
       console.error('❌ [RFX Specs Page] Error applying proposal:', e);
       toast({ 
-        title: 'Error', 
-        description: 'Could not apply this proposal', 
+        title: t('rfxs.error'), 
+        description: t('rfxs.specs_toast_couldNotApplyProposal'), 
         variant: 'destructive' 
       });
     }
@@ -956,7 +958,7 @@ const RFXSpecsPage = () => {
         <div className="flex flex-col justify-center items-center py-12 space-y-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#22183a]"></div>
           {isDecrypting && (
-            <p className="text-sm text-gray-600 font-medium">Decrypting RFX info...</p>
+            <p className="text-sm text-gray-600 font-medium">{t('rfxs.specs_decrypting')}</p>
           )}
         </div>
       </div>
@@ -993,7 +995,7 @@ const RFXSpecsPage = () => {
               <div className="flex items-start md:items-center justify-between gap-3">
                 <div className="min-w-0">
                   <h1 className="text-2xl md:text-3xl font-extrabold text-black font-intro tracking-tight truncate">
-                    {rfx.name} - Specifications
+                    {rfx.name} - {t('rfxs.specs_suffix')}
                   </h1>
                   {rfx.description && (
                     <p className="mt-1 text-sm md:text-base text-gray-600 leading-relaxed max-w-3xl font-inter line-clamp-2">
@@ -1008,7 +1010,7 @@ const RFXSpecsPage = () => {
                         onClick={() => navigate(`/rfxs/candidates/${rfxId}`)}
                         className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-black"
                       >
-                        Go to Candidates
+                        {t('rfxs.specs_goToCandidates')}
                       </Button>
                     ) : (
                       <TooltipProvider delayDuration={100}>
@@ -1020,12 +1022,12 @@ const RFXSpecsPage = () => {
                                 className="bg-[#f4a9aa] text-black opacity-70 cursor-not-allowed"
                                 aria-disabled="true"
                               >
-                                Go to Candidates
+                                {t('rfxs.specs_goToCandidates')}
                               </Button>
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            Complete the requirement fields to move forward
+                            {t('rfxs.specs_completeFieldsToProceed')}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -1036,7 +1038,7 @@ const RFXSpecsPage = () => {
                       className="bg-[#22183a] hover:bg-[#22183a]/90 text-white border-[#22183a]"
                     >
                       <ArrowLeft className="h-4 w-4 mr-2" />
-                      Back
+                      {t('rfxs.specs_back')}
                     </Button>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1050,12 +1052,12 @@ const RFXSpecsPage = () => {
                       {isGeneratingPDF ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Generating PDF...
+                          {t('rfxs.specs_generatingPdf')}
                         </>
                       ) : (
                         <>
                           <Download className="h-4 w-4 mr-2" />
-                          Generate PDF
+                          {t('rfxs.specs_generatePdf')}
                         </>
                       )}
                     </Button>
@@ -1067,12 +1069,12 @@ const RFXSpecsPage = () => {
                       {isSaving ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Saving...
+                          {t('rfxs.specs_saving')}
                         </>
                       ) : (
                         <>
                           <Save className="h-4 w-4 mr-2" />
-                          Save Specifications
+                          {t('rfxs.specs_saveSpecifications')}
                         </>
                       )}
                     </Button>
@@ -1192,8 +1194,8 @@ const RFXSpecsPage = () => {
             } catch (err: any) {
               console.error('Error restoring version:', err);
               toast({
-                title: 'Error',
-                description: 'Failed to restore version completely',
+                title: t('rfxs.error'),
+                description: t('rfxs.specs_failedRestoreVersion'),
                 variant: 'destructive',
               });
             }
@@ -1206,9 +1208,9 @@ const RFXSpecsPage = () => {
       <AlertDialog open={showPDFWarningModal} onOpenChange={setShowPDFWarningModal}>
         <AlertDialogContent className="max-w-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Complete PDF Configuration</AlertDialogTitle>
+            <AlertDialogTitle>{t('rfxs.specs_completePdfConfig')}</AlertDialogTitle>
             <AlertDialogDescription className="text-sm leading-relaxed">
-              Before generating the PDF, we recommend completing the following sections:
+              {t('rfxs.specs_completePdfConfigDesc')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           
@@ -1217,9 +1219,9 @@ const RFXSpecsPage = () => {
               <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
                 <div className="flex-1">
-                  <p className="font-medium text-blue-900">Images Section</p>
+                  <p className="font-medium text-blue-900">{t('rfxs.specs_imagesSection')}</p>
                   <p className="text-sm text-blue-700 mt-1">
-                    You haven't uploaded any images yet. Consider adding images to make your RFX more comprehensive.
+                    {t('rfxs.specs_imagesSectionDesc')}
                   </p>
                 </div>
                 <Button
@@ -1228,7 +1230,7 @@ const RFXSpecsPage = () => {
                   onClick={() => handleGoToSection('images')}
                   className="bg-white border-blue-300 text-blue-700 hover:bg-blue-100"
                 >
-                  Go to Images
+                  {t('rfxs.specs_goToImages')}
                 </Button>
               </div>
             )}
@@ -1237,9 +1239,9 @@ const RFXSpecsPage = () => {
               <div className="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
                 <div className="flex-1">
-                  <p className="font-medium text-blue-900">PDF Customization</p>
+                  <p className="font-medium text-blue-900">{t('rfxs.specs_pdfCustomization')}</p>
                   <p className="text-sm text-blue-700 mt-1">
-                    You're using default PDF customization settings. Consider customizing colors and logos to match your brand.
+                    {t('rfxs.specs_pdfCustomizationDesc')}
                   </p>
                 </div>
                 <Button
@@ -1248,7 +1250,7 @@ const RFXSpecsPage = () => {
                   onClick={() => handleGoToSection('pdf')}
                   className="bg-white border-blue-300 text-blue-700 hover:bg-blue-100"
                 >
-                  Go to PDF Customization
+                  {t('rfxs.specs_goToPdfCustomization')}
                 </Button>
               </div>
             )}
@@ -1256,13 +1258,13 @@ const RFXSpecsPage = () => {
           
           <AlertDialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
             <AlertDialogCancel onClick={() => setShowPDFWarningModal(false)} className="w-full sm:w-auto m-0">
-              Cancel
+              {t('rfxs.specs_cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleProceedWithPDF}
               className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
             >
-              Proceed with PDF Generation
+              {t('rfxs.specs_proceedWithPdf')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1272,29 +1274,27 @@ const RFXSpecsPage = () => {
              <AlertDialog open={showNavigationWarning} onOpenChange={setShowNavigationWarning}>
                <AlertDialogContent className="max-w-2xl">
                  <AlertDialogHeader>
-                   <AlertDialogTitle>You have unsaved changes</AlertDialogTitle>
+                   <AlertDialogTitle>{t('rfxs.specs_unsavedChanges')}</AlertDialogTitle>
                    <AlertDialogDescription className="text-sm leading-relaxed">
-                     You have made changes that haven't been saved as a version. 
-                     You can stay on this page, leave without creating a version (you can continue working on these changes later), 
-                     or create a version now to store your changes.
+                     {t('rfxs.specs_unsavedChangesDesc')}
                    </AlertDialogDescription>
                  </AlertDialogHeader>
                  
                  <AlertDialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                    <AlertDialogCancel onClick={cancelNavigation} className="w-full sm:w-auto m-0">
-                     Stay on this page
+                     {t('rfxs.specs_stayOnPage')}
                    </AlertDialogCancel>
                    <AlertDialogAction
                      onClick={confirmNavigation}
                      className="w-full sm:w-auto bg-orange-600 hover:bg-orange-700"
                    >
-                     Don't create version yet
+                     {t('rfxs.specs_dontCreateVersion')}
                    </AlertDialogAction>
                    <AlertDialogAction
                      onClick={handleOpenCommitDialog}
                      className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
                    >
-                     Create Version
+                     {t('rfxs.specs_createVersion')}
                    </AlertDialogAction>
                  </AlertDialogFooter>
                </AlertDialogContent>
@@ -1312,7 +1312,7 @@ const RFXSpecsPage = () => {
           }
         }}
         pdfUrl={pdfBlobUrl}
-        title="RFX Specifications PDF"
+        title={t('rfxs.specs_pdfTitle')}
       />
 
       {/* RFX Sent Status Modal */}
@@ -1321,21 +1321,21 @@ const RFXSpecsPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-[#f4a9aa]" />
-              RFX Already Sent
+              {t('rfxs.specs_rfxAlreadySent')}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="text-sm leading-relaxed space-y-3 pt-2">
                 <p>
-                  This RFX has already been sent. You can modify the specifications freely, but please note the following:
+                  {t('rfxs.specs_rfxAlreadySentDesc')}
                 </p>
                 <div className="bg-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-lg p-4 space-y-2">
                   <p className="font-medium text-[#22183a]">
-                    For suppliers to receive the updates:
+                    {t('rfxs.specs_forSuppliersToReceive')}
                   </p>
                   <ol className="list-decimal list-inside space-y-1 text-sm text-gray-700 ml-2">
-                    <li>You must save a new version of the specifications</li>
-                    <li>Then validate it with the entire team</li>
-                    <li>Finally, send it to suppliers (in this case there will be no validation by FQ)</li>
+                    <li>{t('rfxs.specs_sentStep1')}</li>
+                    <li>{t('rfxs.specs_sentStep2')}</li>
+                    <li>{t('rfxs.specs_sentStep3')}</li>
                   </ol>
                 </div>
               </div>
@@ -1347,7 +1347,7 @@ const RFXSpecsPage = () => {
               onClick={() => setShowRFXSentModal(false)}
               className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
             >
-              Understood
+              {t('rfxs.specs_understood')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1359,24 +1359,24 @@ const RFXSpecsPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-gray-500" />
-              RFX Archived
+              {t('rfxs.specs_rfxArchived')}
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="text-sm leading-relaxed space-y-3 pt-2">
                 <p>
-                  This RFX has been archived by the project creator.
+                  {t('rfxs.specs_rfxArchivedDesc')}
                 </p>
                 <div className="bg-[#f1f1f1] border-l-4 border-l-gray-400 rounded-lg p-4 space-y-2">
                   <p className="font-medium text-[#22183a]">
-                    While archived:
+                    {t('rfxs.specs_whileArchived')}
                   </p>
                   <ul className="list-disc list-inside space-y-1 text-sm text-gray-700 ml-2">
-                    <li>You cannot modify the RFX specifications</li>
-                    <li>Invited suppliers cannot upload documents</li>
-                    <li>The RFX is read-only for all users</li>
+                    <li>{t('rfxs.specs_archivedBullet1')}</li>
+                    <li>{t('rfxs.specs_archivedBullet2')}</li>
+                    <li>{t('rfxs.specs_archivedBullet3')}</li>
                   </ul>
                   <p className="text-sm text-gray-700 mt-3">
-                    Only the project creator can unarchive it from the RFX list.
+                    {t('rfxs.specs_onlyCreatorUnarchive')}
                   </p>
                 </div>
               </div>
@@ -1390,7 +1390,7 @@ const RFXSpecsPage = () => {
               }}
               className="w-full sm:w-auto"
             >
-              Back to RFX List
+              {t('rfxs.specs_backToRfxList')}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={async () => {
@@ -1401,7 +1401,7 @@ const RFXSpecsPage = () => {
               className="w-full sm:w-auto bg-[#22183a] hover:bg-[#22183a]/90"
             >
               <Download className="h-4 w-4 mr-2" />
-              View PDF
+              {t('rfxs.specs_viewPdf')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ChevronLeft, ChevronRight, ExternalLink, AlertTriangle, CheckCircle, X, FileText, BarChart } from 'lucide-react';
@@ -19,10 +20,11 @@ interface PropuestaDetailsModalProps {
 }
 
 // Extrae y normaliza la justificación desde los distintos formatos posibles
-const getJustificationData = (propuesta: Propuesta) => {
+const DEFAULT_NO_SUMMARY = 'No summary available.';
+const getJustificationData = (propuesta: Propuesta, noSummaryLabel: string = DEFAULT_NO_SUMMARY) => {
   if (propuesta.justification_sentence || propuesta.justification_pros || propuesta.justification_cons) {
     return {
-      sentence: propuesta.justification_sentence || 'No summary available.',
+      sentence: propuesta.justification_sentence || noSummaryLabel,
       pros: propuesta.justification_pros || [],
       cons: propuesta.justification_cons || []
     };
@@ -30,16 +32,16 @@ const getJustificationData = (propuesta: Propuesta) => {
   if (propuesta.justification) {
     if (typeof propuesta.justification === 'object' && propuesta.justification !== null) {
       return {
-        sentence: propuesta.justification.sentence || 'No summary available.',
-        pros: propuesta.justification.pros || [],
-        cons: propuesta.justification.cons || []
+        sentence: (propuesta.justification as any).sentence || noSummaryLabel,
+        pros: (propuesta.justification as any).pros || [],
+        cons: (propuesta.justification as any).cons || []
       };
     }
     if (typeof propuesta.justification === 'string') {
       try {
         const parsed = JSON.parse(propuesta.justification);
         return {
-          sentence: parsed?.sentence || 'No summary available.',
+          sentence: parsed?.sentence || noSummaryLabel,
           pros: parsed?.pros || [],
           cons: parsed?.cons || []
         };
@@ -48,7 +50,7 @@ const getJustificationData = (propuesta: Propuesta) => {
       }
     }
   }
-  return { sentence: 'No summary available.', pros: [], cons: [] };
+  return { sentence: noSummaryLabel, pros: [], cons: [] };
 };
 
 const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({ 
@@ -60,6 +62,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
   saving = false,
   showSaveButton = false
 }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -166,7 +169,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
           data-onboarding-target="fq-match-justification-modal"
         >
           <DialogHeader className="sr-only">
-            <DialogTitle>{propuesta.empresa} - Company Details</DialogTitle>
+            <DialogTitle>{t('rfxs.reasoningModal_title', { company: propuesta.empresa })}</DialogTitle>
           </DialogHeader>
 
           {/* Header */}
@@ -237,15 +240,15 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                         </div>
                       </div>
                     </div>
-                    <div className="text-sm font-medium text-gray-600 mb-4">Overall Match</div>
+                    <div className="text-sm font-medium text-gray-600 mb-4">{t('rfxs.reasoningModal_overallMatch')}</div>
                     <div className="grid grid-cols-2 gap-6 w-full">
                       <div className="text-center">
                         <div className="text-xl font-bold text-gray-900 mb-1">{technicalMatch}%</div>
-                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Technical</div>
+                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">{t('rfxs.reasoningModal_technical')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-xl font-bold text-gray-900 mb-1">{companyMatch}%</div>
-                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Company</div>
+                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">{t('rfxs.reasoningModal_company')}</div>
                       </div>
                     </div>
                   </div>
@@ -256,18 +259,18 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
               <div>
                 <h4 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <FileText className="h-5 w-5 text-[#f4a9aa]" />
-                  Summary
+                  {t('rfxs.reasoningModal_summary')}
                 </h4>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm font-medium text-gray-900 mb-1">Technical:</p>
+                    <p className="text-sm font-medium text-gray-900 mb-1">{t('rfxs.reasoningModal_technicalLabel')}</p>
                     <p className="text-sm text-gray-700 leading-relaxed">
-                      {getJustificationData(propuesta).sentence}
+                      {getJustificationData(propuesta, t('rfxs.reasoningModal_noSummary')).sentence}
                     </p>
                   </div>
                   {propuesta.company_match_justification && (
                     <div>
-                      <p className="text-sm font-medium text-gray-900 mb-1">Company analysis:</p>
+                      <p className="text-sm font-medium text-gray-900 mb-1">{t('rfxs.reasoningModal_companyAnalysis')}</p>
                       <p className="text-sm text-gray-700 leading-relaxed">
                         {propuesta.company_match_justification}
                       </p>
@@ -280,10 +283,10 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
               <div>
                 <h4 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <BarChart className="h-5 w-5 text-[#f4a9aa]" />
-                  Match Analysis
+                  {t('rfxs.reasoningModal_matchAnalysis')}
                 </h4>
                 {(() => {
-                  const data = getJustificationData(propuesta);
+                  const data = getJustificationData(propuesta, t('rfxs.reasoningModal_noSummary'));
                   if (data.pros.length === 0 && data.cons.length === 0) {
                     return (
                       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
@@ -297,7 +300,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                         <div className="border border-gray-200 rounded-lg p-4">
                           <h5 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                             <CheckCircle size={16} className="text-green-600" />
-                            Strengths & Alignments
+                            {t('rfxs.reasoningModal_strengthsAlignments')}
                           </h5>
                           <ul className="space-y-2">
                             {data.pros.map((pro: string, idx: number) => (
@@ -313,7 +316,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                         <div className="border border-gray-200 rounded-lg p-4">
                           <h5 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                             <AlertTriangle size={16} className="text-orange-600" />
-                            Considerations & Gaps
+                            {t('rfxs.reasoningModal_considerationsGaps')}
                           </h5>
                           <ul className="space-y-2">
                             {data.cons.map((con: string, idx: number) => (
@@ -366,15 +369,15 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                         </div>
                       </div>
                     </div>
-                    <div className="text-sm font-medium text-gray-600 mb-4">Overall Match</div>
+                    <div className="text-sm font-medium text-gray-600 mb-4">{t('rfxs.reasoningModal_overallMatch')}</div>
                     <div className="grid grid-cols-2 gap-6 w-full">
                       <div className="text-center">
                         <div className="text-xl font-bold text-gray-900 mb-1">{technicalMatch}%</div>
-                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Technical</div>
+                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">{t('rfxs.reasoningModal_technical')}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-xl font-bold text-gray-900 mb-1">{companyMatch}%</div>
-                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">Company</div>
+                        <div className="text-xs font-medium text-gray-600 uppercase tracking-wide">{t('rfxs.reasoningModal_company')}</div>
                       </div>
                     </div>
                   </div>
@@ -382,7 +385,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
               </div>
 
               <div className="bg-white border border-gray-200 rounded-lg p-4">
-                <h5 className="font-medium text-gray-900 mb-4">Product Preview</h5>
+                <h5 className="font-medium text-gray-900 mb-4">{t('rfxs.reasoningModal_productPreview')}</h5>
                 <div className="bg-gray-100 rounded-lg border border-gray-200">
                   {productImages && productImages.length > 0 ? (
                     <div data-onboarding-target="carousel-arrows-container" className="relative">
@@ -418,7 +421,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                   ) : (
                     <div className="p-6 text-center">
                       <div className="w-20 h-20 mx-auto bg-gray-200 rounded-lg flex items-center justify-center mb-3">📦</div>
-                      <p className="text-xs text-gray-500">Not Available</p>
+                      <p className="text-xs text-gray-500">{t('rfxs.reasoningModal_notAvailable')}</p>
                     </div>
                   )}
                 </div>
@@ -429,7 +432,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                   onClick={async () => {
                     try {
                       if (!user) {
-                        toast({ title: 'Authentication Required', description: 'Please sign in to view supplier details', variant: 'destructive' });
+                        toast({ title: t('rfxs.reasoningModal_authRequired'), description: t('rfxs.reasoningModal_authRequiredDesc'), variant: 'destructive' });
                         return;
                       }
                       const { data: companyData, error } = await supabase
@@ -438,17 +441,17 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                         .eq('id', propuesta.id_company_revision)
                         .single();
                       if (error || !companyData?.slug) {
-                        toast({ title: 'Error', description: 'Could not load company details', variant: 'destructive' });
+                        toast({ title: t('rfxs.reasoningModal_error'), description: t('rfxs.reasoningModal_errorLoadCompany'), variant: 'destructive' });
                         return;
                       }
                       window.open(`/suppliers/${companyData.slug}`, '_blank');
                     } catch (_err) {
-                      toast({ title: 'Error', description: 'Could not open company page', variant: 'destructive' });
+                      toast({ title: t('rfxs.reasoningModal_error'), description: t('rfxs.reasoningModal_errorOpenCompany'), variant: 'destructive' });
                     }
                   }}
                   className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
                 >
-                  View Company Details
+                  {t('rfxs.reasoningModal_viewCompanyDetails')}
                 </button>
                 {showSaveButton && onSaveCompany && (
                   <button 
@@ -460,9 +463,9 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
                         : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
                     } disabled:opacity-50`}
                   >
-                    {saving ? 'Saving...' : 
-                     isSaved ? '✓ Saved' : 
-                     'Save Company'}
+                    {saving ? t('rfxs.reasoningModal_saving') : 
+                     isSaved ? t('rfxs.reasoningModal_saved') : 
+                     t('rfxs.reasoningModal_saveCompany')}
                   </button>
                 )}
               </div>
@@ -475,7 +478,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
         <Dialog open={selectedImageIndex !== null} onOpenChange={() => setSelectedImageIndex(null)}>
           <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-black/90">
             <DialogHeader className="sr-only">
-              <DialogTitle>Product Image {selectedImageIndex + 1}</DialogTitle>
+              <DialogTitle>{t('rfxs.reasoningModal_productImage', { n: selectedImageIndex + 1 })}</DialogTitle>
             </DialogHeader>
             <div className="relative w-full h-full flex items-center justify-center min-h-[60vh]">
               <button onClick={() => setSelectedImageIndex(null)} className="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors">

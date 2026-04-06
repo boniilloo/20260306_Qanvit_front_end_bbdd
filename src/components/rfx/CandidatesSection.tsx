@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Users, MessageCircle, AlertCircle, CheckCircle, XCircle, Loader2, Building2, Package, Check, ExternalLink, Bot, Filter, List, CheckSquare, Search, Plus, Clock, HelpCircle } from 'lucide-react';
+import { Users, MessageCircle, AlertCircle, CheckCircle, Circle, XCircle, Loader2, Building2, Package, Check, ExternalLink, Bot, Filter, List, CheckSquare, Search, Plus, Clock, HelpCircle, Eye } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -22,6 +22,14 @@ import AskFQAgentScopeModal, { type AskFQAgentScope } from '@/components/rfx/Ask
 import NearbyCandidatesMap from '@/components/rfx/NearbyCandidatesMap';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTranslation } from 'react-i18next';
+import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
+import { normalizeBestMatchRow } from '@/utils/rfxCandidateNormalize';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 interface PublicCryptoContext {
   encrypt: (text: string) => Promise<string>;
@@ -58,6 +66,82 @@ interface WebSocketMessage {
   timestamp?: string;
 }
 
+type RubricSections = {
+  context: string;
+  technical: string;
+  company: string;
+};
+
+const EMPTY_RUBRIC_SECTIONS: RubricSections = {
+  context: '',
+  technical: '',
+  company: '',
+};
+
+function buildLegacyRubricFromSections(sections: RubricSections): string {
+  const blocks: string[] = [];
+  if (sections.context?.trim()) blocks.push(`## Context\n\n${sections.context.trim()}`);
+  if (sections.technical?.trim()) blocks.push(`## Technical\n\n${sections.technical.trim()}`);
+  if (sections.company?.trim()) blocks.push(`## Company\n\n${sections.company.trim()}`);
+  return blocks.join('\n\n---\n\n');
+}
+
+function parseRubricSections(rubricSectionsRaw: unknown, legacyRubricRaw: unknown): RubricSections {
+  const raw = rubricSectionsRaw as { context?: unknown; technical?: unknown; company?: unknown } | null;
+  const fromSections: RubricSections = {
+    context: typeof raw?.context === 'string' ? raw.context : '',
+    technical: typeof raw?.technical === 'string' ? raw.technical : '',
+    company: typeof raw?.company === 'string' ? raw.company : '',
+  };
+  if (fromSections.context || fromSections.technical || fromSections.company) return fromSections;
+
+  if (typeof legacyRubricRaw !== 'string' || !legacyRubricRaw.trim()) {
+    return { ...EMPTY_RUBRIC_SECTIONS };
+  }
+  return {
+    ...EMPTY_RUBRIC_SECTIONS,
+    technical: legacyRubricRaw,
+  };
+}
+
+type StepStatus = 'pending' | 'loading' | 'passed';
+type ModalStepId = 'db_lookup' | 'rubric' | 'technical_eval' | 'completed';
+type ModalStep = {
+  id: ModalStepId;
+  text: string;
+  status: StepStatus;
+};
+
+function buildInitialModalSteps(): ModalStep[] {
+  return [
+    {
+      id: 'db_lookup',
+      text: 'Searching candidates in the database...',
+      status: 'pending',
+    },
+    {
+      id: 'rubric',
+      text: 'Obtaining evaluation rubric...',
+      status: 'pending',
+    },
+    {
+      id: 'technical_eval',
+      text: 'Evaluating candidates technically...',
+      status: 'pending',
+    },
+    {
+      id: 'completed',
+      text: 'RFX evaluation completed',
+      status: 'pending',
+    },
+  ];
+}
+
+type StepTiming = {
+  startedAtMs?: number;
+  durationMs?: number;
+};
+
 const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpecs, onResultsUpdated, evaluationResults = [], viewMode = 'all', rfxStatus, archived = false, publicCrypto }) => {
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -78,12 +162,15 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   
   // Memory management constants
   const MAX_MESSAGES = 50; // Limit messages array to prevent memory leak
-  const MAX_MODAL_STEPS = 20; // Limit modal steps array
 
   // State for agent candidates (loaded asynchronously to handle decryption)
   const [agentCandidates, setAgentCandidates] = useState<Propuesta[]>([]);
   const [loadingCandidates, setLoadingCandidates] = useState(false);
   const [hasLoadedCandidates, setHasLoadedCandidates] = useState(false);
+  const [evaluationRubric, setEvaluationRubric] = useState<string | null>(null);
+  const [evaluationRubricSections, setEvaluationRubricSections] = useState<RubricSections>({
+    ...EMPTY_RUBRIC_SECTIONS,
+  });
 
   // Helper: keep ONLY the most recent evaluation result(s) using created_at
   // (If multiple rows share the exact same created_at, keep them all.)
@@ -110,10 +197,14 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     return results.filter((r) => r?.created_at === latestRow.created_at);
   };
   
-  // Extract candidates from the most recent evaluation result in DB (async to handle decryption)
-  const extractCandidatesFromResults = async (results: any[]): Promise<Propuesta[]> => {
+  // Extract candidates + rubric from the most recent evaluation result in DB (async to handle decryption)
+  const extractCandidatesFromResults = async (
+    results: any[]
+  ): Promise<{ candidates: Propuesta[]; rubric: string | null; rubricSections: RubricSections }> => {
     try {
-      if (!Array.isArray(results) || results.length === 0) return [];
+      if (!Array.isArray(results) || results.length === 0) {
+        return { candidates: [], rubric: null, rubricSections: { ...EMPTY_RUBRIC_SECTIONS } };
+      }
 
       const normalizeEvaluationData = async (raw: any): Promise<any | null> => {
         let evaluationData = raw;
@@ -153,10 +244,32 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       // Merge candidates across the evaluation result rows we were given.
       // IMPORTANT: The caller is expected to pass ONLY the most recent created_at batch.
       const merged: Propuesta[] = [];
+      let latestRubric: string | null = null;
+      let latestRubricSections: RubricSections = { ...EMPTY_RUBRIC_SECTIONS };
+
       for (const row of results) {
         const normalized = await normalizeEvaluationData(row?.evaluation_data);
         const matches = Array.isArray(normalized?.best_matches) ? normalized.best_matches : [];
-        if (Array.isArray(matches) && matches.length > 0) merged.push(...matches);
+        if (Array.isArray(matches) && matches.length > 0) {
+          merged.push(...matches.map(normalizeBestMatchRow));
+        }
+
+        if (normalized && typeof normalized === 'object') {
+          const rs = parseRubricSections(
+            (normalized as any).rubric_sections,
+            (normalized as any).rubric
+          );
+          if (rs.context || rs.technical || rs.company) {
+            latestRubricSections = rs;
+            latestRubric =
+              typeof (normalized as any).rubric === 'string' && (normalized as any).rubric.trim()
+                ? (normalized as any).rubric
+                : buildLegacyRubricFromSections(rs) || null;
+          } else if (typeof (normalized as any).rubric === 'string' && (normalized as any).rubric.trim()) {
+            latestRubric = (normalized as any).rubric;
+            latestRubricSections = { ...EMPTY_RUBRIC_SECTIONS, technical: latestRubric };
+          }
+        }
       }
 
       // Dedupe by company+product to avoid duplicates across rows
@@ -167,10 +280,14 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
         if (!byKey.has(key)) byKey.set(key, m);
       }
 
-      return Array.from(byKey.values());
+      return {
+        candidates: Array.from(byKey.values()),
+        rubric: latestRubric,
+        rubricSections: latestRubricSections,
+      };
     } catch (err) {
       console.error('❌ [CandidatesSection] Unexpected error extracting candidates:', err);
-      return [];
+      return { candidates: [], rubric: null, rubricSections: { ...EMPTY_RUBRIC_SECTIONS } };
     }
   };
 
@@ -179,6 +296,8 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     const loadCandidates = async () => {
       if (!evaluationResults || evaluationResults.length === 0) {
         setAgentCandidates([]);
+        setEvaluationRubric(null);
+        setEvaluationRubricSections({ ...EMPTY_RUBRIC_SECTIONS });
         setLoadingCandidates(false);
         // No evaluation results is still a completed load; mark as loaded so manual selections can render
         setHasLoadedCandidates(true);
@@ -278,8 +397,16 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           }
         }
 
-        const matches = await extractCandidatesFromResults(latestResults);
+        const { candidates: matches, rubric: storedRubric, rubricSections: storedSections } =
+          await extractCandidatesFromResults(latestResults);
         setAgentCandidates(matches);
+        if (storedRubric || storedSections.context || storedSections.technical || storedSections.company) {
+          setEvaluationRubricSections(storedSections);
+          setEvaluationRubric(
+            storedRubric ||
+              (buildLegacyRubricFromSections(storedSections) || null)
+          );
+        }
       } catch (err) {
         console.error('❌ [CandidatesSection] Unexpected error extracting candidates:', err);
         setAgentCandidates([]);
@@ -308,7 +435,9 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   // Modal state for evaluation progress
   const [showAskAgentScopeModal, setShowAskAgentScopeModal] = useState(false);
   const [showEvaluationModal, setShowEvaluationModal] = useState(false);
-  const [modalSteps, setModalSteps] = useState<string[]>([]);
+  const [modalSteps, setModalSteps] = useState<ModalStep[]>(buildInitialModalSteps());
+  const [stepTimings, setStepTimings] = useState<Partial<Record<ModalStepId, StepTiming>>>({});
+  const [evaluationScopeSummary, setEvaluationScopeSummary] = useState<string | null>(null);
   const [evaluationCompanies, setEvaluationCompanies] = useState<string[]>([]);
   const [evaluationProducts, setEvaluationProducts] = useState<string[]>([]);
   const [evaluatedCompanies, setEvaluatedCompanies] = useState<Set<string>>(new Set());
@@ -330,12 +459,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const shouldReloadOnCompletionRef = useRef(false);
   const lastKnownWorkflowActiveRef = useRef(false);
   
-  // Auto-hide for initial progress messages
-  const AUTO_HIDE_STEPS = new Set<string>([
-    'Connection established successfully',
-    'RFX specifications are being analysed by Qanvit Agent...',
-  ]);
-  const [dismissedMessages, setDismissedMessages] = useState<Record<string, boolean>>({});
   // Timer for analysis phase
   const [analysisStartTime, setAnalysisStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState<string>('00:00');
@@ -344,6 +467,55 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const [recommendedListMode, setRecommendedListMode] = useState<'global' | 'nearby'>('global');
   const lastNearbyDebugSignatureRef = useRef<string>('');
   const [lastAskAgentScope, setLastAskAgentScope] = useState<AskFQAgentScope | null>(null);
+
+  const formatDurationMs = (durationMs: number): string => {
+    const totalSeconds = Math.max(0, Math.floor(durationMs / 1000));
+    const mm = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+    const ss = String(totalSeconds % 60).padStart(2, '0');
+    return `${mm}:${ss}`;
+  };
+
+  const STEP_ORDER: ModalStepId[] = ['db_lookup', 'rubric', 'technical_eval', 'completed'];
+
+  const upsertStep = (id: ModalStepId, patch: Partial<Pick<ModalStep, 'text' | 'status'>>): void => {
+    setStepTimings((prev) => {
+      if (!patch.status) return prev;
+
+      if (patch.status === 'loading') {
+        const existing = prev[id];
+        if (typeof existing?.startedAtMs === 'number') return prev;
+        return { ...prev, [id]: { startedAtMs: Date.now(), durationMs: undefined } };
+      }
+
+      if (patch.status === 'passed') {
+        const timing = prev[id];
+        if (typeof timing?.startedAtMs !== 'number') return prev;
+        if (typeof timing?.durationMs === 'number') return prev;
+        return { ...prev, [id]: { ...timing, durationMs: Date.now() - timing.startedAtMs } };
+      }
+
+      if (patch.status === 'pending') {
+        if (!prev[id]) return prev;
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      }
+
+      return prev;
+    });
+
+    setModalSteps((prev) => {
+      const existingById = new Map(prev.map((s) => [s.id, s]));
+      const nextById = new Map(existingById);
+
+      const prevStep = buildInitialModalSteps().find((s) => s.id === id);
+      if (!prevStep) return prev;
+
+      nextById.set(id, { ...prevStep, ...(existingById.get(id) ?? {}), ...patch });
+
+      return STEP_ORDER.map((stepId) => nextById.get(stepId)!).filter(Boolean);
+    });
+  };
 
   const getOverallMatchScore = (candidate: any): number => {
     if (typeof candidate?.overall_match === 'number' && Number.isFinite(candidate.overall_match)) {
@@ -421,6 +593,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   // State for candidate card modals
   const [selectedCandidate, setSelectedCandidate] = useState<Propuesta | null>(null);
   const [showJustificationModal, setShowJustificationModal] = useState(false);
+  const [showRubricModal, setShowRubricModal] = useState(false);
   
   // State for company logos
   const [companyLogos, setCompanyLogos] = useState<{[key: string]: string | null}>({});
@@ -844,8 +1017,8 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
 
         // Prefer env-configured WS URL, fallback to production hardcode.
 
-        //const ws = new WebSocket('ws://localhost:8000/ws-rfx');
-        const ws = new WebSocket('wss://web-production-c08e9.up.railway.app/ws-rfx');
+        const ws = new WebSocket('ws://localhost:8000/ws-rfx');
+        //const ws = new WebSocket('wss://web-production-c08e9.up.railway.app/ws-rfx');
         
         wsRef.current = ws;
 
@@ -853,12 +1026,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           setIsConnected(true);
           setIsConnecting(false);
           setConnectionError(null);
-          setModalSteps(prev => {
-            const newSteps = [...prev, 'Connection established successfully'];
-            return newSteps.length > MAX_MODAL_STEPS 
-              ? newSteps.slice(-MAX_MODAL_STEPS) 
-              : newSteps;
-          });
           resolve();
         };
 
@@ -873,6 +1040,31 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
               data: msg?.type === 'memory_loaded' ? { conversation_id: msg?.conversation_id } : '<redacted>',
               timestamp: new Date().toISOString()
             });
+
+            if (msg?.type === 'rfx_progress_step') {
+              const stepKey = msg.data?.stepKey as unknown;
+              const state = msg.data?.state as unknown;
+              const label = msg.data?.label;
+
+              const allowedStepKeys: ModalStepId[] = ['db_lookup', 'rubric', 'technical_eval', 'completed'];
+              if (allowedStepKeys.includes(stepKey as ModalStepId)) {
+                const normalizedState: StepStatus =
+                  state === 'passed' ? 'passed' : state === 'loading' ? 'loading' : 'pending';
+
+                const patch: Partial<Pick<ModalStep, 'text' | 'status'>> = {
+                  status: normalizedState,
+                };
+                if (typeof label === 'string' && label.trim().length > 0) {
+                  patch.text = label;
+                }
+
+                upsertStep(stepKey as ModalStepId, patch);
+
+                if (stepKey === 'db_lookup' && normalizedState === 'loading') {
+                  setAnalysisStartTime(Date.now());
+                }
+              }
+            }
 
             // If we were waiting for handshake ack to send specs, do it now.
             if (msg?.type === 'memory_loaded') {
@@ -1013,28 +1205,33 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
               setEvaluationProducts(products);
               setEvaluatedCompanies(new Set());
               setEvaluatedProducts(new Set());
-              setModalSteps(prev => {
-                const newSteps = [...prev, text || 'Candidates found in database. Starting evaluation...'];
-                return newSteps.length > MAX_MODAL_STEPS 
-                  ? newSteps.slice(-MAX_MODAL_STEPS) 
-                  : newSteps;
-              });
-              // When database search message appears, dismiss initial success boxes
-              const toDismiss = Array.from(AUTO_HIDE_STEPS);
-              setDismissedMessages(prev => {
-                const next = { ...prev };
-                toDismiss.forEach(k => { next[k] = true; });
-                return next;
-              });
+              if (typeof text === 'string' && text.trim()) {
+                upsertStep('db_lookup', { status: 'passed', text });
+              }
               setIsEvaluating(true);
               // Start analysis timer when analysis begins
               setAnalysisStartTime(Date.now());
             }
+
+            // Parallel rubric generation (same message type as FQ / backend get_evaluations)
+            if (msg.type === 'get_evaluation_tools_preamble_rubric') {
+              const d = msg.data || {};
+              const sections = parseRubricSections(d.rubric_sections, d.rubric);
+              setEvaluationRubricSections(sections);
+              const legacy =
+                typeof d.rubric === 'string' && d.rubric.trim()
+                  ? d.rubric
+                  : buildLegacyRubricFromSections(sections);
+              setEvaluationRubric(legacy || null);
+            }
             
             // Handle evaluation progress message
             if (msg.type === 'get_evaluations_tool_preamble_evaluation') {
-              const bestMatches = msg.data?.best_matches || [];
-              
+              const rawMatches = msg.data?.best_matches || [];
+              const bestMatches = Array.isArray(rawMatches)
+                ? rawMatches.map(normalizeBestMatchRow)
+                : [];
+
               // Mark companies and products as evaluated and store candidates
               bestMatches.forEach((match: any) => {
                 if (match.empresa) {
@@ -1044,7 +1241,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                   setEvaluatedProducts(prev => new Set(prev).add(match.producto));
                 }
               });
-              
+
               // Store evaluated candidates with limit to prevent memory leak
               setEvaluatedCandidates(prev => {
                 const newCandidates = [...prev, ...bestMatches];
@@ -1059,12 +1256,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             if (msg.type === '_GET_EVALUATIONS_TOOL_COMPLETED_') {
               setIsEvaluating(false);
               setEvaluationCompleted(true);
-              setModalSteps(prev => {
-                const newSteps = [...prev, 'RFX evaluation completed'];
-                return newSteps.length > MAX_MODAL_STEPS 
-                  ? newSteps.slice(-MAX_MODAL_STEPS) 
-                  : newSteps;
-              });
+              upsertStep('completed', { status: 'passed', text: 'RFX evaluation completed' });
               
               // Note: Evaluation results are now saved directly by the agent
               // No need to save from frontend
@@ -1124,13 +1316,18 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     setCandidatesData(null);
     setIsEvaluating(false);
     setShowEvaluationModal(false);
-    setModalSteps([]);
+    setModalSteps(buildInitialModalSteps());
+    setStepTimings({});
+    setEvaluationScopeSummary(null);
     setEvaluationCompanies([]);
     setEvaluationProducts([]);
     setEvaluatedCompanies(new Set());
     setEvaluatedProducts(new Set());
     setEvaluationCompleted(false);
     setEvaluatedCandidates([]);
+    setEvaluationRubric(null);
+    setEvaluationRubricSections({ ...EMPTY_RUBRIC_SECTIONS });
+    setShowRubricModal(false);
     setAwaitingWorkflowCompletion(false);
     stopWorkflowPolling();
     shouldReloadOnCompletionRef.current = false;
@@ -1319,15 +1516,17 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           
           const manualCandidates: Propuesta[] = (Array.isArray(selected) ? selected : [])
             .filter((item: any) => !agentKeys.has(`${item.id_company_revision}-${item.id_product_revision || 'company'}`))
-            .map((item: any) => ({
-              id_company_revision: item.id_company_revision,
-              id_product_revision: item.id_product_revision || '',
-              empresa: item.empresa,
-              producto: item.producto || '',
-              match: item.match || 0,
-              company_match: item.company_match || 0,
-              website: item.website || '',
-            }));
+            .map((item: any) => {
+              const n = normalizeBestMatchRow(item);
+              return {
+                ...n,
+                id_product_revision: n.id_product_revision || '',
+                producto: n.producto || '',
+                match: n.match || 0,
+                company_match: n.company_match || 0,
+                website: n.website || '',
+              } as Propuesta;
+            });
 
           // Always update manuallyAddedCandidates, even if empty, to ensure state consistency
           // This prevents candidates from getting stuck in "Manual" state if agentCandidates loads late
@@ -2234,13 +2433,18 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const sendRFXData = async (scope?: AskFQAgentScope) => {
     // Open modal and reset state
     setShowEvaluationModal(true);
-    setModalSteps([]);
+    setModalSteps(buildInitialModalSteps());
+    setStepTimings({});
+    setEvaluationScopeSummary(null);
     setEvaluationCompanies([]);
     setEvaluationProducts([]);
     setEvaluatedCompanies(new Set());
     setEvaluatedProducts(new Set());
     setEvaluationCompleted(false);
     setEvaluatedCandidates([]);
+    setEvaluationRubric(null);
+    setEvaluationRubricSections({ ...EMPTY_RUBRIC_SECTIONS });
+    setShowRubricModal(false);
     setIsEvaluating(true);
     setAwaitingWorkflowCompletion(false);
     shouldReloadOnCompletionRef.current = false;
@@ -2269,7 +2473,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           parts.push(`Countries (${names.slice(0, 3).join(', ')}${names.length > 3 ? ` +${names.length - 3}` : ''})`);
         }
       }
-      setModalSteps([`Search scope: ${parts.join(' + ')}`]);
+      setEvaluationScopeSummary(`Search scope: ${parts.join(' + ')}`);
     }
 
     if (!isConnected && wsRef.current?.readyState !== WebSocket.OPEN) {
@@ -2401,12 +2605,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           ? newMessages.slice(-MAX_MESSAGES) 
           : newMessages;
       });
-      setModalSteps(prev => {
-        const newSteps = [...prev, 'RFX specifications queued for transmission'];
-        return newSteps.length > MAX_MODAL_STEPS 
-          ? newSteps.slice(-MAX_MODAL_STEPS) 
-          : newSteps;
-      });
 
       toast({
         title: 'Data queued',
@@ -2466,6 +2664,21 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
               <span className="text-sm text-gray-600">
                 {databaseCandidates.length > 0 ? t('rfxs.cand_reevaluateQuestion') : t('rfxs.cand_lookingForRecommendation')}
               </span>
+              {(evaluationRubric ||
+                evaluationRubricSections.context ||
+                evaluationRubricSections.technical ||
+                evaluationRubricSections.company) && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowRubricModal(true)}
+                  className="mr-1 text-purple-700 border-purple-200 hover:bg-purple-50"
+                  title={t('rfxs.cand_viewRubricTooltip')}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  {t('rfxs.cand_viewRubric')}
+                </Button>
+              )}
               <TooltipProvider delayDuration={100}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -3844,120 +4057,199 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             </div>
           </div>
 
-          <div className="space-y-6">
-            {/* Progress Steps */}
-            <div>
-              {modalSteps.map((step, index) => {
-                const isDismissed = !!dismissedMessages[step];
-                const isAnalysisStep = step.includes('Performed the company and products search') || step.includes('Starting the FQ analysis') || (step.includes('database') && step.includes('analysis'));
-                return (
-                  <div
-                    key={index}
-                    className={`flex items-start gap-3 rounded-lg border transition-all duration-700 ${
-                      isDismissed
-                        ? 'opacity-0 max-h-0 py-0 px-0 my-0 overflow-hidden'
-                        : `opacity-100 ${isAnalysisStep ? 'mb-0 mt-0' : 'mb-3'} p-3 bg-blue-50 border-blue-200`
-                    }`}
-                  >
-                    <CheckCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div className="flex-1 flex items-center justify-between gap-3">
-                      <p className="text-sm text-gray-800 flex-1">{step}</p>
-                      {isAnalysisStep && analysisStartTime && !evaluationCompleted && (
-                        <div className="flex items-center gap-2 shrink-0">
-                          <div className="flex items-center gap-1 text-sm text-gray-600">
-                            <Clock className="h-4 w-4" />
-                            <span>{elapsedTime}</span>
-                          </div>
-                          <TooltipProvider delayDuration={100}>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <HelpCircle className="h-4 w-4 text-gray-500 cursor-help" />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>This process usually takes about 3 minutes to complete fully, please stay on the page</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+          {evaluationScopeSummary && (
+            <div className="mb-4 rounded-md border border-[#f4a9aa]/40 bg-[#fdf6f7] px-3 py-2 text-sm text-[#22183a]">
+              {evaluationScopeSummary}
             </div>
+          )}
 
-            {/* Companies and Products Lists */}
-            {evaluationCompanies.length > 0 && (
-              <div className="space-y-4">
-                {/* Histogram Section - Only show while receiving results */}
-                {!evaluationCompleted && evaluatedCandidates.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 mb-3">
-                      <CheckCircle className="h-5 w-5 text-[#f4a9aa]" />
-                      <h3 className="font-semibold text-gray-900">
-                        {t('rfxs.cand_overallMatchDistribution', { count: evaluatedCandidates.length })}
-                      </h3>
-                    </div>
-                    <div className="border rounded-lg p-4 bg-gray-50">
-                      <div className="flex items-end gap-3" style={{ minHeight: '160px' }}>
-                        {(['0-20', '20-40', '40-60', '60-80', '80-100'] as const).map((range) => {
-                          const count = histogramData[range];
-                          const height = maxHistogramValue > 0 ? (count / maxHistogramValue) * 100 : 0;
-                          const [min, max] = range.split('-').map(Number);
-                          
-                          // Use different colors for different ranges
-                          let barColor = '#f4a9aa'; // Default blue
-                          if (min >= 80) barColor = '#f4a9aa'; // Green for high matches
-                          else if (min >= 60) barColor = '#f4a9aa'; // Blue for good matches
-                          else if (min >= 40) barColor = '#f1f1f1'; // Gray for medium matches
-                          else barColor = '#f1f1f1'; // Gray for low matches
-                          
-                          return (
-                            <div key={range} className="flex-1 flex flex-col items-center gap-2">
-                              {/* Count label above bar */}
-                              <div className="h-6 flex items-center justify-center">
-                                {count > 0 && (
-                                  <span className="text-sm font-semibold text-[#22183a]">{count}</span>
-                                )}
+          <div className="space-y-6">
+            <div>
+              {modalSteps
+                .filter((s) => s.id !== 'completed')
+                .map((step) => {
+                  const isAnalysisStep =
+                    step.id === 'db_lookup' && step.status === 'loading' && !evaluationCompleted;
+                  const stepTiming = stepTimings[step.id];
+                  const shouldShowPassedDuration = step.status === 'passed' && typeof stepTiming?.durationMs === 'number';
+                  const shouldShowLoadingDuration =
+                    step.status === 'loading' &&
+                    typeof stepTiming?.startedAtMs === 'number' &&
+                    !isAnalysisStep;
+
+                  const stepBg =
+                    step.status === 'passed'
+                      ? 'bg-green-50 border-green-200'
+                      : step.status === 'loading'
+                        ? 'bg-blue-50 border-blue-200'
+                        : 'bg-white border-gray-200';
+
+                  const StepIcon = (() => {
+                    if (step.status === 'passed') {
+                      return <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />;
+                    }
+                    if (step.status === 'loading') {
+                      return <Loader2 className="h-5 w-5 animate-spin text-[#f4a9aa] flex-shrink-0 mt-0.5" />;
+                    }
+                    return <Circle className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />;
+                  })();
+
+                  return (
+                    <div key={step.id}>
+                      <div
+                        className={`flex items-start gap-3 rounded-lg border transition-all duration-700 mb-3 p-3 ${stepBg}`}
+                      >
+                        {StepIcon}
+                        <div className="flex-1 flex items-center justify-between gap-3">
+                          <p className="text-sm text-gray-800 flex-1">{step.text}</p>
+                          {isAnalysisStep && analysisStartTime && !evaluationCompleted && (
+                            <div className="flex items-center gap-2 shrink-0">
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <Clock className="h-4 w-4" />
+                                <span>{elapsedTime}</span>
                               </div>
-                              
-                              {/* Bar container */}
-                              <div className="relative w-full flex items-end justify-center" style={{ height: '160px' }}>
-                                <div
-                                  className="w-full rounded-t transition-all duration-300"
-                                  style={{
-                                    height: `${height}%`,
-                                    backgroundColor: barColor,
-                                    minHeight: count > 0 ? '4px' : '0',
-                                  }}
-                                />
-                              </div>
-                              
-                              {/* Range label below bar */}
-                              <div className="text-xs font-medium text-gray-600 text-center h-6 flex items-center">
-                                {min}-{max}%
+                              <TooltipProvider delayDuration={100}>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <HelpCircle className="h-4 w-4 text-gray-500 cursor-help" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>
+                                      {t('rfxs.cand_evalModal_timerTooltip', {
+                                        defaultValue:
+                                          'This process usually takes about 3 minutes to complete fully, please stay on the page',
+                                      })}
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </div>
+                          )}
+
+                          {shouldShowPassedDuration && (
+                            <div className="flex items-center gap-2 shrink-0">
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <Clock className="h-4 w-4" />
+                                <span>{formatDurationMs(stepTiming!.durationMs!)}</span>
                               </div>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                )}
+                          )}
 
-                {/* Companies Section */}
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-blue-600" />
-                      <h3 className="font-semibold text-gray-900">
-                        Companies ({evaluationCompleted ? evaluationCompanies.length : evaluatedCompanies.size} / {evaluationCompanies.length} evaluated)
-                      </h3>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      {evaluationCompleted ? 100 : Math.round((evaluatedCompanies.size / evaluationCompanies.length) * 100)}% complete
-                    </div>
-                  </div>
+                          {shouldShowLoadingDuration && (
+                            <div className="flex items-center gap-2 shrink-0">
+                              <div className="flex items-center gap-1 text-sm text-gray-600">
+                                <Clock className="h-4 w-4" />
+                                <span>{formatDurationMs(Date.now() - stepTiming!.startedAtMs!)}</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {step.id === 'rubric' &&
+                        (evaluationRubricSections.context ||
+                          evaluationRubricSections.technical ||
+                          evaluationRubricSections.company) && (
+                          <div className="mt-2 mb-3 ml-8 max-h-64 overflow-y-auto rounded-md border border-green-100 bg-white p-3 text-sm">
+                            <p className="mb-2 text-xs font-medium text-gray-600">Rubric preview</p>
+                            <Accordion type="multiple" className="w-full">
+                              {!!evaluationRubricSections.context?.trim() && (
+                                <AccordionItem value="rubric-context">
+                                  <AccordionTrigger className="py-2 text-sm">Context</AccordionTrigger>
+                                  <AccordionContent className="text-sm">
+                                    <MarkdownRenderer content={evaluationRubricSections.context} />
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )}
+                              {!!evaluationRubricSections.technical?.trim() && (
+                                <AccordionItem value="rubric-technical">
+                                  <AccordionTrigger className="py-2 text-sm">Technical</AccordionTrigger>
+                                  <AccordionContent className="text-sm">
+                                    <MarkdownRenderer content={evaluationRubricSections.technical} />
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )}
+                              {!!evaluationRubricSections.company?.trim() && (
+                                <AccordionItem value="rubric-company">
+                                  <AccordionTrigger className="py-2 text-sm">Company</AccordionTrigger>
+                                  <AccordionContent className="text-sm">
+                                    <MarkdownRenderer content={evaluationRubricSections.company} />
+                                  </AccordionContent>
+                                </AccordionItem>
+                              )}
+                            </Accordion>
+                          </div>
+                        )}
+
+                      {step.id === 'technical_eval' && step.status !== 'pending' && evaluationCompanies.length > 0 && (
+                        <div className="mt-4 mb-6 space-y-4">
+                          {!evaluationCompleted && evaluatedCandidates.length > 0 && (
+                            <div>
+                              <div className="flex items-center gap-2 mb-3">
+                                <CheckCircle className="h-5 w-5 text-[#f4a9aa]" />
+                                <h3 className="font-semibold text-gray-900">
+                                  {t('rfxs.cand_overallMatchDistribution', { count: evaluatedCandidates.length })}
+                                </h3>
+                              </div>
+                              <div className="border rounded-lg p-4 bg-gray-50">
+                                <div className="flex items-end gap-3" style={{ minHeight: '160px' }}>
+                                  {(['0-20', '20-40', '40-60', '60-80', '80-100'] as const).map((range) => {
+                                    const count = histogramData[range];
+                                    const height = maxHistogramValue > 0 ? (count / maxHistogramValue) * 100 : 0;
+                                    const [min, max] = range.split('-').map(Number);
+                                    let barColor = '#f4a9aa';
+                                    if (min >= 80) barColor = '#f4a9aa';
+                                    else if (min >= 60) barColor = '#f4a9aa';
+                                    else if (min >= 40) barColor = '#f1f1f1';
+                                    else barColor = '#f1f1f1';
+
+                                    return (
+                                      <div key={range} className="flex-1 flex flex-col items-center gap-2">
+                                        <div className="h-6 flex items-center justify-center">
+                                          {count > 0 && (
+                                            <span className="text-sm font-semibold text-[#22183a]">{count}</span>
+                                          )}
+                                        </div>
+                                        <div
+                                          className="relative w-full flex items-end justify-center"
+                                          style={{ height: '160px' }}
+                                        >
+                                          <div
+                                            className="w-full rounded-t transition-all duration-300"
+                                            style={{
+                                              height: `${height}%`,
+                                              backgroundColor: barColor,
+                                              minHeight: count > 0 ? '4px' : '0',
+                                            }}
+                                          />
+                                        </div>
+                                        <div className="text-xs font-medium text-gray-600 text-center h-6 flex items-center">
+                                          {min}-{max}%
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          <div>
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <Building2 className="h-5 w-5 text-blue-600" />
+                                <h3 className="font-semibold text-gray-900">
+                                  Companies ({evaluationCompleted ? evaluationCompanies.length : evaluatedCompanies.size} /{' '}
+                                  {evaluationCompanies.length} evaluated)
+                                </h3>
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {evaluationCompleted
+                                  ? 100
+                                  : Math.round((evaluatedCompanies.size / evaluationCompanies.length) * 100)}
+                                % complete
+                              </div>
+                            </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-48 overflow-y-auto border rounded-lg p-3 bg-gray-50">
                     {evaluationCompanies.map((company, index) => (
                       <div
@@ -4013,8 +4305,11 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                   </div>
                 </div>
               </div>
-            )}
-
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
 
             {/* Completion Message and Close Button */}
             {evaluationCompleted && (
@@ -4132,6 +4427,66 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           propuesta={selectedCandidate}
         />
       )}
+
+      <Dialog open={showRubricModal} onOpenChange={setShowRubricModal}>
+        <DialogContent className="max-w-3xl max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Bot className="h-5 w-5 text-purple-600" />
+              {t('rfxs.cand_rubricModalTitle')}
+            </DialogTitle>
+            <DialogDescription>{t('rfxs.cand_rubricModalDesc')}</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 overflow-y-auto mt-4">
+            {evaluationRubricSections.context ||
+            evaluationRubricSections.technical ||
+            evaluationRubricSections.company ? (
+              <Accordion type="multiple" defaultValue={[]} className="w-full space-y-4">
+                <AccordionItem value="context" className="border border-gray-200 rounded-xl shadow-sm bg-white">
+                  <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
+                    <div className="text-left w-full pr-4">
+                      <h3 className="font-semibold text-black">{t('rfxs.cand_rubricSectionContextTitle')}</h3>
+                      <p className="text-sm text-gray-500">{t('rfxs.cand_rubricSectionContextSubtitle')}</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6">
+                    <MarkdownRenderer content={evaluationRubricSections.context || ''} />
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="technical" className="border border-gray-200 rounded-xl shadow-sm bg-white">
+                  <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
+                    <div className="text-left w-full pr-4">
+                      <h3 className="font-semibold text-black">{t('rfxs.cand_rubricSectionTechnicalTitle')}</h3>
+                      <p className="text-sm text-gray-500">{t('rfxs.cand_rubricSectionTechnicalSubtitle')}</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6">
+                    <MarkdownRenderer content={evaluationRubricSections.technical || ''} />
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="company" className="border border-gray-200 rounded-xl shadow-sm bg-white">
+                  <AccordionTrigger className="px-6 py-4 hover:bg-gray-50 hover:no-underline rounded-t-xl">
+                    <div className="text-left w-full pr-4">
+                      <h3 className="font-semibold text-black">{t('rfxs.cand_rubricSectionCompanyTitle')}</h3>
+                      <p className="text-sm text-gray-500">{t('rfxs.cand_rubricSectionCompanySubtitle')}</p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-6">
+                    <MarkdownRenderer content={evaluationRubricSections.company || ''} />
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            ) : (
+              <MarkdownRenderer content={evaluationRubric || ''} />
+            )}
+          </div>
+          <div className="mt-4 flex justify-end">
+            <Button variant="outline" onClick={() => setShowRubricModal(false)}>
+              {t('rfxs.cand_rubricModalClose')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

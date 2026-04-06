@@ -30,6 +30,9 @@ import { useRFXCompanyInvitationCheck } from '@/hooks/useRFXCompanyInvitationChe
 import { useRFXSpecs } from '@/hooks/useRFXSpecs';
 import { usePublicRFXCrypto } from '@/hooks/usePublicRFXCrypto';
 import { useTranslation } from 'react-i18next';
+import { RFXCandidatesChatSidebar } from '@/components/rfx/chat-wrappers';
+import { useSidebar } from '@/components/ui/sidebar';
+import { normalizeBestMatchRow } from '@/utils/rfxCandidateNormalize';
 
 interface RFXCandidatesPageProps {
   /** When true, renders the page in read-only mode (no writes, public example) */
@@ -56,6 +59,8 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
   const [loading, setLoading] = useState(true);
   const { record: selectedRecord, load: loadSelected, save: saveSelected, loading: selectedLoading } = useRFXSelectedCandidates(rfxId, isPublicExample ? publicCrypto : undefined);
   const [activeTab, setActiveTab] = useState<'recommended' | 'manual' | 'selected' | 'specs'>('recommended');
+  const [isChatExpanded, setIsChatExpanded] = useState(true);
+  const { setOpen: setSidebarOpen, state: sidebarState } = useSidebar();
   const [companyLogos, setCompanyLogos] = useState<{[key: string]: string | null}>({});
   const [companyWebsites, setCompanyWebsites] = useState<{[key: string]: string | null}>({});
   // PDF preview modal state
@@ -112,6 +117,20 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       fetchRFX();
       // fetchSpecs handled by hook
     }
+  }, [rfxId]);
+
+  // Collapse main sidebar on enter; restore on leave if it was open before (deps: rfxId only — avoid re-run when sidebarState changes)
+  useEffect(() => {
+    const wasCollapsed = sidebarState === 'collapsed';
+    if (!wasCollapsed) {
+      setSidebarOpen(false);
+    }
+    return () => {
+      if (!wasCollapsed) {
+        setSidebarOpen(true);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- sidebarState intentionally omitted: including it re-triggers cleanup and toggles the sidebar in a loop
   }, [rfxId]);
 
   // Update currentSpecs when specs from hook are loaded
@@ -507,9 +526,21 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto flex flex-col min-h-full">
-      <div className="container mx-auto px-4 py-8 flex-1">
-        <div className="max-w-7xl mx-auto">
+    <div className="flex flex-row-reverse h-screen overflow-hidden">
+      <RFXCandidatesChatSidebar
+        rfxId={rfxId!}
+        rfxName={rfx?.name || ''}
+        rfxDescription={rfx?.description || ''}
+        onExpandedChange={setIsChatExpanded}
+        currentSpecs={currentSpecs}
+        getCurrentSpecs={() => currentSpecs}
+        readOnly={readOnly || isPublicExample}
+        publicCrypto={isPublicExample ? publicCrypto : undefined}
+      />
+
+      <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
+      <div className="container mx-auto px-4 py-6 md:py-8 flex-1">
+        <div className="max-w-6xl mx-auto">
         {/* Header styled consistent with RFX Specs */}
         <div className="mb-8 bg-gradient-to-r from-white to-[#f1f1f1] border-l-4 border-l-[#f4a9aa] rounded-xl shadow-sm px-4 md:px-6 py-4 md:py-5">
           <div className="flex items-start md:items-center justify-between gap-3">
@@ -718,7 +749,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 (() => {
                   const allSelected = ((selectedRecord as any)?.selected as any[]) || [];
                   const enhanced = allSelected.map((c: any) => ({
-                    ...c,
+                    ...normalizeBestMatchRow(c),
                     __isManual: (c.match === 0) && ((c.company_match ?? 0) === 0),
                   }));
                   // Sort: non-manual first, manual last
@@ -986,9 +1017,10 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
         </Tabs>
         </div>
       </div>
+      </div>
       
-      {/* Floating RFX Candidates Assistant - hide in read-only/public mode */}
-      {!readOnly && (
+      {/* Floating RFX Candidates Assistant - hide when chat sidebar expanded or read-only */}
+      {!readOnly && !isChatExpanded && (
         <RFXCandidatesAssistant
           hasCandidates={hasCandidates}
           onAskAgent={handleAskAgent}

@@ -215,10 +215,15 @@ export type Database = {
           ai_product_completion_system_prompt: string | null
           ai_product_completion_user_prompt: string | null
           ai_product_completion_verbosity: string | null
+          candidates_model: string | null
+          candidates_prompt: string | null
+          candidates_reasoning_effort: string | null
+          candidates_verbosity: string | null
           comment: string | null
           created_at: string
           created_by: string
           embedding_model: number | null
+          evaluation_rubric_prompt: string | null
           evaluations_system_prompt: string | null
           evaluations_user_prompt: string | null
           general_model: string | null
@@ -258,10 +263,15 @@ export type Database = {
           ai_product_completion_system_prompt?: string | null
           ai_product_completion_user_prompt?: string | null
           ai_product_completion_verbosity?: string | null
+          candidates_model?: string | null
+          candidates_prompt?: string | null
+          candidates_reasoning_effort?: string | null
+          candidates_verbosity?: string | null
           comment?: string | null
           created_at?: string
           created_by: string
           embedding_model?: number | null
+          evaluation_rubric_prompt?: string | null
           evaluations_system_prompt?: string | null
           evaluations_user_prompt?: string | null
           general_model?: string | null
@@ -301,10 +311,15 @@ export type Database = {
           ai_product_completion_system_prompt?: string | null
           ai_product_completion_user_prompt?: string | null
           ai_product_completion_verbosity?: string | null
+          candidates_model?: string | null
+          candidates_prompt?: string | null
+          candidates_reasoning_effort?: string | null
+          candidates_verbosity?: string | null
           comment?: string | null
           created_at?: string
           created_by?: string
           embedding_model?: number | null
+          evaluation_rubric_prompt?: string | null
           evaluations_system_prompt?: string | null
           evaluations_user_prompt?: string | null
           general_model?: string | null

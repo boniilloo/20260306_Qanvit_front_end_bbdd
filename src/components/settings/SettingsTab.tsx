@@ -47,6 +47,14 @@ interface AgentConfig {
   get_evaluations_verbosity?: string;
   evaluations_system_prompt?: string;
   evaluations_user_prompt?: string;
+  /** Parallel rubric generation inside get_evaluations */
+  evaluation_rubric_prompt?: string;
+
+  // RFX Candidates engine (sidebar chat; config from same table)
+  candidates_prompt?: string;
+  candidates_model?: string;
+  candidates_reasoning_effort?: string;
+  candidates_verbosity?: string;
   
   // Embedding model
   embedding_model?: number;
@@ -173,6 +181,14 @@ interface BackupConfig {
   get_evaluations_verbosity?: string;
   evaluations_system_prompt?: string;
   evaluations_user_prompt?: string;
+  /** Parallel rubric generation inside get_evaluations */
+  evaluation_rubric_prompt?: string;
+
+  // RFX Candidates engine (sidebar chat; config from same table)
+  candidates_prompt?: string;
+  candidates_model?: string;
+  candidates_reasoning_effort?: string;
+  candidates_verbosity?: string;
   
   // Embedding model
   embedding_model?: number;
@@ -653,6 +669,11 @@ const SettingsTab = () => {
           get_evaluations_verbosity: "low",
           evaluations_system_prompt: "You are an expert evaluator of products and companies.",
           evaluations_user_prompt: "Evaluate the following: {evaluation_data}",
+          evaluation_rubric_prompt: "",
+          candidates_prompt: "",
+          candidates_model: "gpt-5-mini",
+          candidates_reasoning_effort: "medium",
+          candidates_verbosity: "low",
           embedding_model: 0,
           ai_product_completion_system_prompt: "You are an expert at completing product information based on partial data.",
           ai_product_completion_user_prompt: "Complete the following product information: {product_data}",
@@ -903,8 +924,9 @@ const SettingsTab = () => {
         </TabsList>
         
         {/* Secondary Tab Row */}
-        <TabsList className="grid w-full grid-cols-4 mb-2">
+        <TabsList className="grid w-full grid-cols-5 mb-2">
           <TabsTrigger value="recommendation">Recommendation</TabsTrigger>
+          <TabsTrigger value="candidates">Candidates</TabsTrigger>
           <TabsTrigger value="evaluations">Evaluations</TabsTrigger>
           <TabsTrigger value="ai-product-completion">AI Product Completion</TabsTrigger>
           <TabsTrigger value="ai-company-completion">AI Company Completion</TabsTrigger>
@@ -1132,6 +1154,77 @@ const SettingsTab = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="candidates" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5" />
+                Candidates Engine
+              </CardTitle>
+              <CardDescription>Generates candidate recommendations</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="candidates_prompt">Prompt</Label>
+                <Textarea
+                  id="candidates_prompt"
+                  value={config.candidates_prompt || ''}
+                  onChange={(e) => updateConfigValue('candidates_prompt', e.target.value)}
+                  rows={16}
+                  className="mt-1"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="candidates_model">Model</Label>
+                  <Input
+                    id="candidates_model"
+                    value={config.candidates_model || ''}
+                    onChange={(e) => updateConfigValue('candidates_model', e.target.value)}
+                    placeholder="e.g., gpt-5-mini, gpt-5-2025-08-07"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="candidates_reasoning_effort">Reasoning Effort</Label>
+                  <Select
+                    value={config.candidates_reasoning_effort || 'medium'}
+                    onValueChange={(value) => updateConfigValue('candidates_reasoning_effort', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select reasoning effort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="minimal">Minimal</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="candidates_verbosity">Verbosity</Label>
+                  <Select
+                    value={config.candidates_verbosity || 'low'}
+                    onValueChange={(value) => updateConfigValue('candidates_verbosity', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select verbosity level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="evaluations" className="space-y-6">
           <Card>
             <CardHeader>
@@ -1161,6 +1254,20 @@ const SettingsTab = () => {
                   onChange={(e) => updateConfigValue('evaluations_user_prompt', e.target.value)}
                   rows={8}
                   className="mt-1"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="evaluation_rubric_prompt">Evaluation rubric prompt (get_evaluations)</Label>
+                <p className="text-sm text-muted-foreground mt-0.5 mb-1">
+                  Parallel rubric step before scoring (column evaluation_rubric_prompt).
+                </p>
+                <Textarea
+                  id="evaluation_rubric_prompt"
+                  value={config.evaluation_rubric_prompt || ''}
+                  onChange={(e) => updateConfigValue('evaluation_rubric_prompt', e.target.value)}
+                  rows={10}
+                  className="mt-1 font-mono text-sm"
                 />
               </div>
               

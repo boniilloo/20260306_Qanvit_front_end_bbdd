@@ -112,7 +112,7 @@ const RFXChatEncryptedAttachments: React.FC<RFXChatEncryptedAttachmentsProps> = 
               className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2"
             >
               <div className="min-w-0">
-                <div className="text-xs font-medium text-[#22183a] truncate">{filename}</div>
+                <div className="text-xs font-medium text-[#1A1F2C] truncate">{filename}</div>
                 <div className="text-[11px] text-gray-500">Encrypted attachment</div>
               </div>
 
@@ -120,7 +120,7 @@ const RFXChatEncryptedAttachments: React.FC<RFXChatEncryptedAttachmentsProps> = 
                 {isImage && decryptFile && encryptedUrl && (
                   <button
                     type="button"
-                    className="inline-flex items-center gap-1 text-xs text-[#22183a] hover:underline"
+                    className="inline-flex items-center gap-1 text-xs text-[#1A1F2C] hover:underline"
                     onClick={async () => {
                       try {
                         const url = await decryptImage(encryptedUrl, decryptFile);
@@ -142,7 +142,7 @@ const RFXChatEncryptedAttachments: React.FC<RFXChatEncryptedAttachmentsProps> = 
                 {isPdf && decryptFile && encryptedUrl && (
                   <button
                     type="button"
-                    className="inline-flex items-center gap-1 text-xs text-[#22183a] hover:underline"
+                    className="inline-flex items-center gap-1 text-xs text-[#1A1F2C] hover:underline"
                     onClick={async () => {
                       try {
                         const blob = await decryptDocument(encryptedUrl, decryptFile);
@@ -165,7 +165,7 @@ const RFXChatEncryptedAttachments: React.FC<RFXChatEncryptedAttachmentsProps> = 
                 {decryptFile && encryptedUrl && (
                   <button
                     type="button"
-                    className="inline-flex items-center gap-1 text-xs text-[#22183a] hover:underline"
+                    className="inline-flex items-center gap-1 text-xs text-[#1A1F2C] hover:underline"
                     onClick={async () => {
                       try {
                         await downloadDecryptedDocument(encryptedUrl, filename, decryptFile);

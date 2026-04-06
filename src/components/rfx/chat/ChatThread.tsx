@@ -91,7 +91,7 @@ const ChatThread: React.FC<ChatThreadProps> = ({
       <div className="px-4 py-3 border-b bg-[#f1f1f1]">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-sm font-semibold text-[#22183a] truncate">{title || 'Chat'}</div>
+            <div className="text-sm font-semibold text-[#1A1F2C] truncate">{title || 'Chat'}</div>
             {subtitle && <div className="text-xs text-gray-600">{subtitle}</div>}
           </div>
           {headerRight && <div className="shrink-0">{headerRight}</div>}
@@ -101,7 +101,7 @@ const ChatThread: React.FC<ChatThreadProps> = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
         {isLoading && (
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Loader2 className="h-4 w-4 animate-spin text-[#f4a9aa]" />
+            <Loader2 className="h-4 w-4 animate-spin text-[#80c8f0]" />
             Loading messages...
           </div>
         )}
@@ -118,8 +118,8 @@ const ChatThread: React.FC<ChatThreadProps> = ({
           const isMine = !!currentUserId && m.senderUserId === currentUserId;
           // Per request: my messages on the RIGHT, others on the LEFT.
           const outerAlign = isMine ? 'justify-end' : 'justify-start';
-          const bubbleBg = isMine ? 'bg-[#f4a9aa]/15 border-[#f4a9aa]/30' : 'bg-[#f1f1f1] border-gray-200';
-          const bubbleText = 'text-[#22183a]';
+          const bubbleBg = isMine ? 'bg-[#80c8f0]/15 border-[#80c8f0]/30' : 'bg-[#f1f1f1] border-gray-200';
+          const bubbleText = 'text-[#1A1F2C]';
 
           return (
             <div key={m.id} className={`flex ${outerAlign}`}>
@@ -161,7 +161,7 @@ const ChatThread: React.FC<ChatThreadProps> = ({
                 }
               }}
               placeholder="Write a message..."
-              className="min-h-[44px] max-h-[140px] focus-visible:ring-[#f4a9aa]/60"
+              className="min-h-[44px] max-h-[140px] focus-visible:ring-[#80c8f0]/60"
               disabled={isSending || isUploading}
             />
 
@@ -188,7 +188,7 @@ const ChatThread: React.FC<ChatThreadProps> = ({
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isSending || isUploading}
-                  className="h-[44px] border-gray-200 text-[#22183a] hover:bg-[#f1f1f1]"
+                  className="h-[44px] border-gray-200 text-[#1A1F2C] hover:bg-[#f1f1f1]"
                   aria-label="Attach files"
                 >
                   <Paperclip className="h-4 w-4" />
@@ -199,7 +199,7 @@ const ChatThread: React.FC<ChatThreadProps> = ({
             <Button
               onClick={onSend}
               disabled={isSending || isUploading || !computedCanSend}
-              className="bg-[#22183a] hover:bg-[#22183a]/90 text-white h-[44px]"
+              className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white h-[44px]"
             >
               {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>

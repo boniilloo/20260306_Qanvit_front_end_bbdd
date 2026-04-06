@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, ExternalLink, Globe, MapPin, Award, Calendar, Building2, Users, DollarSign, FileText, Settings, TrendingUp, Package, Star, Check, Clock, Eye, Search, Mail, BarChart3, Filter, ChevronLeft, ChevronRight, X, Save, Heart, HeartOff, Edit, Download, Phone, Info } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Globe, MapPin, Award, Calendar, Building2, Users, DollarSign, FileText, Settings, TrendingUp, Package, Star, Check, Clock, Eye, Search, Mail, BarChart3, Filter, ChevronLeft, ChevronRight, X, Save, Heart, HeartOff, Edit, Download, Phone, Info, Linkedin, Newspaper } from 'lucide-react';
 import RevenueChart from '@/components/ui/RevenueChart';
 import CompanyOverviewLeft from '@/components/company/CompanyOverviewLeft';
 import CompanyOverviewRightContact from '@/components/company/CompanyOverviewRightContact';
@@ -8,6 +8,7 @@ import ManageCompanyTabRefactored from '@/components/company/ManageCompanyTabRef
 import { CompanyDocumentViewCard } from '@/components/company/CompanyDocumentViewCard';
 import { ProductDocumentViewCard } from '@/components/products/ProductDocumentViewCard';
 import ProductsServicesTab from '@/components/products/ProductsServicesTab';
+import { LinkedInPeopleTab } from '@/components/company/LinkedInPeopleTab';
 import ProductImageModal from '@/components/products/ProductImageModal';
 import { Product, ProductDocument } from '@/types/product';
 import { usePendingCompanyRFXInvitations } from '@/hooks/usePendingCompanyRFXInvitations';
@@ -16,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
@@ -50,6 +52,8 @@ interface Supplier {
   main_activities: string;
   description: string;
   website: string;
+  /** From public.company via join */
+  linkedin_url?: string | null;
   source: string;
   created_at: string;
   revenues?: any;
@@ -73,6 +77,16 @@ interface CompanyDocument {
   mime_type: string;
   uploaded_by: string;
   created_at: string;
+}
+interface CompanyNews {
+  id: string;
+  title: string | null;
+  url: string | null;
+  source: string | null;
+  time: string | null;
+  snippet: string | null;
+  scraped_at: string;
+  related: string | null;
 }
 const SupplierDetail = () => {
   const {
@@ -101,6 +115,9 @@ const SupplierDetail = () => {
   const [productDocuments, setProductDocuments] = useState<ProductDocument[]>([]);
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null);
   const [productDocumentsLoading, setProductDocumentsLoading] = useState(false);
+  const [latestNews, setLatestNews] = useState<CompanyNews[]>([]);
+  const [latestNewsLoading, setLatestNewsLoading] = useState(false);
+  const [newsThumbnailAttempt, setNewsThumbnailAttempt] = useState<Record<string, number>>({});
   const hasProductsWithImages = products.some(product => {
     const productImages = (product as any)?.image;
     if (Array.isArray(productImages)) {
@@ -428,6 +445,32 @@ const SupplierDetail = () => {
     }
   };
 
+  // Fetch latest related company news (related = true)
+  const fetchLatestNews = async (companyId: string) => {
+    setLatestNewsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('company_news')
+        .select('id, title, url, source, time, snippet, scraped_at, related')
+        .eq('company_id', companyId)
+        .ilike('related', 'true')
+        .order('scraped_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching latest related news:', error);
+        setLatestNews([]);
+        return;
+      }
+
+      setLatestNews((data as CompanyNews[]) || []);
+    } catch (err) {
+      console.error('Exception in fetchLatestNews:', err);
+      setLatestNews([]);
+    } finally {
+      setLatestNewsLoading(false);
+    }
+  };
+
   // Fetch company documents
   const fetchCompanyDocuments = async (companyId: string) => {
     setDocumentsLoading(true);
@@ -583,6 +626,27 @@ const SupplierDetail = () => {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
+
+  const getDomainFromUrl = (rawUrl?: string | null): string | null => {
+    if (!rawUrl) return null;
+    try {
+      const parsed = new URL(rawUrl);
+      return parsed.hostname.replace(/^www\./, '');
+    } catch {
+      return null;
+    }
+  };
+
+  const getNewsImageCandidates = (news: CompanyNews): string[] => {
+    const domain = getDomainFromUrl(news.url);
+    if (!domain) return [];
+
+    return [
+      `https://logo.clearbit.com/${domain}`,
+      `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+      `https://www.google.com/s2/favicons?sz=128&domain=${domain}`,
+    ];
+  };
   useEffect(() => {
     const fetchSupplier = async () => {
       if (!slug) return;
@@ -594,7 +658,10 @@ const SupplierDetail = () => {
         const slugResult = await supabase.from('company_revision').select(`
           *,
           contact_emails,
-          contact_phones
+          contact_phones,
+          company!company_revision_company_id_fkey (
+            linkedin_url
+          )
         `).eq('slug', slug).eq('is_active', true).single();
         
         if (slugResult.data) {
@@ -605,7 +672,10 @@ const SupplierDetail = () => {
           const idResult = await supabase.from('company_revision').select(`
             *,
             contact_emails,
-            contact_phones
+            contact_phones,
+            company!company_revision_company_id_fkey (
+              linkedin_url
+            )
           `).eq('id', slug).eq('is_active', true).single();
           data = idResult.data;
           error = idResult.error;
@@ -621,9 +691,16 @@ const SupplierDetail = () => {
           setError('Supplier not found');
           return;
         }
+
+        const { company: companyJoin, ...revisionRest } = data as typeof data & {
+          company?: { linkedin_url: string | null } | null;
+        };
         
         // Mostrar información básica inmediatamente
-        setSupplier(data);
+        setSupplier({
+          ...revisionRest,
+          linkedin_url: companyJoin?.linkedin_url ?? null,
+        });
         setBasicInfoLoaded(true);
         setLoading(false);
 
@@ -633,6 +710,7 @@ const SupplierDetail = () => {
           fetchProducts(data.company_id);
           fetchCompanyDocuments(data.company_id);
           fetchCoverImage(data.company_id);
+          fetchLatestNews(data.company_id);
         }
       } catch (err) {
         console.error('❌ Exception:', err);
@@ -834,6 +912,19 @@ const SupplierDetail = () => {
                       Visit Website
                     </Button>
                   )}
+                  {supplier.linkedin_url?.trim() && (
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 px-6 py-3 font-semibold border-navy text-navy hover:bg-navy hover:text-white transition-all duration-200 w-full"
+                      onClick={() => {
+                        const u = supplier.linkedin_url!.trim();
+                        window.open(u.startsWith('http') ? u : `https://${u}`, '_blank', 'noopener,noreferrer');
+                      }}
+                    >
+                      <Linkedin className="w-4 h-4" />
+                      Visit LinkedIn
+                    </Button>
+                  )}
                   
                   {/* Show list names if saved */}
                   {isSaved && savedLists.length > 0 && (
@@ -984,6 +1075,19 @@ const SupplierDetail = () => {
                       Visit Website
                     </Button>
                   )}
+                  {supplier.linkedin_url?.trim() && (
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2 px-6 py-3 font-semibold border-navy text-navy hover:bg-navy hover:text-white transition-all duration-200"
+                      onClick={() => {
+                        const u = supplier.linkedin_url!.trim();
+                        window.open(u.startsWith('http') ? u : `https://${u}`, '_blank', 'noopener,noreferrer');
+                      }}
+                    >
+                      <Linkedin className="w-4 h-4" />
+                      Visit LinkedIn
+                    </Button>
+                  )}
                   
                   {/* Show list names if saved */}
                   {isSaved && savedLists.length > 0 && (
@@ -1016,7 +1120,7 @@ const SupplierDetail = () => {
 
           {/* Tabs Navigation - 56px */}
           <Tabs defaultValue={searchParams.get('tab') || (productName ? "products" : "overview")} className="w-full">
-            <TabsList className={`grid w-full ${isOwnerAdmin ? 'grid-cols-3' : 'grid-cols-2'} h-14 bg-[#f1f1f1] rounded-2xl p-1.5 mb-8 border border-white/60 shadow-inner`}>
+            <TabsList className={`grid w-full ${isOwnerAdmin ? 'grid-cols-5' : 'grid-cols-4'} h-14 bg-[#f1f1f1] rounded-2xl p-1.5 mb-8 border border-white/60 shadow-inner`}>
               <TabsTrigger value="overview" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
                 <Building2 className="w-4 h-4" />
                 Overview
@@ -1024,6 +1128,14 @@ const SupplierDetail = () => {
               <TabsTrigger value="products" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
                 <Package className="w-4 h-4" />
                 Products & Services
+              </TabsTrigger>
+              <TabsTrigger value="people" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
+                <Users className="w-4 h-4" />
+                People
+              </TabsTrigger>
+              <TabsTrigger value="latest-news" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
+                <Newspaper className="w-4 h-4" />
+                Latest News
               </TabsTrigger>
               {isOwnerAdmin && (
                 <TabsTrigger value="manage" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
@@ -1136,6 +1248,107 @@ const SupplierDetail = () => {
             formatFileSize={formatFileSize}
             companyWebsite={supplier?.website}
           />
+
+          {/* People Tab - LinkedIn people data */}
+          <TabsContent value="people" className="mt-0">
+            <LinkedInPeopleTab companyId={supplier.company_id} />
+          </TabsContent>
+
+          {/* Latest News Tab - only related news */}
+          <TabsContent value="latest-news" className="mt-0">
+            <Card className="shadow-sm border-0 bg-white">
+              <CardHeader>
+                <CardTitle className="text-navy">Latest News</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {latestNewsLoading ? (
+                  <div className="space-y-4">
+                    {[0, 1, 2].map((item) => (
+                      <div key={item} className="rounded-lg border p-4">
+                        <div className="flex gap-4">
+                          <Skeleton className="h-16 w-16 rounded-lg flex-shrink-0" />
+                          <div className="flex-1 space-y-2">
+                            <Skeleton className="h-5 w-3/4" />
+                            <Skeleton className="h-4 w-1/3" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-5/6" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : latestNews.length === 0 ? (
+                  <p className="text-muted-foreground">No related news available for this supplier.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {latestNews.map((news) => (
+                      <div key={news.id} className="rounded-lg border p-4">
+                        <div className="flex items-start gap-4">
+                          <div className="w-16 h-16 rounded-lg border bg-gray-50 overflow-hidden flex items-center justify-center flex-shrink-0">
+                            {(() => {
+                              const candidates = getNewsImageCandidates(news);
+                              const currentAttempt = newsThumbnailAttempt[news.id] ?? 0;
+                              const currentImage = candidates[currentAttempt];
+                              if (!currentImage) {
+                                return <Newspaper className="w-6 h-6 text-gray-400" />;
+                              }
+
+                              return (
+                                <img
+                                  src={currentImage}
+                                  alt={news.title || 'News source'}
+                                  className="w-full h-full object-cover"
+                                  loading="lazy"
+                                  onError={() => {
+                                    setNewsThumbnailAttempt((prev) => ({
+                                      ...prev,
+                                      [news.id]: currentAttempt + 1,
+                                    }));
+                                  }}
+                                />
+                              );
+                            })()}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-navy">
+                              {news.url ? (
+                                <a
+                                  href={news.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="hover:underline inline-flex items-center gap-2"
+                                >
+                                  {news.title || 'Untitled news'}
+                                  <ExternalLink className="w-4 h-4" />
+                                </a>
+                              ) : (
+                                news.title || 'Untitled news'
+                              )}
+                            </h3>
+                            {(news.source || news.time) && (
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {[news.source, news.time].filter(Boolean).join(' - ')}
+                              </p>
+                            )}
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {getDomainFromUrl(news.url) || 'Unknown source'}
+                            </p>
+                            {news.snippet && (
+                              <p className="text-sm text-gray-700 mt-3">{news.snippet}</p>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground whitespace-nowrap">
+                            {new Date(news.scraped_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Manage Company Tab - Only visible to company admins */}
           {isOwnerAdmin && (
             <TabsContent value="manage" className="mt-0">

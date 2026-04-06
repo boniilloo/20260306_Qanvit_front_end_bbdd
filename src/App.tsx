@@ -365,9 +365,7 @@ const App = () => {
                   } />
                   <Route path="/rfxs/candidates/:rfxId" element={
                     <ProtectedSupplierRoute>
-                      <FooterLayout>
-                        <RFXCandidatesPage />
-                      </FooterLayout>
+                      <RFXCandidatesPage />
                     </ProtectedSupplierRoute>
                   } />
                   <Route path="/rfxs/sending/:rfxId" element={

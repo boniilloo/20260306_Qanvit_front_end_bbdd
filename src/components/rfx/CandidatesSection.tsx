@@ -1017,8 +1017,8 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
 
         // Prefer env-configured WS URL, fallback to production hardcode.
 
-        const ws = new WebSocket('ws://localhost:8000/ws-rfx');
-        //const ws = new WebSocket('wss://web-production-c08e9.up.railway.app/ws-rfx');
+        //const ws = new WebSocket('ws://localhost:8000/ws-rfx');
+        const ws = new WebSocket('wss://web-production-c08e9.up.railway.app/ws-rfx');
         
         wsRef.current = ws;
 

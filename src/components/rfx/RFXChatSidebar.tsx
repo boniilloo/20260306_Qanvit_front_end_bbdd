@@ -90,6 +90,9 @@ interface RFXChatSidebarProps {
     decryptFile: (buffer: ArrayBuffer, iv: string) => Promise<ArrayBuffer | null>;
     key: CryptoKey | null;
   };
+  /** If set, sends this message once when the chat is ready (Home → specs bootstrap). */
+  bootstrapAutoPrompt?: string | null;
+  onBootstrapAutoSent?: () => void;
 }
 
 type ProposalSuggestion = {
@@ -125,6 +128,8 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
   onGeneratingProposalsChange,
   readOnly = false,
   publicCrypto,
+  bootstrapAutoPrompt,
+  onBootstrapAutoSent,
 }) => {
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -168,6 +173,7 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
   const pendingAcksRef = useRef<any[]>([]);
   const autoConnectAttemptedRef = useRef(false);
   const autoConnectInFlightRef = useRef(false);
+  const bootstrapAutoSentRef = useRef(false);
   
   // File attachments state
   const [images, setImages] = useState<MessageImage[]>([]);
@@ -213,6 +219,7 @@ const RFXChatSidebar: React.FC<RFXChatSidebarProps> = ({
   // Reset hasLoadedHistoryRef when rfxId changes
   useEffect(() => {
     hasLoadedHistoryRef.current = false;
+    bootstrapAutoSentRef.current = false;
     setIsLoadingHistory(true);
     setShowLoadingState(true);
     loadingStartTimeRef.current = null;
@@ -1638,79 +1645,6 @@ toast({
     setIsLoading(false);
   };
 
-  const handleSendMessage = async () => {
-    if ((!inputValue.trim() && images.length === 0 && documents.length === 0) || isLoading || !agentReady) return;
-
-    const messageContent = inputValue.trim();
-    const messageSentAt = new Date();
-    const messageImages = [...images];
-    const messageDocuments = [...documents];
-
-    const userMessage: Message = {
-      id: `msg-${Date.now()}`,
-      type: 'user',
-      content: messageContent || t('rfxs.chat_sentFiles'),
-      timestamp: messageSentAt,
-      images: messageImages.length > 0 ? messageImages : undefined,
-      documents: messageDocuments.length > 0 ? messageDocuments : undefined,
-    };
-
-    setMessages(prev => {
-      const newMessages = [...prev, userMessage];
-      // Limit messages to prevent memory leak
-      return newMessages.length > MAX_MESSAGES 
-        ? newMessages.slice(-MAX_MESSAGES) 
-        : newMessages;
-    });
-    
-    setInputValue('');
-    setImages([]);
-    setDocuments([]);
-    
-    // Reset textarea height after sending
-    if (inputRef.current) {
-      inputRef.current.style.height = 'auto';
-      inputRef.current.style.overflowY = 'hidden';
-    }
-    
-    setIsLoading(true);
-    setAgentReady(false);
-    agentReadyRef.current = false;
-    setIsThinking(true); // Show thinking immediately
-    
-    // Disable cancel button for 2 seconds to prevent accidental clicks
-    setCanCancel(false);
-    if (cancelEnableTimerRef.current) {
-      clearTimeout(cancelEnableTimerRef.current);
-    }
-    cancelEnableTimerRef.current = window.setTimeout(() => {
-      setCanCancel(true);
-    }, 2000);
-    
-    // Scroll to last user message after sending
-    setTimeout(() => scrollToLastUserMessage(), 100);
-
-    // Note: The backend agent saves messages to the database, we don't save from frontend
-    // The message will appear in the chat when the backend saves it or when we reload
-
-    // If no connection, establish it first
-    if (!isConnected || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      try {
-        await connectWebSocket();
-        // connectWebSocket() now resolves on handshake (memory_loaded)
-        sendMessageToAgent(messageContent, messageImages, messageDocuments);
-      } catch (error) {
-        setConnectionError(t('rfxs.chat_couldNotConnect'));
-        setIsLoading(false);
-        setAgentReady(true);
-        agentReadyRef.current = true;
-      }
-    } else {
-      // Already connected, send directly
-      sendMessageToAgent(messageContent, messageImages, messageDocuments);
-    }
-  };
-
   const getCurrentRFXState = () => {
     const effectiveSpecs = typeof getCurrentSpecs === 'function' ? getCurrentSpecs() : currentSpecs;
     return {
@@ -1724,7 +1658,7 @@ toast({
     messageContent: string,
     messageImages: MessageImage[] = [],
     messageDocuments: MessageDocument[] = []
-  ) => {
+  ): Promise<boolean> => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       try {
         // Note: we intentionally do NOT clear proposals here on new message send.
@@ -1793,16 +1727,155 @@ toast({
         
         // After sending, block further input until agent_ready
         setAgentReady(false);
+        return true;
       } catch (error) {
         console.error('❌ [WebSocket] Error sending message:', error);
         setConnectionError(t('rfxs.chat_errorSendingMessage'));
         setIsLoading(false);
+        return false;
       }
     } else {
       setConnectionError(t('rfxs.chat_noConnection'));
       setIsLoading(false);
+      return false;
     }
   };
+
+  const commitAndSendUserMessage = async (
+    messageContent: string,
+    messageImages: MessageImage[] = [],
+    messageDocuments: MessageDocument[] = [],
+    options?: { clearInput?: boolean }
+  ): Promise<boolean> => {
+    if (
+      (!messageContent.trim() && messageImages.length === 0 && messageDocuments.length === 0) ||
+      isLoading ||
+      !agentReady
+    ) {
+      return false;
+    }
+
+    const clearInput = options?.clearInput !== false;
+    const messageSentAt = new Date();
+
+    const userMessage: Message = {
+      id: `msg-${Date.now()}`,
+      type: 'user',
+      content: messageContent || t('rfxs.chat_sentFiles'),
+      timestamp: messageSentAt,
+      images: messageImages.length > 0 ? messageImages : undefined,
+      documents: messageDocuments.length > 0 ? messageDocuments : undefined,
+    };
+
+    setMessages((prev) => {
+      const newMessages = [...prev, userMessage];
+      return newMessages.length > MAX_MESSAGES ? newMessages.slice(-MAX_MESSAGES) : newMessages;
+    });
+
+    if (clearInput) {
+      setInputValue('');
+      setImages([]);
+      setDocuments([]);
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+        inputRef.current.style.overflowY = 'hidden';
+      }
+    }
+
+    setIsLoading(true);
+    setAgentReady(false);
+    agentReadyRef.current = false;
+    setIsThinking(true);
+
+    setCanCancel(false);
+    if (cancelEnableTimerRef.current) {
+      clearTimeout(cancelEnableTimerRef.current);
+    }
+    cancelEnableTimerRef.current = window.setTimeout(() => {
+      setCanCancel(true);
+    }, 2000);
+
+    setTimeout(() => scrollToLastUserMessage(), 100);
+
+    try {
+      if (!isConnected || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+        await connectWebSocket();
+      }
+      const sent = await sendMessageToAgent(messageContent, messageImages, messageDocuments);
+      if (!sent) {
+        setIsLoading(false);
+        setAgentReady(true);
+        agentReadyRef.current = true;
+        return false;
+      }
+      return true;
+    } catch {
+      setConnectionError(t('rfxs.chat_couldNotConnect'));
+      setIsLoading(false);
+      setAgentReady(true);
+      agentReadyRef.current = true;
+      return false;
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if ((!inputValue.trim() && images.length === 0 && documents.length === 0) || isLoading || !agentReady) {
+      return;
+    }
+    const messageContent = inputValue.trim();
+    const messageImages = [...images];
+    const messageDocuments = [...documents];
+    await commitAndSendUserMessage(messageContent, messageImages, messageDocuments, { clearInput: true });
+  };
+
+  const commitAndSendUserMessageRef = useRef(commitAndSendUserMessage);
+  commitAndSendUserMessageRef.current = commitAndSendUserMessage;
+
+  // Home → specs: auto-send first agent message once
+  useEffect(() => {
+    if (!bootstrapAutoPrompt?.trim()) return;
+    if (isPublicMode || readOnly) return;
+    // After a successful or failed attempt, do not re-run (agentReady cycles would otherwise reschedule)
+    if (bootstrapAutoSentRef.current) return;
+    if (!isReady || isCryptoLoading) return;
+    if (isLoadingHistory || isDecryptingMessages) return;
+    if (workflowInProgress) return;
+    if (!agentReady || isLoading) return;
+
+    const prompt = bootstrapAutoPrompt.trim();
+    const timer = window.setTimeout(() => {
+      void (async () => {
+        if (bootstrapAutoSentRef.current) return;
+        const ok = await commitAndSendUserMessageRef.current(prompt, [], [], { clearInput: false });
+        bootstrapAutoSentRef.current = true;
+        if (ok) {
+          onBootstrapAutoSent?.();
+        } else {
+          setInputValue(prompt);
+          toast({
+            title: t('rfxs.error'),
+            description: t('rfxs.chat_couldNotConnect'),
+            variant: 'destructive',
+          });
+        }
+      })();
+    }, 450);
+    return () => window.clearTimeout(timer);
+  }, [
+    bootstrapAutoPrompt,
+    isPublicMode,
+    readOnly,
+    isReady,
+    isCryptoLoading,
+    isLoadingHistory,
+    isDecryptingMessages,
+    workflowInProgress,
+    agentReady,
+    isLoading,
+    onBootstrapAutoSent,
+    t,
+    toast,
+  ]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && agentReady) {

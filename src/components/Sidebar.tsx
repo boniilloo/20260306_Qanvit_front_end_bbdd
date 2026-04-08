@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sidebar as UISidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarSeparator, SidebarTrigger, useSidebar } from './ui/sidebar';
-import { MessageCircle, Users, Building2, FileText, Settings, LogOut, Plus, MoreHorizontal, Pencil, Trash2, User, Database, BarChart3, ChevronDown, Code, UserPlus, MessageSquare, Send, Activity, Bell, CheckCircle, Circle, GraduationCap, Volume2, VolumeX, Mail, CreditCard, Globe } from 'lucide-react';
+import { MessageCircle, Users, Building2, FileText, Settings, LogOut, Plus, MoreHorizontal, Pencil, Trash2, User, Database, BarChart3, ChevronDown, ChevronRight, Code, UserPlus, MessageSquare, Send, Activity, Bell, CheckCircle, Circle, GraduationCap, Volume2, VolumeX, Mail, CreditCard, Globe } from 'lucide-react';
 import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
@@ -27,6 +27,7 @@ import { useRFXInvitations } from '@/hooks/useRFXInvitations';
 import { usePendingRFXValidation } from '@/hooks/usePendingRFXValidation';
 import { usePendingNDAValidation } from '@/hooks/usePendingNDAValidation';
 import { useNotifications } from '@/contexts/NotificationsContext';
+import { useRfxWorkspaces } from '@/hooks/useRfxWorkspaces';
 
 const Sidebar = () => {
   const { t, i18n } = useTranslation();
@@ -101,10 +102,14 @@ const Sidebar = () => {
     name: string;
     status: string;
     created_at: string;
+    workspace_id?: string | null;
   }>>([]);
   const [loadingRfxSidebar, setLoadingRfxSidebar] = useState(false);
   const [loadingMoreRfxSidebar, setLoadingMoreRfxSidebar] = useState(false);
   const [hasMoreRfxSidebar, setHasMoreRfxSidebar] = useState(true);
+  const [expandedWorkspaceIds, setExpandedWorkspaceIds] = useState<Record<string, boolean>>({});
+  const [unassignedExpanded, setUnassignedExpanded] = useState(true);
+  const { data: rfxWorkspaces = [] } = useRfxWorkspaces();
 
   type RfxCreatedEventDetail = {
     id: string;
@@ -112,6 +117,15 @@ const Sidebar = () => {
     name?: string;
     status?: string;
     created_at?: string;
+    workspace_id?: string | null;
+  };
+  type RfxUpdatedEventDetail = {
+    id: string;
+    user_id?: string;
+    name?: string;
+    status?: string;
+    created_at?: string;
+    workspace_id?: string | null;
   };
   type RfxDeletedEventDetail = {
     id: string;
@@ -266,6 +280,13 @@ const Sidebar = () => {
     setRfxExpanded(prev => !prev);
   }, []);
 
+  const toggleWorkspaceSidebarSection = useCallback((workspaceId: string) => {
+    setExpandedWorkspaceIds((prev) => ({
+      ...prev,
+      [workspaceId]: !prev[workspaceId],
+    }));
+  }, []);
+
   const handleMenuItemClick = useCallback((path: string, disabled?: boolean) => {
     // Don't navigate if item is disabled
     if (disabled) {
@@ -402,7 +423,7 @@ const Sidebar = () => {
 
         const memberIds = (memberRfxIds || []).map((m: any) => m.rfx_id);
 
-        let query = (supabase.from('rfxs' as any) as any).select('id, name, status, created_at');
+        let query = (supabase.from('rfxs' as any) as any).select('id, name, status, created_at, workspace_id');
 
         if (memberIds.length > 0) {
           const orFilters = [
@@ -427,7 +448,8 @@ const Sidebar = () => {
           id: rfx.id,
           name: rfx.name || 'Untitled RFX',
           status: rfx.status || 'draft',
-          created_at: rfx.created_at
+          created_at: rfx.created_at,
+          workspace_id: rfx.workspace_id ?? null,
         }));
 
         setRfxSidebarItems(items);
@@ -469,6 +491,7 @@ const Sidebar = () => {
           name: rfx.name || 'Untitled RFX',
           status: rfx.status || 'draft',
           created_at: rfx.created_at || new Date().toISOString(),
+          workspace_id: rfx.workspace_id ?? null,
         };
 
         return [newItem, ...prev].slice(0, 20);
@@ -494,6 +517,35 @@ const Sidebar = () => {
     window.addEventListener('rfx-deleted', handleRfxDeleted);
     return () => {
       window.removeEventListener('rfx-deleted', handleRfxDeleted);
+    };
+  }, []);
+
+  // Immediate local update when an RFX is updated in the app (e.g. workspace reassignment).
+  useEffect(() => {
+    const handleRfxUpdated = (event: Event) => {
+      const customEvent = event as CustomEvent<RfxUpdatedEventDetail>;
+      const updated = customEvent.detail;
+      if (!updated?.id) return;
+
+      setRfxSidebarItems((prev) =>
+        prev.map((item) =>
+          item.id === updated.id
+            ? {
+                ...item,
+                name: updated.name || item.name,
+                status: updated.status || item.status,
+                created_at: updated.created_at || item.created_at,
+                workspace_id:
+                  updated.workspace_id === undefined ? item.workspace_id : (updated.workspace_id ?? null),
+              }
+            : item,
+        ),
+      );
+    };
+
+    window.addEventListener('rfx-updated', handleRfxUpdated);
+    return () => {
+      window.removeEventListener('rfx-updated', handleRfxUpdated);
     };
   }, []);
 
@@ -545,7 +597,8 @@ const Sidebar = () => {
                 id: rfx.id,
                 name: rfx.name || 'Untitled RFX',
                 status: rfx.status || 'draft',
-                created_at: rfx.created_at
+                created_at: rfx.created_at,
+                workspace_id: rfx.workspace_id ?? null,
               };
               
               setRfxSidebarItems(prev => {
@@ -564,7 +617,8 @@ const Sidebar = () => {
                     ? {
                         ...r,
                         name: rfx.name || 'Untitled RFX',
-                        status: rfx.status || 'draft'
+                      status: rfx.status || 'draft',
+                      workspace_id: rfx.workspace_id ?? null,
                       }
                     : r
                 );
@@ -599,7 +653,7 @@ const Sidebar = () => {
               
               const updatedMemberIds = (memberRfxIdsForQuery || []).map((m: any) => m.rfx_id);
               
-              let query = (supabase.from('rfxs' as any) as any).select('id, name, status, created_at');
+              let query = (supabase.from('rfxs' as any) as any).select('id, name, status, created_at, workspace_id');
               
               if (updatedMemberIds.length > 0) {
                 const orFilters = [
@@ -620,7 +674,8 @@ const Sidebar = () => {
                   id: rfx.id,
                   name: rfx.name || 'Untitled RFX',
                   status: rfx.status || 'draft',
-                  created_at: rfx.created_at
+                  created_at: rfx.created_at,
+                  workspace_id: rfx.workspace_id ?? null,
                 }));
                 setRfxSidebarItems(items);
                 setHasMoreRfxSidebar(items.length === 20);
@@ -656,7 +711,7 @@ const Sidebar = () => {
 
       const memberIds = (memberRfxIds || []).map((m: any) => m.rfx_id);
 
-      let query = (supabase.from('rfxs' as any) as any).select('id, name, status, created_at');
+      let query = (supabase.from('rfxs' as any) as any).select('id, name, status, created_at, workspace_id');
 
       if (memberIds.length > 0) {
         const orFilters = [
@@ -682,7 +737,8 @@ const Sidebar = () => {
         id: rfx.id,
         name: rfx.name || 'Untitled RFX',
         status: rfx.status || 'draft',
-        created_at: rfx.created_at
+        created_at: rfx.created_at,
+        workspace_id: rfx.workspace_id ?? null,
       }));
 
       if (newItems.length < 20) {
@@ -719,6 +775,19 @@ const Sidebar = () => {
       tooltip: status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ')
     };
   };
+
+  const workspaceSidebarGroups = useMemo(() => {
+    return rfxWorkspaces.map((workspace) => ({
+      workspace,
+      items: rfxSidebarItems.filter((item) => item.workspace_id === workspace.id),
+      expanded: expandedWorkspaceIds[workspace.id] ?? false,
+    }));
+  }, [rfxWorkspaces, rfxSidebarItems, expandedWorkspaceIds]);
+
+  const unassignedSidebarItems = useMemo(
+    () => rfxSidebarItems.filter((item) => !item.workspace_id),
+    [rfxSidebarItems],
+  );
 
 
   return (
@@ -939,34 +1008,83 @@ const Sidebar = () => {
                                     {t('sidebar.noRfxsYet')}
                                   </div>
                                 )}
-                                {rfxSidebarItems.map(rfx => {
-                                const statusInfo = getStatusIcon(rfx.status);
-                                const StatusIcon = statusInfo.icon;
-                                return (
+                                {workspaceSidebarGroups.map(({ workspace, items, expanded }) => (
+                                  <div key={workspace.id} className="mb-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleWorkspaceSidebarSection(workspace.id)}
+                                      className="w-full text-left text-[11px] text-[#f4a9aa] hover:text-[#f1e8f4] rounded-md px-1 py-1 flex items-center gap-1"
+                                    >
+                                      <ChevronRight className={`w-3 h-3 transition-transform ${expanded ? 'rotate-90' : ''}`} />
+                                      <span className="truncate">{workspace.name}</span>
+                                      <span className="ml-auto opacity-80">{items.length}</span>
+                                    </button>
+                                    {expanded && items.map((rfx) => {
+                                      const statusInfo = getStatusIcon(rfx.status);
+                                      const StatusIcon = statusInfo.icon;
+                                      return (
+                                        <button
+                                          key={rfx.id}
+                                          onClick={() => handleMenuItemClick(`/rfxs/${rfx.id}`)}
+                                          className="w-full text-left text-xs text-[#f1e8f4]/80 hover:text-[#f1e8f4] hover:bg-white/10 rounded-md px-2 py-1 flex items-center justify-between gap-2"
+                                        >
+                                          <span className="truncate">{rfx.name || t('sidebar.untitledRfx')}</span>
+                                          <TooltipProvider delayDuration={50}>
+                                            <Tooltip>
+                                              <TooltipTrigger asChild>
+                                                <div className="flex-shrink-0">
+                                                  <StatusIcon
+                                                    className="w-3.5 h-3.5"
+                                                    style={{ color: statusInfo.color }}
+                                                  />
+                                                </div>
+                                              </TooltipTrigger>
+                                              <TooltipContent>
+                                                <p>{statusInfo.tooltip}</p>
+                                              </TooltipContent>
+                                            </Tooltip>
+                                          </TooltipProvider>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                ))}
+                                <div className="mt-2 mb-1">
                                   <button
-                                    key={rfx.id}
-                                    onClick={() => handleMenuItemClick(`/rfxs/${rfx.id}`)}
-                                    className="w-full text-left text-xs text-[#f1e8f4]/80 hover:text-[#f1e8f4] hover:bg-white/10 rounded-md px-2 py-1 flex items-center justify-between gap-2"
+                                    type="button"
+                                    onClick={() => setUnassignedExpanded((prev) => !prev)}
+                                    className="w-full text-left text-[11px] text-[#f4a9aa] hover:text-[#f1e8f4] rounded-md px-1 py-1 flex items-center gap-1"
                                   >
-                                    <span className="truncate">{rfx.name || t('sidebar.untitledRfx')}</span>
-                                    <TooltipProvider delayDuration={50}>
-                                      <Tooltip>
-                                        <TooltipTrigger asChild>
-                                          <div className="flex-shrink-0">
-                                            <StatusIcon 
-                                              className="w-3.5 h-3.5" 
-                                              style={{ color: statusInfo.color }}
-                                            />
-                                          </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                          <p>{statusInfo.tooltip}</p>
-                                        </TooltipContent>
-                                      </Tooltip>
-                                    </TooltipProvider>
+                                    <ChevronRight className={`w-3 h-3 transition-transform ${unassignedExpanded ? 'rotate-90' : ''}`} />
+                                    <span className="truncate">Unassigned</span>
+                                    <span className="ml-auto opacity-80">{unassignedSidebarItems.length}</span>
                                   </button>
-                                );
-                              })}
+                                  {unassignedExpanded && unassignedSidebarItems.map((rfx) => {
+                                    const statusInfo = getStatusIcon(rfx.status);
+                                    const StatusIcon = statusInfo.icon;
+                                    return (
+                                      <button
+                                        key={rfx.id}
+                                        onClick={() => handleMenuItemClick(`/rfxs/${rfx.id}`)}
+                                        className="w-full text-left text-xs text-[#f1e8f4]/80 hover:text-[#f1e8f4] hover:bg-white/10 rounded-md px-2 py-1 flex items-center justify-between gap-2"
+                                      >
+                                        <span className="truncate">{rfx.name || t('sidebar.untitledRfx')}</span>
+                                        <TooltipProvider delayDuration={50}>
+                                          <Tooltip>
+                                            <TooltipTrigger asChild>
+                                              <div className="flex-shrink-0">
+                                                <StatusIcon className="w-3.5 h-3.5" style={{ color: statusInfo.color }} />
+                                              </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                              <p>{statusInfo.tooltip}</p>
+                                            </TooltipContent>
+                                          </Tooltip>
+                                        </TooltipProvider>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               {hasMoreRfxSidebar && (
                                 <button
                                   onClick={loadMoreRfxSidebar}

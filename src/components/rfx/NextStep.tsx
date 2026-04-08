@@ -107,19 +107,10 @@ const NextStep: React.FC<NextStepProps> = ({
       return 0;
     };
 
-    // Calculate Qanvit validation status
-    const getFQValidationStatus = (): TodoStatus => {
-      if (rfxStatus === 'waiting for supplier proposals') {
-        return 'completed';
-      }
-      return 'pending';
-    };
-
     // Calculate all statuses first
     const specsStatus = getSpecsStatus();
     const candidatesStatus = getCandidatesStatus();
     const validationStatus = getValidationStatus();
-    const fqValidationStatus = getFQValidationStatus();
 
     // Determine which step to show (selected item or next step)
     const getStepToShow = () => {
@@ -132,7 +123,6 @@ const NextStep: React.FC<NextStepProps> = ({
       if (specsStatus !== 'completed') return 'specs';
       if (candidatesStatus !== 'completed') return 'candidates';
       if (validationStatus !== 'completed') return 'validation';
-      if (fqValidationStatus !== 'completed') return 'fq_validation';
       
       // If all previous steps are completed, check if responses is in progress
       const responsesStatus = getItemVisualStatus('responses');
@@ -148,8 +138,7 @@ const NextStep: React.FC<NextStepProps> = ({
       // Determine the next step to complete
       const nextStep = specsStatus !== 'completed' ? 'specs' :
                        candidatesStatus !== 'completed' ? 'candidates' :
-                       validationStatus !== 'completed' ? 'validation' :
-                       fqValidationStatus !== 'completed' ? 'fq_validation' : 'none';
+                       validationStatus !== 'completed' ? 'validation' : 'responses';
       
       switch (itemId) {
         case 'specs':
@@ -164,15 +153,8 @@ const NextStep: React.FC<NextStepProps> = ({
           if (validationStatus === 'completed') return 'completed';
           if (nextStep === 'validation') return 'in_progress'; // Next step gets blue
           return 'pending'; // Other pending steps get gray
-        case 'fq_validation':
-          if (fqValidationStatus === 'completed') return 'completed';
-          if (nextStep === 'fq_validation') return 'in_progress';
-          return 'pending';
         case 'responses':
-          // Only show as in_progress if ALL previous steps are completed
-          // This ensures consistency and avoids showing in_progress before candidates is completed
-          if (fqValidationStatus === 'completed' && 
-              specsStatus === 'completed' && 
+          if (specsStatus === 'completed' && 
               candidatesStatus === 'completed' && 
               validationStatus === 'completed') {
             return 'in_progress';
@@ -229,19 +211,6 @@ const NextStep: React.FC<NextStepProps> = ({
           status: validationVisualStatus,
           progress: validationProgressCount,
           total: 2
-        };
-      case 'fq_validation':
-        const fqValidationVisualStatus = getItemVisualStatus('fq_validation');
-        return {
-          id: 'fq_validation',
-          title: t('rfxs.todo_fq_validation_title'),
-          description: t('rfxs.nextStep_fq_validation_desc'),
-          icon: <Send className="h-6 w-6" />,
-          action: undefined,
-          buttonText: undefined,
-          status: fqValidationVisualStatus,
-          progress: fqValidationVisualStatus === 'completed' ? 1 : 0,
-          total: 1
         };
       case 'responses':
         const responsesVisualStatus = getItemVisualStatus('responses');

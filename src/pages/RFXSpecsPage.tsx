@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Save, Download, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -30,10 +30,15 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 import { useRFXSpecs } from '@/hooks/useRFXSpecs';
 import { useTranslation } from 'react-i18next';
+import {
+  readRfxSpecsBootstrapFromStorage,
+  clearRfxSpecsBootstrapStorage,
+} from '@/utils/rfxSpecsBootstrap';
 
 const RFXSpecsPage = () => {
   const { rfxId } = useParams<{ rfxId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -207,6 +212,28 @@ const RFXSpecsPage = () => {
   
   // RFX archived status modal state
   const [showRFXArchivedModal, setShowRFXArchivedModal] = useState(false);
+
+  /** First message for RFX agent sidebar (Home bootstrap); cleared after auto-send */
+  const [bootstrapInitialPrompt, setBootstrapInitialPrompt] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!rfxId) {
+      setBootstrapInitialPrompt(null);
+      return;
+    }
+    const st = location.state as { bootstrapInitialPrompt?: string } | undefined;
+    if (st?.bootstrapInitialPrompt?.trim()) {
+      setBootstrapInitialPrompt(st.bootstrapInitialPrompt.trim());
+      return;
+    }
+    const fromStore = readRfxSpecsBootstrapFromStorage(rfxId);
+    setBootstrapInitialPrompt(fromStore);
+  }, [rfxId, location.key, location.state]);
+
+  const handleBootstrapAutoSent = useCallback(() => {
+    if (rfxId) clearRfxSpecsBootstrapStorage(rfxId);
+    setBootstrapInitialPrompt(null);
+  }, [rfxId]);
 
   useEffect(() => {
     if (rfxId) {
@@ -984,6 +1011,8 @@ const RFXSpecsPage = () => {
         shouldAnimate={shouldAnimateChat}
         onAnimationComplete={handleAnimationComplete}
         onGeneratingProposalsChange={setIsGeneratingProposals}
+        bootstrapAutoPrompt={bootstrapInitialPrompt}
+        onBootstrapAutoSent={handleBootstrapAutoSent}
       />
 
       {/* Main Content */}

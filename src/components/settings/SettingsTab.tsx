@@ -140,6 +140,14 @@ interface AgentConfig {
   rfx_analysis_model?: string;
   rfx_analysis_verbosity?: string;
   rfx_analysis_reasoning_effort?: string;
+
+  // Home → RFX bootstrap (POST /api/rfxs/bootstrap-from-intent)
+  rfx_bootstrap_system_prompt?: string;
+  rfx_bootstrap_user_template?: string;
+  rfx_bootstrap_model?: string;
+  rfx_bootstrap_temperature?: number;
+  rfx_bootstrap_reasoning_effort?: string;
+  rfx_bootstrap_verbosity?: string;
 }
 
 interface BackupConfig {
@@ -274,6 +282,14 @@ interface BackupConfig {
   rfx_analysis_model?: string;
   rfx_analysis_verbosity?: string;
   rfx_analysis_reasoning_effort?: string;
+
+  // Home → RFX bootstrap
+  rfx_bootstrap_system_prompt?: string;
+  rfx_bootstrap_user_template?: string;
+  rfx_bootstrap_model?: string;
+  rfx_bootstrap_temperature?: number;
+  rfx_bootstrap_reasoning_effort?: string;
+  rfx_bootstrap_verbosity?: string;
 }
 
 // Move LLMGroup outside of the main component to prevent re-creation on each render
@@ -947,8 +963,9 @@ const SettingsTab = () => {
         </TabsList>
         
         {/* Fifth Tab Row */}
-        <TabsList className="grid w-full grid-cols-3 mb-4">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-4">
           <TabsTrigger value="rfx-conversational">RFX Conversational</TabsTrigger>
+          <TabsTrigger value="rfx-home-bootstrap">RFX Home Bootstrap</TabsTrigger>
           <TabsTrigger value="propose-edits">Propose Edits</TabsTrigger>
           <TabsTrigger value="rfx-analysis">RFX Analysis</TabsTrigger>
         </TabsList>
@@ -1606,6 +1623,121 @@ const SettingsTab = () => {
                   className="mt-1"
                   placeholder="Enter the system prompt for the RFX conversational agent..."
                 />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="rfx-home-bootstrap" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5" />
+                RFX Home Bootstrap
+              </CardTitle>
+              <CardDescription>
+                System and user template for generating title, description, and first agent message from the free-text intent on the home page (API{' '}
+                <code className="text-xs bg-muted px-1 rounded">POST /api/rfxs/bootstrap-from-intent</code>
+                ). The user template must include the placeholder{' '}
+                <code className="text-xs bg-muted px-1 rounded">{'{intent}'}</code>.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="rfx_bootstrap_system_prompt">System prompt</Label>
+                <Textarea
+                  id="rfx_bootstrap_system_prompt"
+                  value={config.rfx_bootstrap_system_prompt || ''}
+                  onChange={(e) => updateConfigValue('rfx_bootstrap_system_prompt', e.target.value)}
+                  rows={14}
+                  className="mt-1 font-mono text-sm"
+                  placeholder="Instructions for JSON output: title, description, initialAgentPrompt..."
+                />
+              </div>
+              <div>
+                <Label htmlFor="rfx_bootstrap_user_template">User message template</Label>
+                <Textarea
+                  id="rfx_bootstrap_user_template"
+                  value={config.rfx_bootstrap_user_template || ''}
+                  onChange={(e) => updateConfigValue('rfx_bootstrap_user_template', e.target.value)}
+                  rows={4}
+                  className="mt-1 font-mono text-sm"
+                  placeholder={'User intent:\n{intent}'}
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Use <code className="text-xs">{'{intent}'}</code> where the user&apos;s text should be inserted.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <Label htmlFor="rfx_bootstrap_model">Model</Label>
+                  <Input
+                    id="rfx_bootstrap_model"
+                    value={config.rfx_bootstrap_model || ''}
+                    onChange={(e) => updateConfigValue('rfx_bootstrap_model', e.target.value)}
+                    placeholder="Leave empty to use General model"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="rfx_bootstrap_temperature">Temperature</Label>
+                  <Input
+                    id="rfx_bootstrap_temperature"
+                    type="number"
+                    step="0.05"
+                    min={0}
+                    max={2}
+                    value={
+                      config.rfx_bootstrap_temperature === undefined || config.rfx_bootstrap_temperature === null
+                        ? ''
+                        : String(config.rfx_bootstrap_temperature)
+                    }
+                    onChange={(e) => {
+                      const v = e.target.value.trim();
+                      if (v === '') {
+                        updateConfigValue('rfx_bootstrap_temperature', null as unknown as number);
+                        return;
+                      }
+                      const n = parseFloat(v);
+                      if (!Number.isNaN(n)) {
+                        updateConfigValue('rfx_bootstrap_temperature', n);
+                      }
+                    }}
+                    placeholder="0.25"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="rfx_bootstrap_reasoning_effort">Reasoning effort</Label>
+                  <Select
+                    value={config.rfx_bootstrap_reasoning_effort || 'medium'}
+                    onValueChange={(value) => updateConfigValue('rfx_bootstrap_reasoning_effort', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select reasoning effort" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="minimal">Minimal</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="rfx_bootstrap_verbosity">Verbosity</Label>
+                  <Select
+                    value={config.rfx_bootstrap_verbosity || 'medium'}
+                    onValueChange={(value) => updateConfigValue('rfx_bootstrap_verbosity', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select verbosity" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardContent>
           </Card>

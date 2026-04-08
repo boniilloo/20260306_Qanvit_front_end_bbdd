@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, Edit, FileText, Calendar, Check, X, Pencil, ChevronLeft, ChevronRight, User, Search, Filter, ArrowUpDown, Loader2, MoreVertical, Archive } from 'lucide-react';
+import { Plus, Folder, FolderPlus, Trash2, Edit, FileText, Calendar, Check, X, Pencil, User, Search, Filter, ArrowUpDown, Loader2, MoreVertical, Archive, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -35,8 +35,17 @@ import MarkdownEditor from '@/components/ui/MarkdownEditor';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useRFXs, CreateRFXInput } from '@/hooks/useRFXs';
+import {
+  useCreateRfxWorkspace,
+  useDeleteRfxWorkspace,
+  useRfxWorkspaces,
+  useWorkspaceRfxFolderCounts,
+  useWorkspaceRfxs,
+  type WorkspaceRfxListOptions,
+} from '@/hooks/useRfxWorkspaces';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { format } from 'date-fns';
 import { useRFXMembers } from '@/hooks/useRFXMembers';
@@ -46,6 +55,161 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { RFXProgressBar } from '@/components/rfx/RFXProgressBar';
 import PublicRFXExamplesCarousel from '@/components/rfx/PublicRFXExamplesCarousel';
+
+type RfxCardComponent = React.ComponentType<{ rfx: any }>;
+const WORKSPACE_LIST_PAGE_SIZE = 12;
+
+function WorkspaceRfxBlockModule({
+  workspace,
+  listOptions,
+  onDeleteWorkspace,
+  CardComponent,
+}: {
+  workspace: { id: string; name: string };
+  listOptions: WorkspaceRfxListOptions;
+  onDeleteWorkspace: (id: string) => void;
+  CardComponent: RfxCardComponent;
+}) {
+  const { t } = useTranslation();
+  const [loadedPages, setLoadedPages] = useState(1);
+  const paginatedOptions = useMemo(
+    () => ({
+      ...listOptions,
+      page: 1,
+      itemsPerPage: loadedPages * WORKSPACE_LIST_PAGE_SIZE,
+    }),
+    [listOptions, loadedPages],
+  );
+  const { data, isLoading, isFetching } = useWorkspaceRfxs(workspace.id, paginatedOptions, true);
+  const sectionRfxs = (data?.data || []) as any[];
+  const count = data?.count ?? sectionRfxs.length;
+  const canLoadMore = !isLoading && sectionRfxs.length < count;
+
+  useEffect(() => {
+    setLoadedPages(1);
+  }, [workspace.id, listOptions]);
+
+  return (
+    <section className="mb-12 scroll-mt-4" id={`rfx-workspace-${workspace.id}`}>
+      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+        <div className="flex items-center gap-2 min-w-0">
+          <Folder className="h-6 w-6 text-[#f4a9aa] shrink-0" strokeWidth={1.5} />
+          <h2 className="text-xl font-semibold text-[#22183a] truncate">{workspace.name}</h2>
+          <Badge variant="secondary">{count}</Badge>
+        </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => onDeleteWorkspace(workspace.id)}
+          className="h-9 w-9 shrink-0 text-gray-500 hover:text-gray-600 hover:bg-gray-100/80"
+          aria-label={t('rfxs.deleteWorkspace')}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="space-y-6">
+        {isLoading && (
+          <div className="text-sm text-gray-500 flex items-center gap-2 py-4">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {t('rfxs.loadingWorkspaceRfxs')}
+          </div>
+        )}
+        {!isLoading && sectionRfxs.length === 0 && (
+          <p className="text-sm text-gray-500 py-2">{t('rfxs.noRfxInWorkspace')}</p>
+        )}
+        {!isLoading && sectionRfxs.map((rfx) => (
+          <CardComponent key={rfx.id} rfx={rfx} />
+        ))}
+        {canLoadMore && (
+          <div className="pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setLoadedPages((prev) => prev + 1)}
+              disabled={isFetching}
+            >
+              {isFetching ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {t('rfxs.loadingMoreWorkspaceRfxs')}
+                </>
+              ) : (
+                t('rfxs.loadMoreWorkspaceRfxs', { remaining: count - sectionRfxs.length })
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function UnassignedRfxBlockModule({
+  listOptions,
+  CardComponent,
+}: {
+  listOptions: WorkspaceRfxListOptions;
+  CardComponent: RfxCardComponent;
+}) {
+  const { t } = useTranslation();
+  const [loadedPages, setLoadedPages] = useState(1);
+  const paginatedOptions = useMemo(
+    () => ({
+      ...listOptions,
+      page: 1,
+      itemsPerPage: loadedPages * WORKSPACE_LIST_PAGE_SIZE,
+    }),
+    [listOptions, loadedPages],
+  );
+  const { data, isLoading, isFetching } = useWorkspaceRfxs(null, paginatedOptions, true);
+  const sectionRfxs = (data?.data || []) as any[];
+  const count = data?.count ?? sectionRfxs.length;
+  const canLoadMore = !isLoading && sectionRfxs.length < count;
+
+  useEffect(() => {
+    setLoadedPages(1);
+  }, [listOptions]);
+
+  return (
+    <section className="mt-12 pt-10 border-t border-gray-200 scroll-mt-4">
+      <h2 className="text-xl font-semibold text-[#22183a] mb-6">{t('rfxs.unassignedRfxs')}</h2>
+      <div className="space-y-6">
+        {isLoading && (
+          <div className="text-sm text-gray-500 flex items-center gap-2 py-4">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            {t('rfxs.loadingWorkspaceRfxs')}
+          </div>
+        )}
+        {!isLoading && sectionRfxs.length === 0 && (
+          <p className="text-sm text-gray-500 py-2">{t('rfxs.noUnassignedRfx')}</p>
+        )}
+        {!isLoading && sectionRfxs.map((rfx) => (
+          <CardComponent key={rfx.id} rfx={rfx} />
+        ))}
+        {canLoadMore && (
+          <div className="pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setLoadedPages((prev) => prev + 1)}
+              disabled={isFetching}
+            >
+              {isFetching ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {t('rfxs.loadingMoreWorkspaceRfxs')}
+                </>
+              ) : (
+                t('rfxs.loadMoreWorkspaceRfxs', { remaining: count - sectionRfxs.length })
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
 
 const RFXProjects = () => {
   const { t } = useTranslation();
@@ -57,6 +221,7 @@ const RFXProjects = () => {
   
   // Search, filter, and sort state
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'progress'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [filterBy, setFilterBy] = useState<'all' | 'member' | 'owner'>('all');
@@ -81,10 +246,24 @@ const RFXProjects = () => {
   const { invitations, loadMyInvitations, acceptInvitation, declineInvitation } = useRFXInvitations();
   
   const [selectedRFXId, setSelectedRFXId] = useState<string | null>(null);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
+  /** When set, show only that workspace's RFX list (same page, no route change). */
+  const [openFolderWorkspaceId, setOpenFolderWorkspaceId] = useState<string | null>(null);
+  const [newWorkspaceName, setNewWorkspaceName] = useState('');
+  const [isCreateWorkspaceDialogOpen, setIsCreateWorkspaceDialogOpen] = useState(false);
+  const [workspaceDeleteMode, setWorkspaceDeleteMode] = useState<'unassign' | 'delete-rfxs'>('unassign');
+  const [isWorkspaceDeleteDialogOpen, setIsWorkspaceDeleteDialogOpen] = useState(false);
+  const [isAssignWorkspaceModalOpen, setIsAssignWorkspaceModalOpen] = useState(false);
+  const [assignWorkspaceRfxId, setAssignWorkspaceRfxId] = useState<string | null>(null);
+  const [assignWorkspaceRfxName, setAssignWorkspaceRfxName] = useState('');
+  const [assignWorkspaceSelectValue, setAssignWorkspaceSelectValue] = useState<string>('none');
+  const [assignWorkspaceNewName, setAssignWorkspaceNewName] = useState('');
+  const [isSavingWorkspaceAssign, setIsSavingWorkspaceAssign] = useState(false);
   const [formData, setFormData] = useState<CreateRFXInput>({
     name: '',
     description: '',
     status: 'draft',
+    workspace_id: null,
   });
   
   // State for announcement when archiving sent RFX
@@ -96,6 +275,32 @@ const RFXProjects = () => {
   const [unarchiveAnnouncementSubject, setUnarchiveAnnouncementSubject] = useState('');
   const [unarchiveAnnouncementMessage, setUnarchiveAnnouncementMessage] = useState('');
   const [isPostingUnarchiveAnnouncement, setIsPostingUnarchiveAnnouncement] = useState(false);
+  const {
+    data: workspaces = [],
+    isLoading: loadingWorkspaces,
+    isFetching: isFetchingWorkspaces,
+    refetch: refetchWorkspaces,
+  } = useRfxWorkspaces();
+  const createWorkspaceMutation = useCreateRfxWorkspace();
+  const deleteWorkspaceMutation = useDeleteRfxWorkspace();
+
+  const focusedWorkspace = useMemo(
+    () => workspaces.find((w) => w.id === openFolderWorkspaceId) ?? null,
+    [workspaces, openFolderWorkspaceId],
+  );
+
+  useEffect(() => {
+    if (openFolderWorkspaceId && !workspaces.some((w) => w.id === openFolderWorkspaceId)) {
+      setOpenFolderWorkspaceId(null);
+    }
+  }, [openFolderWorkspaceId, workspaces]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 350);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleCreateRFX = async () => {
     if (!formData.name.trim()) {
@@ -121,7 +326,7 @@ const RFXProjects = () => {
         // The refresh is already happening asynchronously in createRFX
         // The page loading state will show while refreshing
         setIsCreateDialogOpen(false);
-        setFormData({ name: '', description: '', status: 'draft' });
+        setFormData({ name: '', description: '', status: 'draft', workspace_id: null });
       }
     } catch (error) {
       console.error('❌ [RFXProjects] Error in handleCreateRFX:', error);
@@ -185,6 +390,70 @@ const RFXProjects = () => {
     }
   };
 
+  const handleOpenCreateWorkspaceDialog = () => {
+    if (!user) {
+      setIsLoginPromptModalOpen(true);
+      return;
+    }
+    setNewWorkspaceName('');
+    setIsCreateWorkspaceDialogOpen(true);
+  };
+
+  const handleCreateWorkspace = async () => {
+    const trimmed = newWorkspaceName.trim();
+    if (!trimmed) return;
+    try {
+      await createWorkspaceMutation.mutateAsync(trimmed);
+      setNewWorkspaceName('');
+      setIsCreateWorkspaceDialogOpen(false);
+      toast({
+        title: t('rfxs.success'),
+        description: t('rfxs.workspaceCreated'),
+      });
+    } catch (error: any) {
+      toast({
+        title: t('rfxs.error'),
+        description: error?.message || t('rfxs.workspaceCreateFailed'),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const openDeleteWorkspaceDialog = (workspaceId: string) => {
+    setSelectedWorkspaceId(workspaceId);
+    setWorkspaceDeleteMode('unassign');
+    setIsWorkspaceDeleteDialogOpen(true);
+  };
+
+  const handleDeleteWorkspace = async () => {
+    if (!selectedWorkspaceId) return;
+    try {
+      const result = await deleteWorkspaceMutation.mutateAsync({
+        workspaceId: selectedWorkspaceId,
+        deleteRfxs: workspaceDeleteMode === 'delete-rfxs',
+      });
+      setIsWorkspaceDeleteDialogOpen(false);
+      if (selectedWorkspaceId === openFolderWorkspaceId) {
+        setOpenFolderWorkspaceId(null);
+      }
+      setSelectedWorkspaceId(null);
+      toast({
+        title: t('rfxs.success'),
+        description:
+          workspaceDeleteMode === 'delete-rfxs'
+            ? `Workspace deleted. ${result.deleted_rfx_count} draft RFXs removed, ${result.unassigned_rfx_count} reassigned.`
+            : `Workspace deleted. ${result.unassigned_rfx_count} RFXs are now unassigned.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: t('rfxs.error'),
+        description: error?.message || 'Failed to delete workspace',
+        variant: 'destructive',
+      });
+    }
+  };
+
+
   useEffect(() => {
     loadMyInvitations();
   }, [loadMyInvitations]);
@@ -192,26 +461,20 @@ const RFXProjects = () => {
   // Fetch RFXs with server-side pagination and filtering
   useEffect(() => {
     fetchRFXs({
-      page: currentPage,
-      itemsPerPage,
-      searchQuery,
+      page: 1,
+      itemsPerPage: 200,
+      searchQuery: debouncedSearchQuery,
       filterBy,
       sortBy,
       sortOrder,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, searchQuery, filterBy, sortBy, sortOrder]);
+  }, [debouncedSearchQuery, filterBy, sortBy, sortOrder]);
 
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, sortBy, sortOrder, filterBy]);
-
-  // Calculate total pages from totalCount
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
-  
-  // RFXs are already filtered and paginated from Supabase
-  const currentRFXs = rfxs;
+  }, [debouncedSearchQuery, sortBy, sortOrder, filterBy]);
 
   const handleDeleteRFX = async () => {
     if (!selectedRFXId) {
@@ -282,6 +545,51 @@ const RFXProjects = () => {
 
   const handleViewRFX = (rfxId: string) => {
     navigate(`/rfxs/${rfxId}`);
+  };
+
+  const openAssignWorkspaceModal = (
+    rfxId: string,
+    currentWorkspaceId: string | null,
+    rfxName: string,
+  ) => {
+    void refetchWorkspaces();
+    setAssignWorkspaceRfxId(rfxId);
+    setAssignWorkspaceRfxName(rfxName);
+    setAssignWorkspaceSelectValue(currentWorkspaceId || 'none');
+    setAssignWorkspaceNewName('');
+    setIsAssignWorkspaceModalOpen(true);
+  };
+
+  const handleSaveAssignWorkspace = async () => {
+    if (!assignWorkspaceRfxId) return;
+    setIsSavingWorkspaceAssign(true);
+    try {
+      let workspaceId: string | null = null;
+      if (assignWorkspaceSelectValue === 'new') {
+        const trimmedWorkspaceName = assignWorkspaceNewName.trim();
+        if (!trimmedWorkspaceName) {
+          toast({
+            title: t('rfxs.error'),
+            description: t('rfxs.workspaceNameRequired'),
+            variant: 'destructive',
+          });
+          return;
+        }
+        const createdWorkspace = await createWorkspaceMutation.mutateAsync(trimmedWorkspaceName);
+        workspaceId = createdWorkspace.id;
+      } else {
+        workspaceId = assignWorkspaceSelectValue === 'none' ? null : assignWorkspaceSelectValue;
+      }
+      const ok = await updateRFX(assignWorkspaceRfxId, { workspace_id: workspaceId });
+      if (ok) {
+        setIsAssignWorkspaceModalOpen(false);
+        setAssignWorkspaceRfxId(null);
+        setAssignWorkspaceRfxName('');
+        setAssignWorkspaceNewName('');
+      }
+    } finally {
+      setIsSavingWorkspaceAssign(false);
+    }
   };
 
   const openDeleteDialog = (rfxId: string) => {
@@ -563,6 +871,27 @@ const RFXProjects = () => {
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
+  const fullListOptions = useMemo(
+    () => ({
+      searchQuery: debouncedSearchQuery,
+      filterBy,
+      sortBy,
+      sortOrder,
+    }),
+    [debouncedSearchQuery, filterBy, sortBy, sortOrder],
+  );
+
+  const workspaceCountOptions = useMemo(
+    () => ({
+      searchQuery: debouncedSearchQuery,
+      filterBy,
+    }),
+    [debouncedSearchQuery, filterBy],
+  );
+
+  const workspaceIds = useMemo(() => workspaces.map((w) => w.id), [workspaces]);
+  const folderCountQueries = useWorkspaceRfxFolderCounts(workspaceIds, workspaceCountOptions);
+
   // Individual RFX Card Component with Progress
   const RFXCard: React.FC<{ rfx: any }> = ({ rfx }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -595,13 +924,11 @@ const RFXProjects = () => {
 
     // Always load members when component mounts or RFX changes to get fresh data
     useEffect(() => {
-      // Only load members if RFX still exists in the list
-      // This prevents loading members for deleted RFXs
-      if (loadMembers && rfxs.find(r => r.id === rfx.id)) {
+      if (loadMembers) {
         loadMembers();
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rfx.id, rfxs]);
+    }, [rfx.id]);
     
     // Update cache when members change, but only if changed to avoid blinking
     const lastMembersSignatureRef = React.useRef<string>('');
@@ -792,12 +1119,20 @@ const RFXProjects = () => {
                     <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="min-w-[12rem] w-max max-w-[min(20rem,calc(100vw-2rem))]">
                   <DropdownMenuItem 
                     onClick={handleEdit}
                     className="cursor-pointer hover:bg-gray-100 focus:bg-gray-100 transition-colors"
                   >
                     {t('rfxs.edit')}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      openAssignWorkspaceModal(rfx.id, rfx.workspace_id ?? null, rfx.name || '')
+                    }
+                    className="cursor-pointer hover:bg-gray-100 focus:bg-gray-100 transition-colors"
+                  >
+                    {t('rfxs.assignRfxToWorkspaceMenu')}
                   </DropdownMenuItem>
                   {isOwner && rfx.status !== 'revision requested by buyer' && (
                     <DropdownMenuItem 
@@ -853,7 +1188,7 @@ const RFXProjects = () => {
                   {t('rfxs.subtitle')}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 ml-6">
+                <div className="flex flex-col gap-3 ml-6 items-end shrink-0">
                   <Button
                     onClick={handleOpenCreateRFXDialog}
                     className="inline-flex items-center px-4 py-2 rounded-md bg-[#22183a] text-white hover:bg-[#22183a]/90"
@@ -861,6 +1196,15 @@ const RFXProjects = () => {
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     {t('rfxs.newRfx')}
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={handleOpenCreateWorkspaceDialog}
+                    className="inline-flex items-center px-4 py-2 rounded-md bg-[#22183a] text-white hover:bg-[#22183a]/90"
+                    disabled={createWorkspaceMutation.isPending}
+                  >
+                    <FolderPlus className="h-4 w-4 mr-2" />
+                    {t('rfxs.newWorkspace')}
                   </Button>
                 </div>
               </div>
@@ -923,10 +1267,12 @@ const RFXProjects = () => {
               </Button>
             </div>
             
-            {/* Results count */}
-            <div className="mt-3 text-sm text-gray-600">
-              {t('rfxs.rfxsFound', { count: totalCount })}
-            </div>
+            {/* Results count (hidden inside a single-workspace folder view) */}
+            {!openFolderWorkspaceId && (
+              <div className="mt-3 text-sm text-gray-600">
+                {t('rfxs.rfxsFound', { count: totalCount })}
+              </div>
+            )}
           </div>
         )}
 
@@ -1052,51 +1398,107 @@ const RFXProjects = () => {
 
         
 
-        {/* RFX List */}
+        {/* Folder grid (3 cols) + unassigned; click folder → that workspace’s RFXs + back */}
         {!loading && totalCount > 0 && (
-          <>
-            <div className="space-y-6">
-              {currentRFXs.map((rfx) => (
-                <RFXCard key={rfx.id} rfx={rfx} />
-              ))}
-            </div>
-            
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center mt-8 gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="bg-white hover:bg-gray-100"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                
-                <div className="flex items-center gap-2 px-4">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <Button
-                      key={page}
-                      variant={currentPage === page ? "default" : "outline"}
-                      onClick={() => setCurrentPage(page)}
-                      className={currentPage === page ? "bg-[#22183a] text-white" : "bg-white hover:bg-gray-100"}
-                    >
-                      {page}
-                    </Button>
-                  ))}
+          <div>
+            {openFolderWorkspaceId && focusedWorkspace ? (
+              <div>
+                <div className="mb-6">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="border-[#22183a] text-[#22183a] hover:bg-[#22183a]/5"
+                    onClick={() => setOpenFolderWorkspaceId(null)}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    {t('rfxs.backToWorkspaceOverview')}
+                  </Button>
                 </div>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="bg-white hover:bg-gray-100"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+                <WorkspaceRfxBlockModule
+                  workspace={focusedWorkspace}
+                  listOptions={fullListOptions}
+                  onDeleteWorkspace={openDeleteWorkspaceDialog}
+                  CardComponent={RFXCard}
+                />
               </div>
+            ) : (
+              <>
+                {loadingWorkspaces && workspaces.length > 0 && (
+                  <div className="text-sm text-gray-500 flex items-center gap-2 mb-4">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {t('rfxs.loadingWorkspaces')}
+                  </div>
+                )}
+
+                {workspaces.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+                    {workspaces.map((workspace, index) => {
+                      const q = folderCountQueries[index];
+                      const countValue =
+                        q?.isPending || q?.isFetching ? null : (q?.data ?? 0);
+                      return (
+                        <Card
+                          key={workspace.id}
+                          className="border border-gray-200 shadow-sm bg-gradient-to-br from-white to-[#f1e8f4]/50 hover:shadow-md transition-shadow"
+                        >
+                          <CardContent
+                            tabIndex={0}
+                            aria-label={t('rfxs.openWorkspaceFolder', { name: workspace.name })}
+                            className="relative flex flex-col items-center justify-center text-center p-6 gap-3 min-h-[132px] cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#22183a]/30 focus-visible:ring-offset-2 rounded-lg"
+                            onClick={(e) => {
+                              if ((e.target as HTMLElement).closest('[data-workspace-delete]')) {
+                                return;
+                              }
+                              setOpenFolderWorkspaceId(workspace.id);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            onKeyDown={(e) => {
+                              if ((e.target as HTMLElement).closest('[data-workspace-delete]')) {
+                                return;
+                              }
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setOpenFolderWorkspaceId(workspace.id);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }
+                            }}
+                          >
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              data-workspace-delete
+                              className="absolute top-2 right-2 z-10 h-8 w-8 text-gray-500 hover:text-gray-600 hover:bg-gray-100/80"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openDeleteWorkspaceDialog(workspace.id);
+                              }}
+                              aria-label={t('rfxs.deleteWorkspace')}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                            <Folder className="h-11 w-11 text-[#f4a9aa]" strokeWidth={1.25} />
+                            <span className="font-semibold text-[#22183a] truncate w-full px-1">
+                              {workspace.name}
+                            </span>
+                            <Badge variant="secondary" className="tabular-nums">
+                              {countValue === null ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                t('rfxs.workspaceFolderRfxCount', { count: countValue })
+                              )}
+                            </Badge>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                )}
+
+                <UnassignedRfxBlockModule listOptions={fullListOptions} CardComponent={RFXCard} />
+              </>
             )}
-          </>
+          </div>
         )}
 
         {/* Create RFX Dialog */}
@@ -1132,13 +1534,47 @@ const RFXProjects = () => {
                   rows={4}
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="workspace">{'Workspace'}</Label>
+                <Select
+                  value={formData.workspace_id || 'none'}
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      workspace_id: value === 'none' ? null : value,
+                    })
+                  }
+                >
+                  <SelectTrigger id="workspace">
+                    <SelectValue placeholder="Select workspace (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t('rfxs.rfxNoWorkspaceOption')}</SelectItem>
+                    {isFetchingWorkspaces && (
+                      <SelectItem value="__loading" disabled>
+                        {t('rfxs.loadingWorkspaces')}
+                      </SelectItem>
+                    )}
+                    {!isFetchingWorkspaces && workspaces.length === 0 && (
+                      <SelectItem value="__empty" disabled>
+                        {t('rfxs.noWorkspacesAvailable')}
+                      </SelectItem>
+                    )}
+                    {workspaces.map((workspace) => (
+                      <SelectItem key={workspace.id} value={workspace.id}>
+                        {workspace.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <DialogFooter>
               <Button
                 variant="outline"
                 onClick={() => {
                   setIsCreateDialogOpen(false);
-                  setFormData({ name: '', description: '', status: 'draft' });
+                  setFormData({ name: '', description: '', status: 'draft', workspace_id: null });
                 }}
                 disabled={isCreatingRFX}
               >
@@ -1161,6 +1597,208 @@ const RFXProjects = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <Dialog
+          open={isAssignWorkspaceModalOpen}
+          onOpenChange={(open) => {
+            setIsAssignWorkspaceModalOpen(open);
+            if (!open) {
+              setAssignWorkspaceRfxId(null);
+              setAssignWorkspaceRfxName('');
+              setAssignWorkspaceNewName('');
+              setIsSavingWorkspaceAssign(false);
+            }
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {t('rfxs.assignRfxToWorkspaceTitle', { name: assignWorkspaceRfxName || t('rfxs.rfxProject') })}
+              </DialogTitle>
+              <DialogDescription>{t('rfxs.assignRfxToWorkspaceDesc')}</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="assign-workspace-select">{t('rfxs.pickWorkspaceLabel')}</Label>
+                <div id="assign-workspace-select" className="rounded-md border p-3 bg-white">
+                  {isFetchingWorkspaces ? (
+                    <div className="text-sm text-gray-500 flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      {t('rfxs.loadingWorkspaces')}
+                    </div>
+                  ) : (
+                    <RadioGroup
+                      value={assignWorkspaceSelectValue}
+                      onValueChange={setAssignWorkspaceSelectValue}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="none" id="assign-workspace-none" />
+                        <Label htmlFor="assign-workspace-none" className="cursor-pointer">
+                          {t('rfxs.rfxNoWorkspaceOption')}
+                        </Label>
+                      </div>
+                      {workspaces.map((workspace) => (
+                        <div key={workspace.id} className="flex items-center space-x-2">
+                          <RadioGroupItem value={workspace.id} id={`assign-workspace-${workspace.id}`} />
+                          <Label htmlFor={`assign-workspace-${workspace.id}`} className="cursor-pointer">
+                            {workspace.name}
+                          </Label>
+                        </div>
+                      ))}
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="new" id="assign-workspace-new" />
+                        <Label htmlFor="assign-workspace-new" className="cursor-pointer">
+                          {t('rfxs.createNewWorkspace')}
+                        </Label>
+                      </div>
+                      {workspaces.length === 0 && (
+                        <p className="text-sm text-gray-500">{t('rfxs.noWorkspacesAvailable')}</p>
+                      )}
+                    </RadioGroup>
+                  )}
+                </div>
+                {assignWorkspaceSelectValue === 'new' && (
+                  <div className="space-y-2 pt-1">
+                    <Label htmlFor="assign-new-workspace-name">{t('rfxs.workspaceNameLabel')}</Label>
+                    <Input
+                      id="assign-new-workspace-name"
+                      value={assignWorkspaceNewName}
+                      onChange={(e) => setAssignWorkspaceNewName(e.target.value)}
+                      placeholder={t('rfxs.workspaceNamePlaceholder')}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsAssignWorkspaceModalOpen(false)}
+                disabled={isSavingWorkspaceAssign}
+              >
+                {t('rfxs.cancel')}
+              </Button>
+              <Button
+                type="button"
+                onClick={() => void handleSaveAssignWorkspace()}
+                disabled={isSavingWorkspaceAssign || isFetchingWorkspaces}
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
+              >
+                {isSavingWorkspaceAssign ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t('rfxs.saving')}
+                  </>
+                ) : (
+                  t('rfxs.saveWorkspaceAssignment')
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={isCreateWorkspaceDialogOpen}
+          onOpenChange={(open) => {
+            setIsCreateWorkspaceDialogOpen(open);
+            if (!open) setNewWorkspaceName('');
+          }}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t('rfxs.createNewWorkspace')}</DialogTitle>
+              <DialogDescription>{t('rfxs.createNewWorkspaceDesc')}</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="workspace-name">{t('rfxs.workspaceNameLabel')}</Label>
+                <Input
+                  id="workspace-name"
+                  placeholder={t('rfxs.workspaceNamePlaceholder')}
+                  value={newWorkspaceName}
+                  onChange={(e) => setNewWorkspaceName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && newWorkspaceName.trim() && !createWorkspaceMutation.isPending) {
+                      e.preventDefault();
+                      handleCreateWorkspace();
+                    }
+                  }}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsCreateWorkspaceDialogOpen(false);
+                  setNewWorkspaceName('');
+                }}
+                disabled={createWorkspaceMutation.isPending}
+              >
+                {t('rfxs.cancel')}
+              </Button>
+              <Button
+                onClick={handleCreateWorkspace}
+                disabled={!newWorkspaceName.trim() || createWorkspaceMutation.isPending}
+                className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
+              >
+                {createWorkspaceMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t('rfxs.creatingWorkspace')}
+                  </>
+                ) : (
+                  t('rfxs.createWorkspace')
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <AlertDialog open={isWorkspaceDeleteDialogOpen} onOpenChange={setIsWorkspaceDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete workspace</AlertDialogTitle>
+              <AlertDialogDescription>
+                Choose whether RFXs inside this workspace should be deleted (only your draft RFXs) or moved to unassigned.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="space-y-2">
+              <Button
+                variant={workspaceDeleteMode === 'unassign' ? 'default' : 'outline'}
+                className="w-full justify-start"
+                onClick={() => setWorkspaceDeleteMode('unassign')}
+              >
+                Keep RFXs as unassigned
+              </Button>
+              <Button
+                variant={workspaceDeleteMode === 'delete-rfxs' ? 'default' : 'outline'}
+                className="w-full justify-start"
+                onClick={() => setWorkspaceDeleteMode('delete-rfxs')}
+              >
+                Delete draft owned RFXs, unassign the rest
+              </Button>
+            </div>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setSelectedWorkspaceId(null);
+                }}
+              >
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteWorkspace}
+                className="bg-red-600 hover:bg-red-700"
+                disabled={deleteWorkspaceMutation.isPending}
+              >
+                {deleteWorkspaceMutation.isPending ? 'Deleting...' : 'Delete workspace'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Free plan creation limit modal */}
         <Dialog open={isPlanLimitModalOpen} onOpenChange={setIsPlanLimitModalOpen}>

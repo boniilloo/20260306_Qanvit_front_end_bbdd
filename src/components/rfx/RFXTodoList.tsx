@@ -51,7 +51,6 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
         { id: 'specs', title: t('rfxs.todo_specs_title'), description: t('rfxs.todo_specs_desc'), status: 'completed', icon: <FileText className="h-5 w-5" /> },
         { id: 'candidates', title: t('rfxs.todo_candidates_title'), description: t('rfxs.todo_candidates_desc'), status: 'completed', icon: <Users className="h-5 w-5" /> },
         { id: 'validation', title: t('rfxs.todo_validation_title'), description: t('rfxs.todo_validation_desc'), status: 'completed', icon: <Send className="h-5 w-5" /> },
-        { id: 'fq_validation', title: t('rfxs.todo_fq_validation_title'), description: t('rfxs.todo_fq_validation_desc'), status: 'completed', icon: <Send className="h-5 w-5" /> },
         { id: 'responses', title: t('rfxs.todo_responses_title'), description: t('rfxs.todo_responses_desc'), status: 'completed', icon: <BarChart3 className="h-5 w-5" /> }
       ];
     }
@@ -91,27 +90,17 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
       return 'pending';
     };
 
-    // Calculate Qanvit validation status (after Launch RFX)
-    const getFQValidationStatus = (): TodoStatus => {
-      if (rfxStatus === 'waiting for supplier proposals') {
-        return 'completed';
-      }
-      return 'pending';
-    };
-
     // Calculate all statuses first
     const specsStatus = getSpecsStatus();
     const candidatesStatus = getCandidatesStatus();
     const validationStatus = getValidationStatus();
-    const fqValidationStatus = getFQValidationStatus();
 
     // Determine the next step to complete
     const getNextStepToComplete = (): string => {
       if (specsStatus !== 'completed') return 'specs';
       if (candidatesStatus !== 'completed') return 'candidates';
       if (validationStatus !== 'completed') return 'validation';
-      if (fqValidationStatus !== 'completed') return 'fq_validation';
-      return 'none'; // All completed
+      return 'responses';
     };
 
     const nextStep = getNextStepToComplete();
@@ -135,15 +124,8 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
           if (validationStatus === 'completed') return 'completed';
           if (nextStep === 'validation') return 'in_progress'; // Next step gets blue
           return 'pending'; // Other pending steps get gray
-        case 'fq_validation':
-          if (fqValidationStatus === 'completed') return 'completed';
-          if (nextStep === 'fq_validation') return 'in_progress';
-          return 'pending';
         case 'responses':
-          // Only show as in_progress if ALL previous steps are completed
-          // This ensures consistency and avoids showing in_progress before candidates is completed
-          if (fqValidationStatus === 'completed' && 
-              specsStatus === 'completed' && 
+          if (specsStatus === 'completed' && 
               candidatesStatus === 'completed' && 
               validationStatus === 'completed') {
             return 'in_progress';
@@ -158,7 +140,6 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
       { id: 'specs', title: t('rfxs.todo_specs_title'), description: t('rfxs.todo_specs_desc'), status: getItemStatus('specs'), icon: <FileText className="h-5 w-5" /> },
       { id: 'candidates', title: t('rfxs.todo_candidates_title'), description: t('rfxs.todo_candidates_desc'), status: getItemStatus('candidates'), icon: <Users className="h-5 w-5" /> },
       { id: 'validation', title: t('rfxs.todo_validation_title'), description: t('rfxs.todo_validation_desc'), status: getItemStatus('validation'), icon: <Send className="h-5 w-5" /> },
-      { id: 'fq_validation', title: t('rfxs.todo_fq_validation_title'), description: t('rfxs.todo_fq_validation_desc'), status: getItemStatus('fq_validation'), icon: <Send className="h-5 w-5" /> },
       { id: 'responses', title: t('rfxs.todo_responses_title'), description: t('rfxs.todo_responses_desc'), status: getItemStatus('responses'), icon: <BarChart3 className="h-5 w-5" /> }
     ];
   }, [specsCompletion, candidatesCompletion, candidatesProgress, validationProgress, rfxStatus, versionMismatchWarning, forceAllCompleted, t]);
@@ -210,7 +191,6 @@ const RFXTodoList: React.FC<RFXTodoListProps> = ({ specsCompletion, candidatesCo
                 onClick={() => onItemClick?.(item.id)}
                 data-onboarding-target={
                   item.id === 'specs' ? 'define-rfx-specifications-item' : 
-                  item.id === 'fq_validation' ? 'rfx-progress-item-fq_validation' : 
                   item.id === 'responses' ? 'rfx-progress-item-responses' : 
                   undefined
                 }

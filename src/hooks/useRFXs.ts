@@ -1,7 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { userCrypto } from '@/lib/userCrypto';
+import {
+  RFX_WORKSPACES_QUERY_KEY,
+  WORKSPACE_RFX_COUNT_QUERY_KEY,
+  WORKSPACE_RFXS_QUERY_KEY,
+  UNASSIGNED_RFXS_QUERY_KEY,
+} from '@/hooks/useRfxWorkspaces';
 
 export interface RFX {
   id: string;
@@ -12,6 +19,7 @@ export interface RFX {
   created_at: string;
   updated_at: string;
   progress_step: number;
+  workspace_id?: string | null;
   creator_email?: string;
   creator_name?: string;
   creator_surname?: string;
@@ -22,12 +30,14 @@ export interface CreateRFXInput {
   name: string;
   description?: string;
   status?: 'draft' | 'revision requested by buyer' | 'waiting for supplier proposals' | 'closed' | 'cancelled';
+  workspace_id?: string | null;
 }
 
 export interface UpdateRFXInput {
   name?: string;
   description?: string;
   status?: 'draft' | 'revision requested by buyer' | 'waiting for supplier proposals' | 'closed' | 'cancelled';
+  workspace_id?: string | null;
 }
 
 export interface FetchRFXsOptions {
@@ -40,6 +50,7 @@ export interface FetchRFXsOptions {
 }
 
 export const useRFXs = () => {
+  const queryClient = useQueryClient();
   const [rfxs, setRfxs] = useState<RFX[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -259,6 +270,7 @@ export const useRFXs = () => {
             name: input.name,
             description: input.description || null,
             status: input.status || 'draft',
+            workspace_id: input.workspace_id ?? null,
             progress_step: 0,
             creator_name: creatorData.name || null,
             creator_surname: creatorData.surname || null,
@@ -347,9 +359,15 @@ export const useRFXs = () => {
             name: (data as any).name || 'Untitled RFX',
             status: (data as any).status || 'draft',
             created_at: (data as any).created_at,
+            workspace_id: (data as any).workspace_id ?? null,
           },
         })
       );
+
+      queryClient.invalidateQueries({ queryKey: RFX_WORKSPACES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_RFXS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: UNASSIGNED_RFXS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_RFX_COUNT_QUERY_KEY });
 
       return data as unknown as RFX;
     } catch (err: any) {
@@ -369,10 +387,12 @@ export const useRFXs = () => {
   // Update an existing RFX
   const updateRFX = async (id: string, input: UpdateRFXInput): Promise<boolean> => {
     try {
-      const { error: updateError } = await supabase
+      const { data: updatedRfx, error: updateError } = await supabase
         .from('rfxs' as any)
         .update(input)
-        .eq('id', id);
+        .eq('id', id)
+        .select('id, user_id, name, status, created_at, workspace_id')
+        .single();
 
       if (updateError) {
         throw updateError;
@@ -385,6 +405,26 @@ export const useRFXs = () => {
 
       // Refresh the list
       await fetchRFXs();
+      queryClient.invalidateQueries({ queryKey: RFX_WORKSPACES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_RFXS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: UNASSIGNED_RFXS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_RFX_COUNT_QUERY_KEY });
+
+      // Notify other UI surfaces (e.g. sidebar) for immediate workspace/status refresh.
+      if (updatedRfx) {
+        window.dispatchEvent(
+          new CustomEvent('rfx-updated', {
+            detail: {
+              id: (updatedRfx as any).id,
+              user_id: (updatedRfx as any).user_id,
+              name: (updatedRfx as any).name || 'Untitled RFX',
+              status: (updatedRfx as any).status || 'draft',
+              created_at: (updatedRfx as any).created_at,
+              workspace_id: (updatedRfx as any).workspace_id ?? null,
+            },
+          }),
+        );
+      }
 
       return true;
     } catch (err: any) {
@@ -437,6 +477,10 @@ export const useRFXs = () => {
 
       // Refresh the list
       await fetchRFXs();
+      queryClient.invalidateQueries({ queryKey: RFX_WORKSPACES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_RFXS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: UNASSIGNED_RFXS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_RFX_COUNT_QUERY_KEY });
 
       return true;
     } catch (err: any) {
@@ -484,6 +528,10 @@ export const useRFXs = () => {
 
       // Refresh the list
       await fetchRFXs();
+      queryClient.invalidateQueries({ queryKey: RFX_WORKSPACES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_RFXS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: UNASSIGNED_RFXS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: WORKSPACE_RFX_COUNT_QUERY_KEY });
 
       return true;
     } catch (err: any) {

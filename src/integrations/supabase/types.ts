@@ -242,6 +242,12 @@ export type Database = {
           recommendation_prompt: string | null
           recommendation_reasoning_effort: string | null
           recommendation_verbosity: string | null
+          rfx_bootstrap_model: string | null
+          rfx_bootstrap_reasoning_effort: string | null
+          rfx_bootstrap_temperature: number | null
+          rfx_bootstrap_system_prompt: string | null
+          rfx_bootstrap_user_template: string | null
+          rfx_bootstrap_verbosity: string | null
           router_model: string | null
           router_prompt: string | null
           router_reasoning_effort: string | null
@@ -290,6 +296,12 @@ export type Database = {
           recommendation_prompt?: string | null
           recommendation_reasoning_effort?: string | null
           recommendation_verbosity?: string | null
+          rfx_bootstrap_model?: string | null
+          rfx_bootstrap_reasoning_effort?: string | null
+          rfx_bootstrap_temperature?: number | null
+          rfx_bootstrap_system_prompt?: string | null
+          rfx_bootstrap_user_template?: string | null
+          rfx_bootstrap_verbosity?: string | null
           router_model?: string | null
           router_prompt?: string | null
           router_reasoning_effort?: string | null
@@ -338,6 +350,12 @@ export type Database = {
           recommendation_prompt?: string | null
           recommendation_reasoning_effort?: string | null
           recommendation_verbosity?: string | null
+          rfx_bootstrap_model?: string | null
+          rfx_bootstrap_reasoning_effort?: string | null
+          rfx_bootstrap_temperature?: number | null
+          rfx_bootstrap_system_prompt?: string | null
+          rfx_bootstrap_user_template?: string | null
+          rfx_bootstrap_verbosity?: string | null
           router_model?: string | null
           router_prompt?: string | null
           router_reasoning_effort?: string | null

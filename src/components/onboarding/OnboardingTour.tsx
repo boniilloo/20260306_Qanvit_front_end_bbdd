@@ -374,20 +374,20 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
       disableBeacon: true,
     },
     {
-      target: '[data-onboarding-target="rfx-progress-item-fq_validation"]',
+      target: '[data-onboarding-target="rfx-progress-item-responses"]',
       content: (
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">12</span>
             <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
-              Qanvit Validation 🛡️
+              Responses & AI Analysis 📊
             </h3>
           </div>
           <p className="text-base">
-            Once sent, all RFXs are <strong>validated by the Qanvit team</strong>.
+            Once the RFX is launched, this area becomes the next active step for reviewing supplier responses.
           </p>
           <p className="text-base">
-            We ensure every RFX reaching suppliers is verified and backed by real intent, maintaining a high-quality marketplace.
+            Here you'll compare proposals, analyze answers and move the process toward the final decision.
           </p>
         </div>
       ),
@@ -847,8 +847,8 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
           return;
         }
 
-        // Special case: When moving from step 18 (index 10) to step 19 (FQ Validation),
-        // navigate back to RFX overview
+        // Special case: When moving from sending back to the overview,
+        // navigate to the responses step card
         if (index === 10) {
           setRun(false);
           
@@ -859,9 +859,9 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
             const rfxId = rfxIdMatch[1];
             navigate(`/rfx-example/${rfxId}`);
             
-            // Wait for overview page to load and find validation item
-            const waitForValidationItem = (retries = 20): void => {
-              const item = document.querySelector('[data-onboarding-target="rfx-progress-item-fq_validation"]') as HTMLElement | null;
+            // Wait for overview page to load and find responses item
+            const waitForResponsesItem = (retries = 20): void => {
+              const item = document.querySelector('[data-onboarding-target="rfx-progress-item-responses"]') as HTMLElement | null;
 
               if (item) {
                 item.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -870,7 +870,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
                   setRun(true);
                 }, 500);
               } else if (retries > 0) {
-                setTimeout(() => waitForValidationItem(retries - 1), 300);
+                setTimeout(() => waitForResponsesItem(retries - 1), 300);
               } else {
                 setStepIndex(11);
                 setRun(true);
@@ -878,7 +878,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
             };
 
             setTimeout(() => {
-              waitForValidationItem();
+              waitForResponsesItem();
             }, 1000);
           } else {
             setStepIndex(11);

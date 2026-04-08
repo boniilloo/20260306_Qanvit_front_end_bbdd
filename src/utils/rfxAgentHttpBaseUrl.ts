@@ -5,7 +5,10 @@
 export function getRfxAgentHttpBaseUrl(): string {
   const explicit = import.meta.env.VITE_RFX_API_HTTP_URL;
   if (explicit && String(explicit).trim()) {
-    return String(explicit).replace(/\/$/, '');
+    return String(explicit)
+      .replace(/\/$/, '')
+      .replace(/\/ws-rfx-agent\/?$/i, '')
+      .replace(/\/ws-rfx-candidates\/?$/i, '');
   }
 
   const wsUrl = import.meta.env.DEV
@@ -19,5 +22,6 @@ export function getRfxAgentHttpBaseUrl(): string {
   return String(wsUrl)
     .replace(/^ws:\/\//i, 'http://')
     .replace(/^wss:\/\//i, 'https://')
-    .replace(/\/ws-rfx-agent\/?$/i, '');
+    .replace(/\/ws-rfx-agent\/?$/i, '')
+    .replace(/\/ws-rfx-candidates\/?$/i, '');
 }

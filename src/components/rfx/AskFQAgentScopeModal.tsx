@@ -3,24 +3,17 @@ import 'leaflet/dist/leaflet.css';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { LocateFixed } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
-export type AskFQAgentScope =
-  | {
-      global: true; // always true (locked)
-      /**
-       * Deprecated (temporarily hidden in UI): country filter.
-       * Kept for backward compatibility with older messages.
-       */
-      country?: { countries: Array<{ countryCode: string; countryName: string }> };
-      /** Selected location + (optional) radius for "nearby" mode */
-      nearby?: { lat: number; lng: number; radius_km?: number };
-      /** UI mode hint (non-breaking for backend) */
-      mode?: 'global' | 'nearby';
-    };
+const DEFAULT_SCOPE_LOCATION = { lat: 40.4210, lng: -3.7022 }; // Default point (Madrid area)
+const DEFAULT_SCOPE_RADIUS_KM = 650;
+const MIN_SCOPE_RADIUS_KM = 100;
+const MAX_SCOPE_RADIUS_KM = 2500;
+
+export type AskFQAgentScope = {
+  nearby: { lat: number; lng: number; radius_km: number };
+};
 
 type Props = {
   open: boolean;
@@ -63,6 +56,56 @@ function LeafletLocationPicker({
   const circleRef = useRef<any>(null);
   const leafletRef = useRef<any>(null);
 
+  const syncMapSelection = (
+    map: any,
+    L: any,
+    selectedValue: { lat: number; lng: number } | null,
+    fallbackCenter: { lat: number; lng: number },
+    currentRadiusKm: number
+  ) => {
+    const target = selectedValue ?? fallbackCenter;
+    const zoom = selectedValue ? 6 : 2;
+    map.setView([target.lat, target.lng], zoom, { animate: true });
+
+    if (selectedValue) {
+      if (!markerRef.current) {
+        markerRef.current = L.marker([selectedValue.lat, selectedValue.lng]).addTo(map);
+      } else {
+        markerRef.current.setLatLng([selectedValue.lat, selectedValue.lng]);
+      }
+
+      const radiusMeters = Math.max(100, currentRadiusKm) * 1000;
+      if (!circleRef.current) {
+        circleRef.current = L.circle([selectedValue.lat, selectedValue.lng], {
+          radius: radiusMeters,
+          color: '#f4a9aa',
+          weight: 2,
+          opacity: 0.9,
+          fillColor: '#f4a9aa',
+          fillOpacity: 0.18,
+        }).addTo(map);
+      } else {
+        circleRef.current.setLatLng([selectedValue.lat, selectedValue.lng]);
+        circleRef.current.setRadius(radiusMeters);
+      }
+
+      try {
+        map.fitBounds(circleRef.current.getBounds(), { padding: [18, 18], maxZoom: 10, animate: true });
+      } catch {
+        // ignore
+      }
+    } else {
+      if (markerRef.current) {
+        markerRef.current.remove?.();
+        markerRef.current = null;
+      }
+      if (circleRef.current) {
+        circleRef.current.remove?.();
+        circleRef.current = null;
+      }
+    }
+  };
+
   useEffect(() => {
     if (!open) return;
     if (!containerRef.current) return;
@@ -95,6 +138,9 @@ function LeafletLocationPicker({
         map.on('click', (e: any) => {
           onPick(e.latlng.lat, e.latlng.lng);
         });
+
+        // Draw default/current selection as soon as the map is created.
+        syncMapSelection(map, L, value, center, radiusKm);
       }
 
       // Ensure correct sizing once dialog is visible
@@ -120,48 +166,7 @@ function LeafletLocationPicker({
     const L = leafletRef.current;
     if (!map || !L) return;
 
-    const target = value ?? center;
-    const zoom = value ? Math.max(map.getZoom?.() || 2, 6) : 2;
-    map.setView([target.lat, target.lng], zoom, { animate: true });
-
-    if (value) {
-      if (!markerRef.current) {
-        markerRef.current = L.marker([value.lat, value.lng]).addTo(map);
-      } else {
-        markerRef.current.setLatLng([value.lat, value.lng]);
-      }
-
-      // Radius circle overlay (meters)
-      const radiusMeters = Math.max(100, radiusKm) * 1000;
-      if (!circleRef.current) {
-        circleRef.current = L.circle([value.lat, value.lng], {
-          radius: radiusMeters,
-          color: '#f4a9aa',
-          weight: 2,
-          opacity: 0.9,
-          fillColor: '#f4a9aa',
-          fillOpacity: 0.18,
-        }).addTo(map);
-      } else {
-        circleRef.current.setLatLng([value.lat, value.lng]);
-        circleRef.current.setRadius(radiusMeters);
-      }
-
-      // Keep the selected radius visible
-      try {
-        map.fitBounds(circleRef.current.getBounds(), { padding: [18, 18], maxZoom: 10, animate: true });
-      } catch {
-        // ignore
-      }
-    } else if (markerRef.current) {
-      markerRef.current.remove?.();
-      markerRef.current = null;
-    }
-
-    if (!value && circleRef.current) {
-      circleRef.current.remove?.();
-      circleRef.current = null;
-    }
+    syncMapSelection(map, L, value, center, radiusKm);
   }, [open, center, value, radiusKm]);
 
   useEffect(() => {
@@ -183,37 +188,33 @@ function LeafletLocationPicker({
 
 export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: Props) {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<'global' | 'nearby'>('global');
-  const [radiusKm, setRadiusKm] = useState<number>(300);
+  const [radiusKm, setRadiusKm] = useState<number>(DEFAULT_SCOPE_RADIUS_KM);
 
-  const [picked, setPicked] = useState<{ lat: number; lng: number } | null>(null);
-  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({ lat: 20, lng: 0 });
+  const [picked, setPicked] = useState<{ lat: number; lng: number } | null>(DEFAULT_SCOPE_LOCATION);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>(DEFAULT_SCOPE_LOCATION);
 
   useEffect(() => {
     if (!open) return;
     // Reset to required defaults each time it opens.
-    setMode('global');
-    setRadiusKm(300);
-    setPicked(null);
-    setMapCenter({ lat: 20, lng: 0 });
+    setRadiusKm(DEFAULT_SCOPE_RADIUS_KM);
+    setPicked(DEFAULT_SCOPE_LOCATION);
+    setMapCenter(DEFAULT_SCOPE_LOCATION);
   }, [open]);
 
-  const canConfirm = mode === 'global' || !!picked;
+  const canConfirm = !!picked;
 
   const handleConfirm = () => {
-    const scope: AskFQAgentScope = { global: true, mode };
-    if (mode === 'nearby' && picked) {
-      scope.nearby = { lat: picked.lat, lng: picked.lng, radius_km: radiusKm };
-    }
-    return onConfirm(scope);
+    if (!picked) return;
+    return onConfirm({
+      nearby: { lat: picked.lat, lng: picked.lng, radius_km: radiusKm },
+    });
   };
 
-  const useMyLocation = async () => {
+  const pickMyLocation = async () => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const next = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setMode('nearby');
         setPicked(next);
         setMapCenter(next);
       },
@@ -236,117 +237,79 @@ export default function AskFQAgentScopeModal({ open, onOpenChange, onConfirm }: 
 
         <div className="space-y-5">
           <div className="grid gap-3">
-            <RadioGroup value={mode} onValueChange={(v) => setMode(v as any)} className="grid gap-3">
-              {/* Global */}
-              <label
-                htmlFor="ask-fq-scope-global"
-                className={cn(
-                  'flex items-start gap-3 rounded-lg border p-4 cursor-pointer',
-                  mode === 'global' ? 'border-[#f4a9aa] bg-[#f4a9aa]/10' : 'border-gray-200 bg-white'
-                )}
-              >
-                <RadioGroupItem id="ask-fq-scope-global" value="global" className="mt-1" />
+            <div className="rounded-lg border border-[#f4a9aa] bg-[#f4a9aa]/10 p-4">
+              <div className="space-y-3 w-full">
                 <div className="space-y-1">
-                  <div className="text-base font-semibold text-[#22183a]">{t('rfxs.scopeModal_globally')}</div>
-                  <p className="text-sm text-gray-600">{t('rfxs.scopeModal_globallyDesc')}</p>
+                  <div className="text-base font-semibold text-[#22183a]">{t('rfxs.scopeModal_nearLocation')}</div>
+                  <p className="text-sm text-gray-600">{t('rfxs.scopeModal_nearLocationDesc')}</p>
                 </div>
-              </label>
 
-              {/* Nearby */}
-              <label
-                htmlFor="ask-fq-scope-nearby"
-                className={cn(
-                  'flex items-start gap-3 rounded-lg border p-4 cursor-pointer',
-                  mode === 'nearby' ? 'border-[#f4a9aa] bg-[#f4a9aa]/10' : 'border-gray-200 bg-white'
-                )}
-              >
-                <RadioGroupItem id="ask-fq-scope-nearby" value="nearby" className="mt-1" />
-                <div className="space-y-3 w-full">
-                  <div className="space-y-1">
-                    <div className="text-base font-semibold text-[#22183a]">{t('rfxs.scopeModal_nearLocation')}</div>
-                    <p className="text-sm text-gray-600">
-                      {t('rfxs.scopeModal_nearLocationDesc')}
-                    </p>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <Button type="button" variant="outline" className="bg-white" onClick={() => void pickMyLocation()}>
+                    <LocateFixed className="h-4 w-4 mr-2" />
+                    {t('rfxs.scopeModal_useMyLocation')}
+                  </Button>
+                  <p className="text-sm text-gray-600">{t('rfxs.scopeModal_clickMapHint')}</p>
+                </div>
 
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="bg-white"
-                      onClick={() => {
-                        setMode('nearby');
-                        void useMyLocation();
+                <div className="rounded-lg overflow-hidden border border-gray-200">
+                  <div className="h-72 w-full">
+                    <FixLeafletDefaultIcons />
+                    <LeafletLocationPicker
+                      open={open}
+                      center={mapCenter}
+                      value={picked}
+                      radiusKm={radiusKm}
+                      onPick={(lat, lng) => {
+                        setPicked({ lat, lng });
+                        setMapCenter({ lat, lng });
                       }}
-                    >
-                      <LocateFixed className="h-4 w-4 mr-2" />
-                      {t('rfxs.scopeModal_useMyLocation')}
-                    </Button>
-                    <p className="text-sm text-gray-600">{t('rfxs.scopeModal_clickMapHint')}</p>
+                    />
                   </div>
 
-                  {mode === 'nearby' && (
-                    <div className="rounded-lg overflow-hidden border border-gray-200">
-                      <div className="h-72 w-full">
-                        <FixLeafletDefaultIcons />
-                        <LeafletLocationPicker
-                          open={open && mode === 'nearby'}
-                          center={mapCenter}
-                          value={picked}
-                          radiusKm={radiusKm}
-                          onPick={(lat, lng) => {
-                            setMode('nearby');
-                            setPicked({ lat, lng });
-                            setMapCenter({ lat, lng });
-                          }}
-                        />
+                  <div className="px-3 py-3 bg-white space-y-3">
+                    <div className="text-xs text-gray-600 flex items-center justify-between">
+                      <span>
+                        {picked
+                          ? t('rfxs.scopeModal_selectedPoint', { lat: picked.lat.toFixed(5), lng: picked.lng.toFixed(5) })
+                          : t('rfxs.scopeModal_noPointYet')}
+                      </span>
+                      {picked && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setPicked(null)}
+                          className="text-gray-600"
+                        >
+                          {t('rfxs.scopeModal_clear')}
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm text-[#22183a]">{t('rfxs.scopeModal_radius')}</Label>
+                        <span className="text-sm font-semibold text-[#22183a]">{radiusKm} km</span>
                       </div>
-
-                      <div className="px-3 py-3 bg-white space-y-3">
-                        <div className="text-xs text-gray-600 flex items-center justify-between">
-                          <span>
-                            {picked
-                              ? t('rfxs.scopeModal_selectedPoint', { lat: picked.lat.toFixed(5), lng: picked.lng.toFixed(5) })
-                              : t('rfxs.scopeModal_noPointYet')}
-                          </span>
-                          {picked && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setPicked(null)}
-                              className="text-gray-600"
-                            >
-                              {t('rfxs.scopeModal_clear')}
-                            </Button>
-                          )}
-                        </div>
-
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <Label className="text-sm text-[#22183a]">{t('rfxs.scopeModal_radius')}</Label>
-                            <span className="text-sm font-semibold text-[#22183a]">{radiusKm} km</span>
-                          </div>
-                          <input
-                            type="range"
-                            min={100}
-                            max={1500}
-                            step={50}
-                            value={radiusKm}
-                            onChange={(e) => setRadiusKm(Number(e.target.value))}
-                            className="w-full accent-[#f4a9aa]"
-                          />
-                          <div className="flex items-center justify-between text-xs text-gray-600">
-                            <span>100 km</span>
-                            <span>1500 km</span>
-                          </div>
-                        </div>
+                      <input
+                        type="range"
+                        min={MIN_SCOPE_RADIUS_KM}
+                        max={MAX_SCOPE_RADIUS_KM}
+                        step={50}
+                        value={radiusKm}
+                        onChange={(e) => setRadiusKm(Number(e.target.value))}
+                        className="w-full accent-[#f4a9aa]"
+                      />
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>{MIN_SCOPE_RADIUS_KM} km</span>
+                        <span>{MAX_SCOPE_RADIUS_KM} km</span>
                       </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </label>
-            </RadioGroup>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-2">

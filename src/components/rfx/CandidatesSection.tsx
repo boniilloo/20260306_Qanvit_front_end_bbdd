@@ -475,8 +475,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const [analysisStartTime, setAnalysisStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState<string>('00:00');
 
-  // Recommended list tabs (Global vs Nearby)
-  const [recommendedListMode, setRecommendedListMode] = useState<'global' | 'nearby'>('global');
+  // Recommended list is now always location-based (nearby-only).
   const lastNearbyDebugSignatureRef = useRef<string>('');
   const [lastAskAgentScope, setLastAskAgentScope] = useState<AskFQAgentScope | null>(null);
 
@@ -621,15 +620,12 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const [companyPeopleCounts, setCompanyPeopleCounts] = useState<{[key: string]: number}>({});
   const [companyNewsCounts, setCompanyNewsCounts] = useState<{[key: string]: number}>({});
   const [productUrls, setProductUrls] = useState<{[key: string]: string | null}>({});
-  const [companyGpsCoordinates, setCompanyGpsCoordinates] = useState<{[key: string]: any | null}>({});
-  const [isGlobalMapLoading, setIsGlobalMapLoading] = useState(false);
   
   // Track which company IDs we've already attempted to load (even if they don't exist in DB)
   // This prevents infinite loops when querying for non-existent IDs
   const attemptedCompanyIdsRef = useRef<Set<string>>(new Set());
   const attemptedCompanyPeopleCountIdsRef = useRef<Set<string>>(new Set());
   const attemptedCompanyNewsCountIdsRef = useRef<Set<string>>(new Set());
-  const attemptedCompanyGpsIdsRef = useRef<Set<string>>(new Set());
 
   // Selection state
   const [selectionMode, setSelectionMode] = useState(false);
@@ -728,8 +724,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const manualCandidateKeys = React.useMemo(() => new Set(manuallyAddedCandidates.map(c => `${c.id_company_revision}-${c.id_product_revision || 'company'}`)), [manuallyAddedCandidates]);
 
   // Recommended visible candidates (exclude manual additions)
-  // Build the two recommended lists independently (Global vs Nearby).
-  // We intentionally do NOT cap the list size here; pagination controls how many are shown per page.
+  // Recommended visible candidates (exclude manual additions), sorted by overall score.
   const recommendedCandidates = React.useMemo(() => {
     return agentCandidates
       .filter(c => !manualCandidateKeys.has(`${c.id_company_revision}-${c.id_product_revision || 'company'}`))
@@ -743,10 +738,8 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       .sort((a, b) => getOverallMatchScore(b) - getOverallMatchScore(a))
   }, [agentCandidates, manualCandidateKeys]);
 
-  // Debug Nearby filtering issues (kept intentionally small and only logs when Nearby tab is active)
+  // Debug Nearby filtering issues.
   useEffect(() => {
-    if (recommendedListMode !== 'nearby') return;
-
     const candidates = Array.isArray(agentCandidates) ? agentCandidates : [];
     const signature = `${rfxId}|${candidates.length}|${manualCandidateKeys.size}|${nearbyRecommendedCandidates.length}`;
     if (signature === lastNearbyDebugSignatureRef.current) return;
@@ -778,11 +771,11 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       uniqueInNearbyValuesInSample: uniqueInNearby,
       sample,
     });
-  }, [recommendedListMode, rfxId, agentCandidates, manualCandidateKeys, nearbyRecommendedCandidates]);
+  }, [rfxId, agentCandidates, manualCandidateKeys, nearbyRecommendedCandidates]);
 
   const activeRecommendedCandidates = React.useMemo(() => {
-    return recommendedListMode === 'nearby' ? nearbyRecommendedCandidates : recommendedCandidates;
-  }, [recommendedCandidates, nearbyRecommendedCandidates, recommendedListMode]);
+    return nearbyRecommendedCandidates;
+  }, [nearbyRecommendedCandidates]);
 
   // For the FQ recommended list, keep only one candidate per company domain
   // and preserve the highest overall match.
@@ -844,7 +837,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   // Reset recommended pagination when list changes
   useEffect(() => {
     setRecommendedPage(1);
-  }, [recommendedCandidates.length, nearbyRecommendedCandidates.length, recommendedListMode]);
+  }, [nearbyRecommendedCandidates.length]);
 
   // Keep page index in range after per-domain deduplication or page-size changes.
   useEffect(() => {
@@ -1166,54 +1159,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     if (!showSupplierInsightsModal || supplierInsightsTab !== 'latest-news') return;
     setSupplierInsightsNewsThumbnailAttempt({});
   }, [showSupplierInsightsModal, supplierInsightsTab, supplierInsightsCompanyId]);
-
-  // Load gps_coordinates for global map (all company locations)
-  useEffect(() => {
-    const loadCompanyGps = async () => {
-      if (recommendedListMode !== 'global') return;
-      if (recommendedCandidates.length === 0) return;
-
-      const companyIds = [...new Set(recommendedCandidates.map((c: any) => c.id_company_revision).filter(Boolean))];
-      const missing = companyIds.filter((id) => {
-        const isLoaded = id in companyGpsCoordinates;
-        const wasAttempted = attemptedCompanyGpsIdsRef.current.has(id);
-        return !isLoaded && !wasAttempted;
-      });
-      if (missing.length === 0) return;
-
-      missing.forEach((id) => attemptedCompanyGpsIdsRef.current.add(id));
-      setIsGlobalMapLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('company_revision')
-          .select('id, gps_coordinates')
-          .in('id', missing);
-
-        if (error) {
-          console.error('Error loading company gps_coordinates:', error);
-          return;
-        }
-
-        const next: {[key: string]: any | null} = {};
-        (data || []).forEach((row: any) => {
-          next[row.id] = row.gps_coordinates ?? null;
-        });
-
-        // Avoid unnecessary re-renders when query returns empty or unchanged payload.
-        if (Object.keys(next).length > 0) {
-          setCompanyGpsCoordinates((prev) => ({ ...prev, ...next }));
-        }
-      } catch (err) {
-        console.error('Error loading company gps_coordinates:', err);
-        // Allow retry on network/runtime failures.
-        missing.forEach((id) => attemptedCompanyGpsIdsRef.current.delete(id));
-      } finally {
-        setIsGlobalMapLoading(false);
-      }
-    };
-
-    loadCompanyGps();
-  }, [recommendedListMode, recommendedCandidates, companyGpsCoordinates]);
 
   // Load product URLs for candidates
   useEffect(() => {
@@ -1811,52 +1756,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     return `${candidate.id_company_revision}-${candidate.id_product_revision || 'company'}`;
   };
 
-  const parseCompanyGpsCoordinates = (value: any): Array<{ lat: number; lng: number }> => {
-    if (!value) return [];
-    const inputArray = Array.isArray(value) ? value : [value];
-    const out: Array<{ lat: number; lng: number }> = [];
-
-    for (const item of inputArray) {
-      if (!item) continue;
-      if (typeof item === 'string') {
-        const parts = item.split(/[,\s]+/).map((s) => s.trim()).filter(Boolean);
-        if (parts.length >= 2) {
-          const lat = parseFloat(parts[0]);
-          const lng = parseFloat(parts[1]);
-          if (
-            Number.isFinite(lat) &&
-            Number.isFinite(lng) &&
-            lat >= -90 &&
-            lat <= 90 &&
-            lng >= -180 &&
-            lng <= 180
-          ) {
-            out.push({ lat, lng });
-          }
-        }
-      } else if (typeof item === 'object') {
-        const lat = (item as any).latitude ?? (item as any).lat;
-        const lng = (item as any).longitude ?? (item as any).lon ?? (item as any).lng;
-        const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
-        const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
-        if (
-          typeof latNum === 'number' &&
-          typeof lngNum === 'number' &&
-          Number.isFinite(latNum) &&
-          Number.isFinite(lngNum) &&
-          latNum >= -90 &&
-          latNum <= 90 &&
-          lngNum >= -180 &&
-          lngNum <= 180
-        ) {
-          out.push({ lat: latNum, lng: lngNum });
-        }
-      }
-    }
-
-    return out;
-  };
-
   // Quick lookup to open "FQ Match Reasoning" from the map popup.
   const nearbyCandidateById = useMemo(() => {
     const m = new Map<string, Propuesta>();
@@ -1865,14 +1764,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     });
     return m;
   }, [nearbyRecommendedCandidates]);
-
-  const globalCandidateById = useMemo(() => {
-    const m = new Map<string, Propuesta>();
-    (recommendedCandidates || []).forEach((c: Propuesta) => {
-      m.set(getCandidateKey(c), c);
-    });
-    return m;
-  }, [recommendedCandidates]);
 
   const nearbyMapCandidates = useMemo(() => {
     return (nearbyRecommendedCandidates || []).map((c: any) => ({
@@ -1890,32 +1781,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       matchPercent: getOverallMatchScore(c),
     }));
   }, [nearbyRecommendedCandidates, companyWebsites]);
-
-  const globalMapCandidates = useMemo(() => {
-    const items: any[] = [];
-    (recommendedCandidates || []).forEach((c: any) => {
-      const coords = parseCompanyGpsCoordinates(companyGpsCoordinates[c.id_company_revision]);
-      if (coords.length === 0) return;
-
-      const candidateKey = `${c.id_company_revision}-${c.id_product_revision || 'company'}`;
-      const matchPercent = getOverallMatchScore(c);
-      const websiteUrl = companyWebsites[c.id_company_revision] || c.website || null;
-      const name = c.empresa || 'Supplier';
-
-      coords.forEach((pt, idx) => {
-        items.push({
-          id: `${candidateKey}__${idx}`,
-          reasoningCandidateId: candidateKey,
-          name,
-          lat: pt.lat,
-          lng: pt.lng,
-          websiteUrl,
-          matchPercent,
-        });
-      });
-    });
-    return items;
-  }, [recommendedCandidates, companyGpsCoordinates, companyWebsites]);
 
   // Get the correct website URL for a candidate (product URL or company website)
   const getCandidateWebsiteUrl = (candidate: Propuesta): string | null => {
@@ -2010,7 +1875,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   };
 
   // Detect duplicate company website domains only inside the FQ recommended
-  // candidates tab dataset (global/nearby active list, excluding manual tab).
+  // candidates tab dataset (active nearby list, excluding manual tab).
   const lastRecommendedDuplicatesSignatureRef = useRef<string>('');
   useEffect(() => {
     if (viewMode !== 'all' && viewMode !== 'recommended') return;
@@ -2055,7 +1920,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       .sort();
 
     const signature = JSON.stringify({
-      mode: recommendedListMode,
       page: recommendedPage,
       domains: duplicateDomains.map((domain) => ({
         domain,
@@ -2086,18 +1950,17 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     viewMode,
     activeRecommendedCandidates,
     companyWebsites,
-    recommendedListMode,
     recommendedPage,
   ]);
 
-  // Build a list for FQ recommended (global list) where Visit Website domain
+  // Build a list for FQ recommended (nearby list) where Visit Website domain
   // does not match the company website domain.
   const lastVisitVsCompanySignatureRef = useRef<string>('');
   useEffect(() => {
     if (viewMode !== 'all' && viewMode !== 'recommended') return;
-    if (!Array.isArray(recommendedCandidates) || recommendedCandidates.length === 0) return;
+    if (!Array.isArray(activeRecommendedCandidates) || activeRecommendedCandidates.length === 0) return;
 
-    const mismatchedCandidates = recommendedCandidates
+    const mismatchedCandidates = activeRecommendedCandidates
       .map((candidate, index) => {
         const companyUrl = companyWebsites[candidate.id_company_revision] || candidate.website || null;
         const productUrl = candidate.id_product_revision
@@ -2145,16 +2008,16 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
 
     if (mismatchedCandidates.length > 0) {
       console.log(
-        '🔎 [FQ recommended - Global] Candidatos con dominio distinto (Visit Website vs Empresa):',
+        '🔎 [FQ recommended - Nearby] Candidatos con dominio distinto (Visit Website vs Empresa):',
         mismatchedCandidates
       );
       console.table(mismatchedCandidates);
     } else {
       console.log(
-        '🔎 [FQ recommended - Global] No hay candidatos con dominio distinto entre Visit Website y Empresa.'
+        '🔎 [FQ recommended - Nearby] No hay candidatos con dominio distinto entre Visit Website y Empresa.'
       );
     }
-  }, [viewMode, recommendedCandidates, companyWebsites, productUrls]);
+  }, [viewMode, activeRecommendedCandidates, companyWebsites, productUrls]);
 
   // Toggle individual candidate selection
   const toggleCandidateSelection = (candidate: Propuesta) => {
@@ -2736,7 +2599,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     }
   };
 
-  const sendRFXData = async (scope?: AskFQAgentScope) => {
+  const sendRFXData = async (scope: AskFQAgentScope) => {
     // Open modal and reset state
     setShowEvaluationModal(true);
     setModalSteps(buildInitialModalSteps());
@@ -2760,27 +2623,14 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     // Enable cancel button after a short delay to prevent accidental clicks
     setCanCancel(false);
     setTimeout(() => setCanCancel(true), 1500);
-    if (scope) setLastAskAgentScope(scope);
-    if (scope) {
-      const parts: string[] = [];
-      if (scope.nearby) {
-        const radiusKm =
-          (scope.nearby as any)?.radius_km ??
-          (scope.nearby as any)?.radiusKm ??
-          (scope.nearby as any)?.radius;
-        parts.push(
-          `Near (${scope.nearby.lat.toFixed(4)}, ${scope.nearby.lng.toFixed(4)}${radiusKm ? `, ${radiusKm} km` : ''})`
-        );
-      } else {
-        parts.push('Global');
-        // Backward-compatible (deprecated): include country scope in summary if present.
-        if (scope.country?.countries?.length) {
-          const names = scope.country.countries.map((c) => c.countryName || c.countryCode).filter(Boolean);
-          parts.push(`Countries (${names.slice(0, 3).join(', ')}${names.length > 3 ? ` +${names.length - 3}` : ''})`);
-        }
-      }
-      setEvaluationScopeSummary(`Search scope: ${parts.join(' + ')}`);
-    }
+    setLastAskAgentScope(scope);
+    const radiusKm =
+      (scope.nearby as any)?.radius_km ??
+      (scope.nearby as any)?.radiusKm ??
+      (scope.nearby as any)?.radius;
+    setEvaluationScopeSummary(
+      `Search scope: Near (${scope.nearby.lat.toFixed(4)}, ${scope.nearby.lng.toFixed(4)}${radiusKm ? `, ${radiusKm} km` : ''})`
+    );
 
     if (!isConnected && wsRef.current?.readyState !== WebSocket.OPEN) {
       try {
@@ -2800,12 +2650,21 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       // Step 1: Get symmetric key and send conversation_id message immediately
       const symmetricKeyBase64 = exportSymmetricKeyToBase64 ? await exportSymmetricKeyToBase64() : null;
       
-      const resolvedScope = scope ?? { global: true };
+      const resolvedScope = scope;
       const resolvedNearby = (resolvedScope as any)?.nearby as
         | { lat: number; lng: number; radius_km?: number }
         | undefined;
+      if (!resolvedNearby || typeof resolvedNearby.lat !== 'number' || typeof resolvedNearby.lng !== 'number') {
+        toast({
+          title: 'Location Required',
+          description: 'Please select a valid location before continuing.',
+          variant: 'destructive',
+        });
+        setShowEvaluationModal(false);
+        return;
+      }
       const resolvedRadiusKm = resolvedNearby?.radius_km;
-      const resolvedMode = resolvedNearby ? 'nearby' : 'global';
+      const resolvedMode = 'nearby';
 
       const conversationIdMessage = {
         type: 'conversation_id',
@@ -2939,7 +2798,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <Users className="h-5 w-5 text-indigo-600" />
-              {t('rfxs.cand_recommendedTitle')}{recommendedCandidates.length > 0 ? ` (${recommendedCandidates.length})` : ''}
+              {t('rfxs.cand_recommendedTitle')}{activeRecommendedCandidates.length > 0 ? ` (${activeRecommendedCandidates.length})` : ''}
             </CardTitle>
             <div className="flex items-center gap-3">
               {databaseCandidates.length > 0 && !selectionMode && (
@@ -3156,73 +3015,33 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                     </div>
                   </div>
 
-                  {/* Candidates list tabs */}
-                  <div className="mt-4">
-                    <Tabs
-                      value={recommendedListMode}
-                      onValueChange={(v) => setRecommendedListMode(v as 'global' | 'nearby')}
-                      className="w-full mb-4"
-                    >
-                      <TabsList className="grid w-full grid-cols-2 h-11 bg-[#f1f1f1] rounded-xl p-1 border border-white/60 shadow-inner">
-                        <TabsTrigger
-                          value="global"
-                          className="rounded-lg px-4 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
-                        >
-                          {t('rfxs.cand_globalTab', { count: recommendedCandidates.length })}
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="nearby"
-                          className="rounded-lg px-4 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50"
-                        >
-                          {t('rfxs.cand_nearbyTab', { count: nearbyRecommendedCandidates.length })}
-                        </TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-
-                      {recommendedListMode === 'global' && (
-                        <div className="mb-4">
-                          <div className="w-4/5 mx-auto">
-                            <NearbyCandidatesMap
-                              candidates={globalMapCandidates}
-                              onOpenMatchReasoning={(candidateId) => {
-                                const candidate = globalCandidateById.get(candidateId);
-                                if (!candidate) return;
-                                setSelectedCandidate(candidate);
-                                setShowJustificationModal(true);
-                              }}
-                              isLoading={isGlobalMapLoading}
-                              heightClassName="h-[30rem]"
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {recommendedListMode === 'nearby' && (
-                        <div className="mb-4">
-                          <div className="w-4/5 mx-auto">
-                            <NearbyCandidatesMap
-                              selected={
-                                lastAskAgentScope?.nearby
-                                  ? {
-                                      lat: (lastAskAgentScope.nearby as any).lat,
-                                      lng: (lastAskAgentScope.nearby as any).lng,
-                                      radiusKm: (lastAskAgentScope.nearby as any).radius_km ?? null,
-                                    }
-                                  : undefined
+                  <div className="mt-4 mb-4">
+                    <div className="text-sm font-semibold text-[#22183a] mb-3">
+                      {t('rfxs.cand_nearbyTab', { count: nearbyRecommendedCandidates.length })}
+                    </div>
+                    <div className="w-4/5 mx-auto">
+                      <NearbyCandidatesMap
+                        selected={
+                          lastAskAgentScope?.nearby
+                            ? {
+                                lat: (lastAskAgentScope.nearby as any).lat,
+                                lng: (lastAskAgentScope.nearby as any).lng,
+                                radiusKm: (lastAskAgentScope.nearby as any).radius_km ?? null,
                               }
-                              candidates={nearbyMapCandidates}
-                              onOpenMatchReasoning={(candidateId) => {
-                                const candidate = nearbyCandidateById.get(candidateId);
-                                if (!candidate) return;
-                                setSelectedCandidate(candidate);
-                                setShowJustificationModal(true);
-                              }}
-                              // h-80 is 20rem; +50% => 30rem
-                              heightClassName="h-[30rem]"
-                            />
-                          </div>
-                        </div>
-                      )}
+                            : undefined
+                        }
+                        candidates={nearbyMapCandidates}
+                        onOpenMatchReasoning={(candidateId) => {
+                          const candidate = nearbyCandidateById.get(candidateId);
+                          if (!candidate) return;
+                          setSelectedCandidate(candidate);
+                          setShowJustificationModal(true);
+                        }}
+                        // h-80 is 20rem; +50% => 30rem
+                        heightClassName="h-[30rem]"
+                      />
+                    </div>
+                  </div>
 
                       <div className="space-y-4">
               {(() => {
@@ -3236,7 +3055,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                 const overallMatch = getOverallMatchScore(candidate);
                 
                 const candidateKey = `${candidate.id_company_revision}-${candidate.id_product_revision || 'company'}`;
-                const candidateNumber = startIndexRec + index + 1; // Global position in the list
+                const candidateNumber = startIndexRec + index + 1; // Position in the current list
                 const peopleCount = companyPeopleCounts[candidate.id_company_revision] || 0;
                 const newsCount = companyNewsCounts[candidate.id_company_revision] || 0;
                 const hasPeopleOrNews = peopleCount > 0 || newsCount > 0;
@@ -3493,7 +3312,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                       );
                     })()}
                   </div>
-                  </div>
                 </>
               )}
 
@@ -3510,7 +3328,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                     const companyMatch = candidate.company_match ?? candidate.match;
                     const overallMatch = getOverallMatchScore(candidate);
                     
-                    const candidateNumber = startIndexRec + index + 1; // Global position in the list
+                    const candidateNumber = startIndexRec + index + 1; // Position in the current list
                     const peopleCount = companyPeopleCounts[candidate.id_company_revision] || 0;
                     const newsCount = companyNewsCounts[candidate.id_company_revision] || 0;
                     const hasPeopleOrNews = peopleCount > 0 || newsCount > 0;

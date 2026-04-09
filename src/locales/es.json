@@ -662,7 +662,7 @@
     "reasoningModal_loadingCompanyOverview": "Cargando informaci\u00f3n de la empresa...",
     "reasoningModal_noCompanyOverview": "No hay informaci\u00f3n de empresa disponible.",
     "scopeModal_title": "¿Dónde debe Qanvit buscar candidatos?",
-    "scopeModal_description": "Elige el ámbito geográfico de búsqueda. Por defecto es global.",
+    "scopeModal_description": "Selecciona un punto y un radio para buscar candidatos cercanos.",
     "scopeModal_globally": "Global",
     "scopeModal_globallyDesc": "Mejores coincidencias en toda la base de datos de Qanvit.",
     "scopeModal_nearLocation": "Cerca de una ubicación",

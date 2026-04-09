@@ -662,7 +662,7 @@
     "reasoningModal_loadingCompanyOverview": "Loading company information...",
     "reasoningModal_noCompanyOverview": "No company information available.",
     "scopeModal_title": "Where should Qanvit look for candidates?",
-    "scopeModal_description": "Choose the geographic scope for the search. Default is global.",
+    "scopeModal_description": "Choose a point and radius to search nearby candidates.",
     "scopeModal_globally": "Globally",
     "scopeModal_globallyDesc": "Best matches anywhere in the Qanvit database.",
     "scopeModal_nearLocation": "Near a location",

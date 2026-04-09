@@ -206,7 +206,7 @@ export const useLogoAnalysis = (logoUrl: string | null | undefined, isSupplierRo
           // Use brightness threshold only
           const isWhite = analysis.averageBrightness > 150;
           method = 'computer-vision';
-          reason = isWhite ? `Brillo alto: ${analysis.averageBrightness.toFixed(1)} > 150` : `Brillo bajo: ${analysis.averageBrightness.toFixed(1)} â‰¤ 150`;
+          reason = isWhite ? `Brillo alto: ${analysis.averageBrightness.toFixed(1)} > 150` : `Brillo bajo: ${analysis.averageBrightness.toFixed(1)} âÿ¤ 150`;
           
           setNeedsDarkBg(isWhite);
         } else if (analysis.method === 'skip-jpg') {
@@ -259,37 +259,48 @@ export const useLogoWithFavicon = (
   const { needsDarkBg, isAnalyzing, analysisData } = useLogoAnalysis(finalLogoUrl, isSupplierRoute);
   
   React.useEffect(() => {
-    // Reset state when logoUrl changes
-    setFinalLogoUrl(logoUrl);
+    // Reset state when supplier identity changes (logo and/or website).
+    // Without websiteUrl here, two suppliers with null logoUrl could share stale favicon state.
+    setFinalLogoUrl(logoUrl ?? null);
     setLogoError(false);
     setIsLoadingFavicon(false);
-  }, [logoUrl]);
+  }, [logoUrl, websiteUrl, isSupplierRoute]);
   
   // Test if the current logo URL is working, or use favicon if no logo
   React.useEffect(() => {
     if (!isSupplierRoute) return;
+    let cancelled = false;
     
     // If no logo URL, try favicon directly
     if (!finalLogoUrl && websiteUrl) {
       setIsLoadingFavicon(true);
       const faviconUrl = getFaviconUrl(websiteUrl);
       if (faviconUrl) {
+        if (cancelled) return;
         setFinalLogoUrl(faviconUrl);
         setLogoError(true); // Mark as using favicon
       }
       setIsLoadingFavicon(false);
-      return;
+      return () => {
+        cancelled = true;
+      };
     }
     
     // If we have a logo URL, test if it works
-    if (!finalLogoUrl) return;
+    if (!finalLogoUrl) {
+      return () => {
+        cancelled = true;
+      };
+    }
     
     const testImage = new Image();
     testImage.onload = () => {
+      if (cancelled) return;
       // Logo is working, no need for favicon
       setLogoError(false);
     };
     testImage.onerror = () => {
+      if (cancelled) return;
       // Logo failed to load, try favicon
       setLogoError(true);
       
@@ -297,12 +308,16 @@ export const useLogoWithFavicon = (
         setIsLoadingFavicon(true);
         const faviconUrl = getFaviconUrl(websiteUrl);
         if (faviconUrl) {
+          if (cancelled) return;
           setFinalLogoUrl(faviconUrl);
         }
         setIsLoadingFavicon(false);
       }
     };
     testImage.src = finalLogoUrl;
+    return () => {
+      cancelled = true;
+    };
   }, [finalLogoUrl, websiteUrl, isSupplierRoute]);
   
   return { 

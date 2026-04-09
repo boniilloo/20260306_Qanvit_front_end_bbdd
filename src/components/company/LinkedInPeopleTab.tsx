@@ -81,14 +81,18 @@ function isFeaturedPerson(person: LinkedInPerson): boolean {
 }
 
 function PersonCard({ person }: { person: LinkedInPerson }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const hasValidImage = !!person.linkedin_profile_image_url && !imageFailed;
+
   return (
     <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 hover:border-[#f4a9aa]/40 hover:bg-gray-50/50 transition-colors">
       <div className="flex-shrink-0">
-        {person.linkedin_profile_image_url ? (
+        {hasValidImage ? (
           <img
             src={person.linkedin_profile_image_url}
             alt={person.person_name}
             className="w-14 h-14 rounded-full object-cover bg-gray-100"
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <div className="w-14 h-14 rounded-full bg-gray-200 flex items-center justify-center">

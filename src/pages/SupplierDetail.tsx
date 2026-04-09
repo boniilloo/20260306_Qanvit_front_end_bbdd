@@ -86,7 +86,7 @@ interface CompanyNews {
   time: string | null;
   snippet: string | null;
   scraped_at: string;
-  related: string | null;
+  related: string | boolean | null;
 }
 const SupplierDetail = () => {
   const {
@@ -445,7 +445,28 @@ const SupplierDetail = () => {
     }
   };
 
-  // Fetch latest related company news (related = true)
+  const getNewsRelatedLabel = (related: CompanyNews['related']): 'Related' | 'Unrelated' | 'Not classified yet' => {
+    if (related === null || related === undefined) return 'Not classified yet';
+    if (typeof related === 'boolean') return related ? 'Related' : 'Unrelated';
+
+    const normalized = String(related).trim().toLowerCase();
+    if (!normalized) return 'Not classified yet';
+    if (['true', 't', '1', 'yes', 'y'].includes(normalized)) return 'Related';
+    if (['false', 'f', '0', 'no', 'n'].includes(normalized)) return 'Unrelated';
+    return 'Not classified yet';
+  };
+
+  const getNewsRelatedBadgeClasses = (label: ReturnType<typeof getNewsRelatedLabel>): string => {
+    if (label === 'Related') {
+      return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    }
+    if (label === 'Unrelated') {
+      return 'bg-rose-50 text-rose-700 border-rose-200';
+    }
+    return 'bg-amber-50 text-amber-700 border-amber-200';
+  };
+
+  // Fetch latest company news
   const fetchLatestNews = async (companyId: string) => {
     setLatestNewsLoading(true);
     try {
@@ -453,11 +474,10 @@ const SupplierDetail = () => {
         .from('company_news')
         .select('id, title, url, source, time, snippet, scraped_at, related')
         .eq('company_id', companyId)
-        .ilike('related', 'true')
         .order('scraped_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching latest related news:', error);
+        console.error('Error fetching latest news:', error);
         setLatestNews([]);
         return;
       }
@@ -1254,7 +1274,7 @@ const SupplierDetail = () => {
             <LinkedInPeopleTab companyId={supplier.company_id} />
           </TabsContent>
 
-          {/* Latest News Tab - only related news */}
+          {/* Latest News Tab */}
           <TabsContent value="latest-news" className="mt-0">
             <Card className="shadow-sm border-0 bg-white">
               <CardHeader>
@@ -1278,7 +1298,7 @@ const SupplierDetail = () => {
                     ))}
                   </div>
                 ) : latestNews.length === 0 ? (
-                  <p className="text-muted-foreground">No related news available for this supplier.</p>
+                  <p className="text-muted-foreground">No news available for this supplier.</p>
                 ) : (
                   <div className="space-y-4">
                     {latestNews.map((news) => (
@@ -1325,6 +1345,16 @@ const SupplierDetail = () => {
                                 news.title || 'Untitled news'
                               )}
                             </h3>
+                            <div className="mt-2">
+                              {(() => {
+                                const label = getNewsRelatedLabel(news.related);
+                                return (
+                                  <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${getNewsRelatedBadgeClasses(label)}`}>
+                                    {label}
+                                  </span>
+                                );
+                              })()}
+                            </div>
                             {(news.source || news.time) && (
                               <p className="text-sm text-muted-foreground mt-1">
                                 {[news.source, news.time].filter(Boolean).join(' - ')}

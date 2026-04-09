@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Users, MessageCircle, AlertCircle, CheckCircle, Circle, XCircle, Loader2, Building2, Package, Check, ExternalLink, Bot, Filter, List, CheckSquare, Search, Plus, Clock, HelpCircle, Eye } from 'lucide-react';
+import { Users, MessageCircle, AlertCircle, CheckCircle, Circle, XCircle, Loader2, Building2, Package, Check, ExternalLink, Bot, Filter, List, CheckSquare, Search, Plus, Clock, HelpCircle, Eye, Newspaper } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -20,7 +20,8 @@ import { useRFXCompanyInvitationCheck } from '@/hooks/useRFXCompanyInvitationChe
 import { useRFXCrypto } from '@/hooks/useRFXCrypto';
 import AskFQAgentScopeModal, { type AskFQAgentScope } from '@/components/rfx/AskFQAgentScopeModal';
 import NearbyCandidatesMap from '@/components/rfx/NearbyCandidatesMap';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LinkedInPeopleTab } from '@/components/company/LinkedInPeopleTab';
 import { useTranslation } from 'react-i18next';
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
 import { normalizeBestMatchRow } from '@/utils/rfxCandidateNormalize';
@@ -64,6 +65,17 @@ interface WebSocketMessage {
   content?: string;
   data?: any;
   timestamp?: string;
+}
+
+interface CompanyNews {
+  id: string;
+  title: string | null;
+  url: string | null;
+  source: string | null;
+  time: string | null;
+  snippet: string | null;
+  scraped_at: string;
+  related: string | boolean | null;
 }
 
 type RubricSections = {
@@ -594,10 +606,20 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const [selectedCandidate, setSelectedCandidate] = useState<Propuesta | null>(null);
   const [showJustificationModal, setShowJustificationModal] = useState(false);
   const [showRubricModal, setShowRubricModal] = useState(false);
+  const [showSupplierInsightsModal, setShowSupplierInsightsModal] = useState(false);
+  const [supplierInsightsTab, setSupplierInsightsTab] = useState<'people' | 'latest-news'>('people');
+  const [supplierInsightsCandidate, setSupplierInsightsCandidate] = useState<Propuesta | null>(null);
+  const [supplierInsightsCompanyId, setSupplierInsightsCompanyId] = useState<string | null>(null);
+  const [supplierInsightsNews, setSupplierInsightsNews] = useState<CompanyNews[]>([]);
+  const [supplierInsightsNewsLoading, setSupplierInsightsNewsLoading] = useState(false);
+  const [supplierInsightsNewsThumbnailAttempt, setSupplierInsightsNewsThumbnailAttempt] = useState<Record<string, number>>({});
   
   // State for company logos
   const [companyLogos, setCompanyLogos] = useState<{[key: string]: string | null}>({});
   const [companyWebsites, setCompanyWebsites] = useState<{[key: string]: string | null}>({});
+  const [companyRevisionToCompanyId, setCompanyRevisionToCompanyId] = useState<{[key: string]: string | null}>({});
+  const [companyPeopleCounts, setCompanyPeopleCounts] = useState<{[key: string]: number}>({});
+  const [companyNewsCounts, setCompanyNewsCounts] = useState<{[key: string]: number}>({});
   const [productUrls, setProductUrls] = useState<{[key: string]: string | null}>({});
   const [companyGpsCoordinates, setCompanyGpsCoordinates] = useState<{[key: string]: any | null}>({});
   const [isGlobalMapLoading, setIsGlobalMapLoading] = useState(false);
@@ -605,6 +627,8 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   // Track which company IDs we've already attempted to load (even if they don't exist in DB)
   // This prevents infinite loops when querying for non-existent IDs
   const attemptedCompanyIdsRef = useRef<Set<string>>(new Set());
+  const attemptedCompanyPeopleCountIdsRef = useRef<Set<string>>(new Set());
+  const attemptedCompanyNewsCountIdsRef = useRef<Set<string>>(new Set());
   const attemptedCompanyGpsIdsRef = useRef<Set<string>>(new Set());
 
   // Selection state
@@ -879,7 +903,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
         // Fetch all missing company data in parallel using a single query with .in()
         const { data: companiesData, error } = await supabase
           .from('company_revision')
-          .select('id, logo, website')
+          .select('id, logo, website, company_id')
           .in('id', missingIds);
 
         if (!error && companiesData) {
@@ -888,15 +912,18 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             // Update state once with all the data
             const newLogos: {[key: string]: string | null} = {};
             const newWebsites: {[key: string]: string | null} = {};
+            const newRevisionToCompany: {[key: string]: string | null} = {};
             
             companiesData.forEach(company => {
               newLogos[company.id] = company.logo || null;
               newWebsites[company.id] = company.website || null;
+              newRevisionToCompany[company.id] = (company as any).company_id || null;
             });
 
             // Batch state updates to trigger only one re-render
             setCompanyLogos(prev => ({ ...prev, ...newLogos }));
             setCompanyWebsites(prev => ({ ...prev, ...newWebsites }));
+            setCompanyRevisionToCompanyId(prev => ({ ...prev, ...newRevisionToCompany }));
           }
         } else if (error) {
           console.error('Error loading company data query:', error);
@@ -912,6 +939,233 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
 
     loadCompanyData();
   }, [agentCandidates, manuallyAddedCandidates, companyLogos]);
+
+  // Track the signature of company IDs for people/news counters
+  const prevCompanyCountsSignatureRef = useRef<string>('');
+
+  // Load People and Latest News counters per company (mapped from company_revision.id -> company_id)
+  useEffect(() => {
+    const companyRevisionIds = [...new Set([
+      ...agentCandidates.map((c) => c.id_company_revision),
+      ...manuallyAddedCandidates.map((c) => c.id_company_revision),
+    ])].sort().join(',');
+
+    const revisionToCompanySignature = JSON.stringify(companyRevisionToCompanyId);
+    const signature = `${companyRevisionIds}::${revisionToCompanySignature}`;
+    if (signature === prevCompanyCountsSignatureRef.current) {
+      return;
+    }
+
+    prevCompanyCountsSignatureRef.current = signature;
+
+    const loadCompanyCounts = async () => {
+      if (companyRevisionIds === '') return;
+
+      const revisionIdsArray = companyRevisionIds.split(',').filter((id) => id);
+
+      // Initialize counters at 0 for any visible revision IDs to avoid undefined UI values.
+      const missingPeopleRevisionIds = revisionIdsArray.filter((id) => !(id in companyPeopleCounts));
+      const missingNewsRevisionIds = revisionIdsArray.filter((id) => !(id in companyNewsCounts));
+      if (missingPeopleRevisionIds.length > 0) {
+        setCompanyPeopleCounts((prev) => {
+          const next = { ...prev };
+          missingPeopleRevisionIds.forEach((id) => {
+            if (!(id in next)) next[id] = 0;
+          });
+          return next;
+        });
+      }
+      if (missingNewsRevisionIds.length > 0) {
+        setCompanyNewsCounts((prev) => {
+          const next = { ...prev };
+          missingNewsRevisionIds.forEach((id) => {
+            if (!(id in next)) next[id] = 0;
+          });
+          return next;
+        });
+      }
+
+      // Reuse already-known counts for revisions that point to a company_id we already counted.
+      const knownPeopleByCompanyId: {[key: string]: number} = {};
+      Object.entries(companyRevisionToCompanyId).forEach(([revisionId, companyId]) => {
+        if (!companyId) return;
+        if (revisionId in companyPeopleCounts) {
+          knownPeopleByCompanyId[companyId] = companyPeopleCounts[revisionId];
+        }
+      });
+      if (Object.keys(knownPeopleByCompanyId).length > 0) {
+        setCompanyPeopleCounts((prev) => {
+          const next = { ...prev };
+          revisionIdsArray.forEach((revisionId) => {
+            const companyId = companyRevisionToCompanyId[revisionId];
+            if (!companyId) return;
+            const knownCount = knownPeopleByCompanyId[companyId];
+            if (typeof knownCount === 'number') next[revisionId] = knownCount;
+          });
+          return next;
+        });
+      }
+
+      const knownNewsByCompanyId: {[key: string]: number} = {};
+      Object.entries(companyRevisionToCompanyId).forEach(([revisionId, companyId]) => {
+        if (!companyId) return;
+        if (revisionId in companyNewsCounts) {
+          knownNewsByCompanyId[companyId] = companyNewsCounts[revisionId];
+        }
+      });
+      if (Object.keys(knownNewsByCompanyId).length > 0) {
+        setCompanyNewsCounts((prev) => {
+          const next = { ...prev };
+          revisionIdsArray.forEach((revisionId) => {
+            const companyId = companyRevisionToCompanyId[revisionId];
+            if (!companyId) return;
+            const knownCount = knownNewsByCompanyId[companyId];
+            if (typeof knownCount === 'number') next[revisionId] = knownCount;
+          });
+          return next;
+        });
+      }
+
+      // Build the company_id list from revision IDs (same relationship used by SupplierDetail).
+      const companyIdsForVisibleRevisions = Array.from(
+        new Set(
+          revisionIdsArray
+            .map((revisionId) => companyRevisionToCompanyId[revisionId])
+            .filter((companyId): companyId is string => !!companyId)
+        )
+      );
+      if (companyIdsForVisibleRevisions.length === 0) return;
+
+      const missingPeopleCompanyIds = companyIdsForVisibleRevisions.filter((companyId) => {
+        const wasAttempted = attemptedCompanyPeopleCountIdsRef.current.has(companyId);
+        return !wasAttempted;
+      });
+      const missingNewsCompanyIds = companyIdsForVisibleRevisions.filter((companyId) => {
+        const wasAttempted = attemptedCompanyNewsCountIdsRef.current.has(companyId);
+        return !wasAttempted;
+      });
+
+      if (missingPeopleCompanyIds.length === 0 && missingNewsCompanyIds.length === 0) return;
+
+      if (missingPeopleCompanyIds.length > 0) {
+        missingPeopleCompanyIds.forEach((companyId) => attemptedCompanyPeopleCountIdsRef.current.add(companyId));
+      }
+      if (missingNewsCompanyIds.length > 0) {
+        missingNewsCompanyIds.forEach((companyId) => attemptedCompanyNewsCountIdsRef.current.add(companyId));
+      }
+
+      if (missingPeopleCompanyIds.length > 0) {
+        try {
+          const { data, error } = await (supabase as any)
+            .from('linkedin_company_people' as any)
+            .select('company_id')
+            .in('company_id', missingPeopleCompanyIds);
+
+          if (error) {
+            console.error('Error loading people counts:', error);
+            missingPeopleCompanyIds.forEach((companyId) => attemptedCompanyPeopleCountIdsRef.current.delete(companyId));
+          } else {
+            const countsByCompanyId: {[key: string]: number} = {};
+            (data || []).forEach((row: any) => {
+              if (!row?.company_id) return;
+              countsByCompanyId[row.company_id] = (countsByCompanyId[row.company_id] || 0) + 1;
+            });
+            const revisionCounts: {[key: string]: number} = {};
+            revisionIdsArray.forEach((revisionId) => {
+              const companyId = companyRevisionToCompanyId[revisionId];
+              if (!companyId || !missingPeopleCompanyIds.includes(companyId)) return;
+              revisionCounts[revisionId] = countsByCompanyId[companyId] || 0;
+            });
+            setCompanyPeopleCounts((prev) => {
+              const next = { ...prev };
+              Object.entries(revisionCounts).forEach(([revisionId, count]) => {
+                next[revisionId] = count;
+              });
+              return next;
+            });
+          }
+        } catch (err) {
+          console.error('Error loading people counts:', err);
+          missingPeopleCompanyIds.forEach((companyId) => attemptedCompanyPeopleCountIdsRef.current.delete(companyId));
+        }
+      }
+
+      if (missingNewsCompanyIds.length > 0) {
+        try {
+          const { data, error } = await (supabase as any)
+            .from('company_news' as any)
+            .select('company_id')
+            .in('company_id', missingNewsCompanyIds);
+
+          if (error) {
+            console.error('Error loading latest news counts:', error);
+            missingNewsCompanyIds.forEach((companyId) => attemptedCompanyNewsCountIdsRef.current.delete(companyId));
+          } else {
+            const countsByCompanyId: {[key: string]: number} = {};
+            (data || []).forEach((row: any) => {
+              if (!row?.company_id) return;
+              countsByCompanyId[row.company_id] = (countsByCompanyId[row.company_id] || 0) + 1;
+            });
+            const revisionCounts: {[key: string]: number} = {};
+            revisionIdsArray.forEach((revisionId) => {
+              const companyId = companyRevisionToCompanyId[revisionId];
+              if (!companyId || !missingNewsCompanyIds.includes(companyId)) return;
+              revisionCounts[revisionId] = countsByCompanyId[companyId] || 0;
+            });
+            setCompanyNewsCounts((prev) => {
+              const next = { ...prev };
+              Object.entries(revisionCounts).forEach(([revisionId, count]) => {
+                next[revisionId] = count;
+              });
+              return next;
+            });
+          }
+        } catch (err) {
+          console.error('Error loading latest news counts:', err);
+          missingNewsCompanyIds.forEach((companyId) => attemptedCompanyNewsCountIdsRef.current.delete(companyId));
+        }
+      }
+    };
+
+    loadCompanyCounts();
+  }, [agentCandidates, manuallyAddedCandidates, companyPeopleCounts, companyNewsCounts, companyRevisionToCompanyId]);
+
+  // Load company news for the supplier insights modal (News tab)
+  useEffect(() => {
+    const loadSupplierInsightsNews = async () => {
+      if (!showSupplierInsightsModal) return;
+      if (supplierInsightsTab !== 'latest-news') return;
+      if (!supplierInsightsCompanyId) return;
+
+      setSupplierInsightsNewsLoading(true);
+      try {
+        const { data, error } = await (supabase as any)
+          .from('company_news' as any)
+          .select('id, title, url, source, time, snippet, scraped_at, related')
+          .eq('company_id', supplierInsightsCompanyId)
+          .order('scraped_at', { ascending: false });
+
+        if (error) {
+          console.error('Error loading supplier insights news:', error);
+          setSupplierInsightsNews([]);
+          return;
+        }
+        setSupplierInsightsNews((data || []) as CompanyNews[]);
+      } catch (err) {
+        console.error('Error loading supplier insights news:', err);
+        setSupplierInsightsNews([]);
+      } finally {
+        setSupplierInsightsNewsLoading(false);
+      }
+    };
+
+    loadSupplierInsightsNews();
+  }, [showSupplierInsightsModal, supplierInsightsTab, supplierInsightsCompanyId]);
+
+  useEffect(() => {
+    if (!showSupplierInsightsModal || supplierInsightsTab !== 'latest-news') return;
+    setSupplierInsightsNewsThumbnailAttempt({});
+  }, [showSupplierInsightsModal, supplierInsightsTab, supplierInsightsCompanyId]);
 
   // Load gps_coordinates for global map (all company locations)
   useEffect(() => {
@@ -1677,6 +1931,24 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     return companyWebsites[candidate.id_company_revision] || candidate.website || null;
   };
 
+  const openSupplierInsightsModal = (candidate: Propuesta, tab: 'people' | 'latest-news') => {
+    const companyRevisionId = candidate.id_company_revision;
+    const companyId = companyRevisionToCompanyId[companyRevisionId] || null;
+    if (!companyRevisionId || !companyId) {
+      toast({
+        title: t('rfxs.cand_toast_noSupplier'),
+        description: t('rfxs.cand_toast_noSupplierDesc'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSupplierInsightsCandidate(candidate);
+    setSupplierInsightsCompanyId(companyId);
+    setSupplierInsightsTab(tab);
+    setShowSupplierInsightsModal(true);
+  };
+
   // Helper function to extract domain from URL
   const extractDomain = (url: string | null | undefined): string | null => {
     if (!url || typeof url !== 'string' || url.trim() === '') {
@@ -1701,6 +1973,40 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       // If URL parsing fails, return null
       return null;
     }
+  };
+
+  const getNewsRelatedStatus = (related: CompanyNews['related']): 'related' | 'unrelated' | 'not_classified' => {
+    if (related === null || related === undefined) return 'not_classified';
+    if (typeof related === 'boolean') return related ? 'related' : 'unrelated';
+
+    const normalized = String(related).trim().toLowerCase();
+    if (!normalized) return 'not_classified';
+    if (['true', 't', '1', 'yes', 'y'].includes(normalized)) return 'related';
+    if (['false', 'f', '0', 'no', 'n'].includes(normalized)) return 'unrelated';
+    return 'not_classified';
+  };
+
+  const getNewsRelatedBadgeClasses = (status: ReturnType<typeof getNewsRelatedStatus>): string => {
+    if (status === 'related') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    if (status === 'unrelated') return 'bg-rose-50 text-rose-700 border-rose-200';
+    return 'bg-amber-50 text-amber-700 border-amber-200';
+  };
+
+  const getNewsRelatedLabel = (status: ReturnType<typeof getNewsRelatedStatus>): string => {
+    if (status === 'related') return t('rfxs.cand_newsBadge_related');
+    if (status === 'unrelated') return t('rfxs.cand_newsBadge_unrelated');
+    return t('rfxs.cand_newsBadge_notClassified');
+  };
+
+  const getNewsImageCandidates = (news: CompanyNews): string[] => {
+    const domain = extractDomain(news.url);
+    if (!domain) return [];
+
+    return [
+      `https://logo.clearbit.com/${domain}`,
+      `https://icons.duckduckgo.com/ip3/${domain}.ico`,
+      `https://www.google.com/s2/favicons?sz=128&domain=${domain}`,
+    ];
   };
 
   // Detect duplicate company website domains only inside the FQ recommended
@@ -2931,6 +3237,9 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                 
                 const candidateKey = `${candidate.id_company_revision}-${candidate.id_product_revision || 'company'}`;
                 const candidateNumber = startIndexRec + index + 1; // Global position in the list
+                const peopleCount = companyPeopleCounts[candidate.id_company_revision] || 0;
+                const newsCount = companyNewsCounts[candidate.id_company_revision] || 0;
+                const hasPeopleOrNews = peopleCount > 0 || newsCount > 0;
 
                 const isSelected = selectedCandidates.has(candidateKey);
 
@@ -3040,36 +3349,61 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="flex gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => {
-                            setSelectedCandidate(candidate);
-                            setShowJustificationModal(true);
-                          }}
-                          data-onboarding-target="see-fq-match-justification"
-                          className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
-                        >
-                          {t('rfxs.cand_seeMatchReasoning')}
-                        </button>
-                        
-                        <button 
-                          onClick={() => {
-                            const websiteUrl = getCandidateWebsiteUrl(candidate);
-                            if (websiteUrl) {
-                              window.open(websiteUrl, '_blank', 'noopener,noreferrer');
-                            } else {
-                              toast({
-                                title: "No website available",
-                                description: "This candidate doesn't have a website URL",
-                                variant: "destructive",
-                              });
-                            }
-                          }}
-                          className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2"
-                        >
-                          <ExternalLink size={16} />
-                          {t('rfxs.cand_viewWebsite')}
-                        </button>
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedCandidate(candidate);
+                              setShowJustificationModal(true);
+                            }}
+                            data-onboarding-target="see-fq-match-justification"
+                            className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
+                          >
+                            {t('rfxs.cand_seeMatchReasoning')}
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              const websiteUrl = getCandidateWebsiteUrl(candidate);
+                              if (websiteUrl) {
+                                window.open(websiteUrl, '_blank', 'noopener,noreferrer');
+                              } else {
+                                toast({
+                                  title: "No website available",
+                                  description: "This candidate doesn't have a website URL",
+                                  variant: "destructive",
+                                });
+                              }
+                            }}
+                            className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2"
+                          >
+                            <ExternalLink size={16} />
+                            {t('rfxs.cand_viewWebsite')}
+                          </button>
+                        </div>
+
+                        {hasPeopleOrNews && (
+                          <div className="flex gap-2">
+                            {peopleCount > 0 && (
+                              <button
+                                onClick={() => openSupplierInsightsModal(candidate, 'people')}
+                                className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
+                              >
+                                <Users size={16} />
+                                {t('rfxs.cand_viewPeopleWithCount', { count: peopleCount })}
+                              </button>
+                            )}
+                            {newsCount > 0 && (
+                              <button
+                                onClick={() => openSupplierInsightsModal(candidate, 'latest-news')}
+                                className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
+                              >
+                                <Newspaper size={16} />
+                                {t('rfxs.cand_viewNewsWithCount', { count: newsCount })}
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                     </div>
@@ -3177,6 +3511,9 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                     const overallMatch = getOverallMatchScore(candidate);
                     
                     const candidateNumber = startIndexRec + index + 1; // Global position in the list
+                    const peopleCount = companyPeopleCounts[candidate.id_company_revision] || 0;
+                    const newsCount = companyNewsCounts[candidate.id_company_revision] || 0;
+                    const hasPeopleOrNews = peopleCount > 0 || newsCount > 0;
 
                     return (
                       <div 
@@ -3251,36 +3588,61 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex gap-2 flex-shrink-0">
-                              <button
-                                onClick={() => {
-                                  setSelectedCandidate(candidate);
-                                  setShowJustificationModal(true);
-                                }}
-                                data-onboarding-target="see-fq-match-justification"
-                                className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
-                              >
-                                {t('rfxs.cand_seeMatchReasoning')}
-                              </button>
-                              
-                              <button 
-                                onClick={() => {
-                                  const websiteUrl = getCandidateWebsiteUrl(candidate);
-                                  if (websiteUrl) {
-                                    window.open(websiteUrl, '_blank', 'noopener,noreferrer');
-                                  } else {
-                                    toast({
-                                      title: "No website available",
-                                      description: "This candidate doesn't have a website URL",
-                                      variant: "destructive",
-                                    });
-                                  }
-                                }}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2"
-                              >
-                                <ExternalLink size={16} />
-                                {t('rfxs.cand_viewWebsite')}
-                              </button>
+                            <div className="flex flex-col gap-2 flex-shrink-0">
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => {
+                                    setSelectedCandidate(candidate);
+                                    setShowJustificationModal(true);
+                                  }}
+                                  data-onboarding-target="see-fq-match-justification"
+                                  className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
+                                >
+                                  {t('rfxs.cand_seeMatchReasoning')}
+                                </button>
+
+                                <button
+                                  onClick={() => {
+                                    const websiteUrl = getCandidateWebsiteUrl(candidate);
+                                    if (websiteUrl) {
+                                      window.open(websiteUrl, '_blank', 'noopener,noreferrer');
+                                    } else {
+                                      toast({
+                                        title: "No website available",
+                                        description: "This candidate doesn't have a website URL",
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }}
+                                  className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                >
+                                  <ExternalLink size={16} />
+                                  {t('rfxs.cand_viewWebsite')}
+                                </button>
+                              </div>
+
+                              {hasPeopleOrNews && (
+                                <div className="flex gap-2">
+                                  {peopleCount > 0 && (
+                                    <button
+                                      onClick={() => openSupplierInsightsModal(candidate, 'people')}
+                                      className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
+                                    >
+                                      <Users size={16} />
+                                      {t('rfxs.cand_viewPeopleWithCount', { count: peopleCount })}
+                                    </button>
+                                  )}
+                                  {newsCount > 0 && (
+                                    <button
+                                      onClick={() => openSupplierInsightsModal(candidate, 'latest-news')}
+                                      className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
+                                    >
+                                      <Newspaper size={16} />
+                                      {t('rfxs.cand_viewNewsWithCount', { count: newsCount })}
+                                    </button>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -4332,6 +4694,156 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
 
             {/* Loading indicator at the end removed per request */}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Supplier Insights Modal (People / Latest News) */}
+      <Dialog
+        open={showSupplierInsightsModal}
+        onOpenChange={(open) => {
+          setShowSupplierInsightsModal(open);
+          if (!open) {
+            setSupplierInsightsCompanyId(null);
+            setSupplierInsightsCandidate(null);
+            setSupplierInsightsNews([]);
+            setSupplierInsightsNewsLoading(false);
+          }
+        }}
+      >
+        <DialogContent className="max-w-6xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {t('rfxs.cand_supplierInsightsTitle', {
+                company: supplierInsightsCandidate?.empresa || t('rfxs.cand_supplierFallback'),
+              })}
+            </DialogTitle>
+            <DialogDescription>
+              {t('rfxs.cand_supplierInsightsDescription')}
+            </DialogDescription>
+          </DialogHeader>
+
+          {supplierInsightsCandidate && supplierInsightsCompanyId ? (
+            <Tabs
+              value={supplierInsightsTab}
+              onValueChange={(value) => setSupplierInsightsTab(value as 'people' | 'latest-news')}
+              className="w-full"
+            >
+              <TabsList className="grid w-full grid-cols-2 h-14 bg-[#f1f1f1] rounded-2xl p-1.5 mb-6 border border-white/60 shadow-inner">
+                <TabsTrigger value="people" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
+                  <Users className="w-4 h-4" />
+                  {t('rfxs.cand_viewPeopleWithCount', { count: companyPeopleCounts[supplierInsightsCandidate.id_company_revision] || 0 })}
+                </TabsTrigger>
+                <TabsTrigger value="latest-news" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
+                  <Newspaper className="w-4 h-4" />
+                  {t('rfxs.cand_viewNewsWithCount', { count: companyNewsCounts[supplierInsightsCandidate.id_company_revision] || 0 })}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="people" className="mt-0">
+                <LinkedInPeopleTab companyId={supplierInsightsCompanyId} />
+              </TabsContent>
+
+              <TabsContent value="latest-news" className="mt-0">
+                <Card className="shadow-sm border-0 bg-white">
+                  <CardHeader>
+                    <CardTitle className="text-navy">{t('rfxs.cand_latestNewsTitle')}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {supplierInsightsNewsLoading ? (
+                      <div className="space-y-4">
+                        <div className="rounded-lg border p-4">
+                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            {t('rfxs.cand_latestNewsLoading')}
+                          </div>
+                        </div>
+                      </div>
+                    ) : supplierInsightsNews.length === 0 ? (
+                      <p className="text-muted-foreground">{t('rfxs.cand_latestNewsEmpty')}</p>
+                    ) : (
+                      <div className="space-y-4">
+                        {supplierInsightsNews.map((news) => (
+                          <div key={news.id} className="rounded-lg border p-4">
+                            <div className="flex items-start gap-4">
+                              <div className="w-16 h-16 rounded-lg border bg-gray-50 overflow-hidden flex items-center justify-center flex-shrink-0">
+                                {(() => {
+                                  const candidates = getNewsImageCandidates(news);
+                                  const currentAttempt = supplierInsightsNewsThumbnailAttempt[news.id] ?? 0;
+                                  const currentImage = candidates[currentAttempt];
+                                  if (!currentImage) {
+                                    return <Newspaper className="w-6 h-6 text-gray-400" />;
+                                  }
+                                  return (
+                                    <img
+                                      src={currentImage}
+                                      alt={news.title || 'News source'}
+                                      className="w-full h-full object-cover"
+                                      loading="lazy"
+                                      onError={() => {
+                                        setSupplierInsightsNewsThumbnailAttempt((prev) => ({
+                                          ...prev,
+                                          [news.id]: currentAttempt + 1,
+                                        }));
+                                      }}
+                                    />
+                                  );
+                                })()}
+                              </div>
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-navy">
+                                  {news.url ? (
+                                    <a
+                                      href={news.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="hover:underline inline-flex items-center gap-2"
+                                    >
+                                      {news.title || 'Untitled news'}
+                                      <ExternalLink className="w-4 h-4" />
+                                    </a>
+                                  ) : (
+                                    news.title || 'Untitled news'
+                                  )}
+                                </h3>
+                                <div className="mt-2">
+                                  {(() => {
+                                    const status = getNewsRelatedStatus(news.related);
+                                    return (
+                                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${getNewsRelatedBadgeClasses(status)}`}>
+                                        {getNewsRelatedLabel(status)}
+                                      </span>
+                                    );
+                                  })()}
+                                </div>
+                                {(news.source || news.time) && (
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    {[news.source, news.time].filter(Boolean).join(' - ')}
+                                  </p>
+                                )}
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {extractDomain(news.url) || 'Unknown source'}
+                                </p>
+                                {news.snippet && (
+                                  <p className="text-sm text-gray-700 mt-3">{news.snippet}</p>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground whitespace-nowrap">
+                                {new Date(news.scraped_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <div className="text-sm text-muted-foreground">
+              {t('rfxs.cand_supplierInsightsNoData')}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 

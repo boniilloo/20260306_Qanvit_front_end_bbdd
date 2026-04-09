@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { ChevronLeft, ChevronRight, ExternalLink, AlertTriangle, CheckCircle, X, FileText, BarChart } from 'lucide-react';
 import SmartLogo from './SmartLogo';
+import CompanyOverviewLeft from '@/components/company/CompanyOverviewLeft';
+import CompanyOverviewRightContact from '@/components/company/CompanyOverviewRightContact';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -68,6 +71,9 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
 
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
   const [companyWebsite, setCompanyWebsite] = useState<string | null>(null);
+  const [companyOverviewData, setCompanyOverviewData] = useState<any | null>(null);
+  const [companyOverviewLoading, setCompanyOverviewLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'reasoning' | 'company'>('reasoning');
   const [productImages, setProductImages] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
@@ -79,6 +85,7 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
 
   useEffect(() => {
     if (!open) return;
+    let cancelled = false;
 
     const checkImageUrl = (url: string): Promise<boolean> => {
       return new Promise((resolve) => {
@@ -110,23 +117,27 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
           }
         } catch (_e) {}
       }
-      setProductImages(allValid);
+      if (!cancelled) setProductImages(allValid);
     };
 
     const load = async () => {
       try {
+        setCompanyOverviewLoading(true);
+        setActiveTab('reasoning');
         setCompanyLogo(null);
         setCompanyWebsite(null);
+        setCompanyOverviewData(null);
         setProductImages([]);
 
         const { data: companyData } = await supabase
           .from('company_revision')
-          .select('logo, website')
+          .select('*')
           .eq('id', propuesta.id_company_revision)
           .single();
-        if (companyData) {
+        if (!cancelled && companyData) {
           setCompanyLogo(companyData.logo || null);
           setCompanyWebsite(companyData.website || null);
+          setCompanyOverviewData(companyData);
         }
 
         if (propuesta.id_product_revision) {
@@ -136,29 +147,35 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
             .eq('id', propuesta.id_product_revision)
             .eq('is_active', true)
             .single();
-          if (productData?.image) await validateAndSetImages([productData.image]);
+          if (!cancelled && productData?.image) await validateAndSetImages([productData.image]);
         } else if (propuesta.id_company_revision) {
           const { data: allProducts } = await supabase.rpc('get_products_by_company_revision', {
             p_company_revision_id: propuesta.id_company_revision,
             p_only_active: true,
           });
-          if (allProducts && allProducts.length > 0) {
+          if (!cancelled && allProducts && allProducts.length > 0) {
             const productIds = allProducts.map((p: any) => p.id_product_revision);
             const { data: imgs } = await supabase
               .from('product_revision')
               .select('image')
               .in('id', productIds)
               .eq('is_active', true);
-            if (imgs && imgs.length > 0) {
+            if (!cancelled && imgs && imgs.length > 0) {
               const arr = imgs.map((p: any) => p.image).filter(Boolean);
               await validateAndSetImages(arr);
             }
           }
         }
-      } catch (_err) {}
+      } catch (_err) {
+      } finally {
+        if (!cancelled) setCompanyOverviewLoading(false);
+      }
     };
 
     load();
+    return () => {
+      cancelled = true;
+    };
   }, [open, propuesta.id_company_revision, propuesta.id_product_revision]);
 
   return (
@@ -204,6 +221,19 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
             </div>
           </div>
 
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'reasoning' | 'company')} className="w-full">
+            <div className="px-6 pt-4">
+              <TabsList className="grid w-full grid-cols-2 h-12 bg-[#f1f1f1] rounded-xl p-1 border border-white/60 shadow-inner">
+                <TabsTrigger value="reasoning" className="font-semibold">
+                  {t('rfxs.reasoningModal_tabReasoning')}
+                </TabsTrigger>
+                <TabsTrigger value="company" className="font-semibold">
+                  {t('rfxs.reasoningModal_tabCompanyOverview')}
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="reasoning" className="mt-0">
           {/* Main Content */}
           <div className="flex flex-col lg:flex-row">
             <div className="flex-1 p-6 space-y-6">
@@ -471,6 +501,29 @@ const PropuestaDetailsModal: React.FC<PropuestaDetailsModalProps> = ({
               </div>
             </div>
           </div>
+            </TabsContent>
+
+            <TabsContent value="company" className="mt-0">
+              <div className="p-6">
+                {companyOverviewLoading ? (
+                  <div className="text-sm text-gray-500">{t('rfxs.reasoningModal_loadingCompanyOverview')}</div>
+                ) : companyOverviewData ? (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                      <div className="lg:col-span-3">
+                        <CompanyOverviewLeft data={companyOverviewData} />
+                      </div>
+                      <div className="lg:col-span-1">
+                        <CompanyOverviewRightContact data={companyOverviewData} />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">{t('rfxs.reasoningModal_noCompanyOverview')}</div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </DialogContent>
       </Dialog>
 

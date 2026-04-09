@@ -253,8 +253,8 @@ export default function NearbyCandidatesMap({
         <div className="space-y-1 text-[11px] text-gray-700">
           <LegendRow color="#dc2626" label="< 50%" />
           <LegendRow color="#f59e0b" label="50–65%" />
-          <LegendRow color="#f4a9aa" label="65–80%" />
-          <LegendRow color="#f4a9aa" label="80–100%" />
+          <LegendRow color="#22c55e" label="65–80%" />
+          <LegendRow color="#3b82f6" label="80–100%" />
         </div>
       </div>
 
@@ -373,15 +373,15 @@ function getMatchRingColor(matchPercent: number | null) {
   // Discrete bands for quick ranking:
   // <50 (bad) -> strong red
   // 50-65 -> orange
-  // 65-80 -> brand light-blue
-  // 80-100 (best) -> brand green
-  if (matchPercent === null) return 'rgba(128,200,240,0.9)'; // fallback to brand light-blue
+  // 65-80 -> green
+  // 80-100 (best) -> blue
+  if (matchPercent === null) return 'rgba(59,130,246,0.75)'; // fallback blue
   const clamped = Math.max(0, Math.min(100, matchPercent));
 
   if (clamped < 50) return '#dc2626'; // stronger red
   if (clamped < 65) return '#f59e0b'; // orange
-  if (clamped < 80) return '#f4a9aa'; // brand light-blue
-  return '#f4a9aa'; // brand green
+  if (clamped < 80) return '#22c55e'; // green
+  return '#3b82f6'; // blue
 }
 
 function escapeHtml(input: string) {

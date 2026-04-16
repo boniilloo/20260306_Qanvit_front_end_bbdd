@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -20,11 +20,12 @@ import { useRFXCompanyInvitationCheck } from '@/hooks/useRFXCompanyInvitationChe
 import { useRFXCrypto } from '@/hooks/useRFXCrypto';
 import AskFQAgentScopeModal, { type AskFQAgentScope } from '@/components/rfx/AskFQAgentScopeModal';
 import NearbyCandidatesMap from '@/components/rfx/NearbyCandidatesMap';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LinkedInPeopleTab } from '@/components/company/LinkedInPeopleTab';
 import { useTranslation } from 'react-i18next';
 import MarkdownRenderer from '@/components/ui/MarkdownRenderer';
 import { normalizeBestMatchRow } from '@/utils/rfxCandidateNormalize';
+import RFXCandidateCompleteInfoModal from '@/components/rfx/RFXCandidateCompleteInfoModal';
+import type { EnrichmentSnapshotRecord } from '@/types/rfxEnrichment';
+import { getRfxAgentHttpBaseUrl, getRfxLegacyCandidatesWsUrl } from '@/utils/rfxAgentHttpBaseUrl';
 import {
   Accordion,
   AccordionContent,
@@ -67,28 +68,32 @@ interface WebSocketMessage {
   timestamp?: string;
 }
 
-interface CompanyNews {
-  id: string;
-  title: string | null;
-  url: string | null;
-  source: string | null;
-  time: string | null;
-  snippet: string | null;
-  scraped_at: string;
-  related: string | boolean | null;
-}
-
 type RubricSections = {
   context: string;
   technical: string;
   company: string;
 };
 
+type CandidateWithCompany = Propuesta & {
+  company_id?: string;
+};
+
+type EnrichmentRunStatus = 'idle' | 'loading' | 'completed' | 'error';
+
 const EMPTY_RUBRIC_SECTIONS: RubricSections = {
   context: '',
   technical: '',
   company: '',
 };
+
+function hasEnrichmentSnapshotData(snapshot: EnrichmentSnapshotRecord | null | undefined): boolean {
+  if (!snapshot) return false;
+  const payload = snapshot.enrichment_payload;
+  if (payload && typeof payload === 'object' && Object.keys(payload).length > 0) return true;
+  return Boolean(snapshot.stage_classification || snapshot.last_agent_run_at);
+}
+
+const buildCandidatesEnrichmentBackendBaseUrl = () => getRfxAgentHttpBaseUrl();
 
 function buildLegacyRubricFromSections(sections: RubricSections): string {
   const blocks: string[] = [];
@@ -604,21 +609,24 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   // State for candidate card modals
   const [selectedCandidate, setSelectedCandidate] = useState<Propuesta | null>(null);
   const [showJustificationModal, setShowJustificationModal] = useState(false);
+  const [showCompleteInfoModal, setShowCompleteInfoModal] = useState(false);
+  const [completeInfoCandidate, setCompleteInfoCandidate] = useState<CandidateWithCompany | null>(null);
+  const [completeInfoInitialSection, setCompleteInfoInitialSection] = useState<
+    'news' | 'employees' | 'financials' | 'investment_rounds' | null
+  >(null);
   const [showRubricModal, setShowRubricModal] = useState(false);
-  const [showSupplierInsightsModal, setShowSupplierInsightsModal] = useState(false);
-  const [supplierInsightsTab, setSupplierInsightsTab] = useState<'people' | 'latest-news'>('people');
-  const [supplierInsightsCandidate, setSupplierInsightsCandidate] = useState<Propuesta | null>(null);
-  const [supplierInsightsCompanyId, setSupplierInsightsCompanyId] = useState<string | null>(null);
-  const [supplierInsightsNews, setSupplierInsightsNews] = useState<CompanyNews[]>([]);
-  const [supplierInsightsNewsLoading, setSupplierInsightsNewsLoading] = useState(false);
-  const [supplierInsightsNewsThumbnailAttempt, setSupplierInsightsNewsThumbnailAttempt] = useState<Record<string, number>>({});
   
   // State for company logos
   const [companyLogos, setCompanyLogos] = useState<{[key: string]: string | null}>({});
   const [companyWebsites, setCompanyWebsites] = useState<{[key: string]: string | null}>({});
   const [companyRevisionToCompanyId, setCompanyRevisionToCompanyId] = useState<{[key: string]: string | null}>({});
+  const [companyRevisionToHqLocation, setCompanyRevisionToHqLocation] = useState<{[key: string]: string | null}>({});
   const [companyPeopleCounts, setCompanyPeopleCounts] = useState<{[key: string]: number}>({});
   const [companyNewsCounts, setCompanyNewsCounts] = useState<{[key: string]: number}>({});
+  const [enrichmentByCompanyId, setEnrichmentByCompanyId] = useState<Record<string, EnrichmentSnapshotRecord>>({});
+  const [enrichmentRunStatusByCompanyId, setEnrichmentRunStatusByCompanyId] = useState<
+    Record<string, EnrichmentRunStatus>
+  >({});
   const [productUrls, setProductUrls] = useState<{[key: string]: string | null}>({});
   
   // Track which company IDs we've already attempted to load (even if they don't exist in DB)
@@ -626,6 +634,26 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const attemptedCompanyIdsRef = useRef<Set<string>>(new Set());
   const attemptedCompanyPeopleCountIdsRef = useRef<Set<string>>(new Set());
   const attemptedCompanyNewsCountIdsRef = useRef<Set<string>>(new Set());
+  const attemptedCompanyEnrichmentIdsRef = useRef<Set<string>>(new Set());
+  const inFlightEnrichmentCompanyIdsRef = useRef<Set<string>>(new Set());
+  const autoEnrichmentAttemptedCompanyIdsRef = useRef<Set<string>>(new Set());
+  const autoEnrichmentLoopInProgressRef = useRef(false);
+
+  const resolveCandidateCompanyId = useCallback(
+    (candidate: Propuesta): string | null => {
+      const candidateWithCompany = candidate as CandidateWithCompany;
+      const companyRevisionId = candidate.id_company_revision;
+      return companyRevisionToCompanyId[companyRevisionId] || candidateWithCompany.company_id || null;
+    },
+    [companyRevisionToCompanyId]
+  );
+
+  const updateEnrichmentRunStatus = useCallback((companyId: string, status: EnrichmentRunStatus) => {
+    setEnrichmentRunStatusByCompanyId((prev) => {
+      if (prev[companyId] === status) return prev;
+      return { ...prev, [companyId]: status };
+    });
+  }, []);
 
   // Selection state
   const [selectionMode, setSelectionMode] = useState(false);
@@ -847,6 +875,12 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     }
   }, [dedupedActiveRecommendedCandidates.length, itemsPerPage, recommendedPage]);
 
+  const visibleRecommendedCandidates = useMemo(() => {
+    const startIndexRec = (recommendedPage - 1) * itemsPerPage;
+    const endIndexRec = startIndexRec + itemsPerPage;
+    return dedupedActiveRecommendedCandidates.slice(startIndexRec, endIndexRec);
+  }, [dedupedActiveRecommendedCandidates, itemsPerPage, recommendedPage]);
+
   useEffect(() => {
     return () => {
       if (wsRef.current) {
@@ -896,7 +930,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
         // Fetch all missing company data in parallel using a single query with .in()
         const { data: companiesData, error } = await supabase
           .from('company_revision')
-          .select('id, logo, website, company_id')
+          .select('id, logo, website, company_id, cities, countries')
           .in('id', missingIds);
 
         if (!error && companiesData) {
@@ -906,17 +940,42 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
             const newLogos: {[key: string]: string | null} = {};
             const newWebsites: {[key: string]: string | null} = {};
             const newRevisionToCompany: {[key: string]: string | null} = {};
+            const newRevisionToLocation: {[key: string]: string | null} = {};
             
             companiesData.forEach(company => {
               newLogos[company.id] = company.logo || null;
               newWebsites[company.id] = company.website || null;
               newRevisionToCompany[company.id] = (company as any).company_id || null;
+
+              const rawCities = (company as any).cities;
+              const rawCountries = (company as any).countries;
+              const citiesArray = Array.isArray(rawCities)
+                ? rawCities
+                : typeof rawCities === 'string'
+                  ? rawCities.split(',').map((value) => value.trim()).filter(Boolean)
+                  : [];
+              const countriesArray = Array.isArray(rawCountries)
+                ? rawCountries
+                : typeof rawCountries === 'string'
+                  ? rawCountries.split(',').map((value) => value.trim()).filter(Boolean)
+                  : [];
+
+              const firstCity = String(citiesArray[0] || '').trim();
+              const firstCountry = String(countriesArray[0] || '').trim();
+              if (firstCity && firstCountry) {
+                newRevisionToLocation[company.id] = `${firstCity}, ${firstCountry}`;
+              } else if (firstCountry) {
+                newRevisionToLocation[company.id] = firstCountry;
+              } else {
+                newRevisionToLocation[company.id] = null;
+              }
             });
 
             // Batch state updates to trigger only one re-render
             setCompanyLogos(prev => ({ ...prev, ...newLogos }));
             setCompanyWebsites(prev => ({ ...prev, ...newWebsites }));
             setCompanyRevisionToCompanyId(prev => ({ ...prev, ...newRevisionToCompany }));
+            setCompanyRevisionToHqLocation(prev => ({ ...prev, ...newRevisionToLocation }));
           }
         } else if (error) {
           console.error('Error loading company data query:', error);
@@ -1123,42 +1182,76 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     loadCompanyCounts();
   }, [agentCandidates, manuallyAddedCandidates, companyPeopleCounts, companyNewsCounts, companyRevisionToCompanyId]);
 
-  // Load company news for the supplier insights modal (News tab)
+  // Load enrichment snapshots by company_id for stage badge and modals.
   useEffect(() => {
-    const loadSupplierInsightsNews = async () => {
-      if (!showSupplierInsightsModal) return;
-      if (supplierInsightsTab !== 'latest-news') return;
-      if (!supplierInsightsCompanyId) return;
+    const loadEnrichmentSnapshots = async () => {
+      const revisionIds = Array.from(
+        new Set(
+          [...agentCandidates, ...manuallyAddedCandidates]
+            .map((candidate) => candidate.id_company_revision)
+            .filter(Boolean)
+        )
+      ) as string[];
+      if (revisionIds.length === 0) return;
 
-      setSupplierInsightsNewsLoading(true);
+      const companyIds = Array.from(
+        new Set(
+          revisionIds
+            .map((revisionId) => companyRevisionToCompanyId[revisionId])
+            .filter((companyId): companyId is string => Boolean(companyId))
+        )
+      );
+      const missingCompanyIds = companyIds.filter((companyId) => {
+        if (companyId in enrichmentByCompanyId) return false;
+        if (attemptedCompanyEnrichmentIdsRef.current.has(companyId)) return false;
+        attemptedCompanyEnrichmentIdsRef.current.add(companyId);
+        return true;
+      });
+      if (missingCompanyIds.length === 0) return;
+
       try {
         const { data, error } = await (supabase as any)
-          .from('company_news' as any)
-          .select('id, title, url, source, time, snippet, scraped_at, related')
-          .eq('company_id', supplierInsightsCompanyId)
-          .order('scraped_at', { ascending: false });
+          .from('rfx_candidate_company_enrichment' as any)
+          .select(
+            'id, rfx_id, company_id, id_company_revision, id_product_revision, enrichment_payload, stage_classification, confidence, last_agent_run_at, updated_at'
+          )
+          .eq('rfx_id', rfxId)
+          .in('company_id', missingCompanyIds);
 
         if (error) {
-          console.error('Error loading supplier insights news:', error);
-          setSupplierInsightsNews([]);
+          console.error('Error loading enrichment snapshots:', error);
+          missingCompanyIds.forEach((companyId) => attemptedCompanyEnrichmentIdsRef.current.delete(companyId));
           return;
         }
-        setSupplierInsightsNews((data || []) as CompanyNews[]);
+
+        const rows = (data || []) as EnrichmentSnapshotRecord[];
+        const byCompany: Record<string, EnrichmentSnapshotRecord> = {};
+        rows.forEach((row) => {
+          if (!row?.company_id) return;
+          byCompany[row.company_id] = row;
+        });
+        setEnrichmentByCompanyId((prev) => ({ ...prev, ...byCompany }));
+        Object.values(byCompany).forEach((snapshot) => {
+          if (snapshot?.company_id && hasEnrichmentSnapshotData(snapshot)) {
+            updateEnrichmentRunStatus(snapshot.company_id, 'completed');
+          }
+        });
       } catch (err) {
-        console.error('Error loading supplier insights news:', err);
-        setSupplierInsightsNews([]);
-      } finally {
-        setSupplierInsightsNewsLoading(false);
+        console.error('Error loading enrichment snapshots:', err);
+        missingCompanyIds.forEach((companyId) => attemptedCompanyEnrichmentIdsRef.current.delete(companyId));
       }
     };
 
-    loadSupplierInsightsNews();
-  }, [showSupplierInsightsModal, supplierInsightsTab, supplierInsightsCompanyId]);
-
-  useEffect(() => {
-    if (!showSupplierInsightsModal || supplierInsightsTab !== 'latest-news') return;
-    setSupplierInsightsNewsThumbnailAttempt({});
-  }, [showSupplierInsightsModal, supplierInsightsTab, supplierInsightsCompanyId]);
+    loadEnrichmentSnapshots();
+  }, [
+    agentCandidates,
+    manuallyAddedCandidates,
+    companyRevisionToCompanyId,
+    enrichmentByCompanyId,
+    hasEnrichmentSnapshotData,
+    rfxId,
+    updateEnrichmentRunStatus,
+  ]);
 
   // Load product URLs for candidates
   useEffect(() => {
@@ -1216,8 +1309,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
 
         // Prefer env-configured WS URL, fallback to production hardcode.
 
-        //const ws = new WebSocket('ws://localhost:8000/ws-rfx');
-        const ws = new WebSocket('wss://web-production-c08e9.up.railway.app/ws-rfx');
+        const ws = new WebSocket(getRfxLegacyCandidatesWsUrl());
         
         wsRef.current = ws;
 
@@ -1796,23 +1888,518 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
     return companyWebsites[candidate.id_company_revision] || candidate.website || null;
   };
 
-  const openSupplierInsightsModal = (candidate: Propuesta, tab: 'people' | 'latest-news') => {
+  const openCompleteInfoModalAtSection = (
+    candidate: Propuesta,
+    section: 'news' | 'employees' | 'financials' | 'investment_rounds' | null
+  ) => {
+    openCompleteInfoModal(candidate, section);
+  };
+
+  const openCompleteInfoModal = (
+    candidate: Propuesta,
+    initialSection: 'news' | 'employees' | 'financials' | 'investment_rounds' | null = null
+  ) => {
+    const candidateWithCompany = candidate as CandidateWithCompany;
     const companyRevisionId = candidate.id_company_revision;
-    const companyId = companyRevisionToCompanyId[companyRevisionId] || null;
+    const companyId = resolveCandidateCompanyId(candidate);
     if (!companyRevisionId || !companyId) {
       toast({
-        title: t('rfxs.cand_toast_noSupplier'),
-        description: t('rfxs.cand_toast_noSupplierDesc'),
+        title: 'No company available',
+        description: 'This candidate does not have a linked company identifier yet.',
         variant: 'destructive',
       });
       return;
     }
-
-    setSupplierInsightsCandidate(candidate);
-    setSupplierInsightsCompanyId(companyId);
-    setSupplierInsightsTab(tab);
-    setShowSupplierInsightsModal(true);
+    setCompleteInfoCandidate({
+      ...candidate,
+      ...candidateWithCompany,
+      company_id: companyId,
+    } as CandidateWithCompany);
+    setCompleteInfoInitialSection(initialSection);
+    setShowCompleteInfoModal(true);
   };
+
+  const getCandidateEnrichment = (candidate: Propuesta): EnrichmentSnapshotRecord | null => {
+    const companyId = resolveCandidateCompanyId(candidate);
+    if (!companyId) return null;
+    return enrichmentByCompanyId[companyId] || null;
+  };
+
+  const getCandidateEnrichmentRunStatus = (candidate: Propuesta): EnrichmentRunStatus => {
+    const companyId = resolveCandidateCompanyId(candidate);
+    if (!companyId) return 'idle';
+    const localStatus = enrichmentRunStatusByCompanyId[companyId];
+    if (localStatus === 'loading') return 'loading';
+    const snapshot = enrichmentByCompanyId[companyId];
+    if (hasEnrichmentSnapshotData(snapshot)) return 'completed';
+    return localStatus || 'idle';
+  };
+
+  const getCandidateStageClassification = (candidate: Propuesta): string | null => {
+    const enrichment = getCandidateEnrichment(candidate);
+    if (!enrichment) return null;
+    const fromColumn = enrichment.stage_classification || null;
+    const fromPayload = enrichment.enrichment_payload?.stage_classification?.label || null;
+    return fromColumn || fromPayload;
+  };
+
+  const getStageLabel = (stage: string | null): string | null => {
+    if (!stage) return null;
+    if (stage === 'preseed') return 'Preseed';
+    if (stage === 'startup') return 'Startup';
+    if (stage === 'scaleup') return 'Scaleup';
+    if (stage === 'empresa_consolidada') return 'Empresa consolidada';
+    return stage;
+  };
+
+  const parseAmountToNumber = (amountRaw: string | undefined | null): number | null => {
+    if (!amountRaw) return null;
+    const sanitized = String(amountRaw)
+      .trim()
+      .replace(/[^\d.,-]/g, '');
+    if (!sanitized) return null;
+
+    let normalized = sanitized;
+    const hasComma = sanitized.includes(',');
+    const hasDot = sanitized.includes('.');
+    if (hasComma && hasDot) {
+      const lastComma = sanitized.lastIndexOf(',');
+      const lastDot = sanitized.lastIndexOf('.');
+      if (lastComma > lastDot) {
+        normalized = sanitized.replace(/\./g, '').replace(',', '.');
+      } else {
+        normalized = sanitized.replace(/,/g, '');
+      }
+    } else if (hasComma) {
+      const commaCount = (sanitized.match(/,/g) || []).length;
+      const commaSuffixLength = sanitized.length - sanitized.lastIndexOf(',') - 1;
+      if (commaCount === 1 && commaSuffixLength <= 2) {
+        normalized = sanitized.replace(',', '.');
+      } else {
+        normalized = sanitized.replace(/,/g, '');
+      }
+    } else if (hasDot) {
+      const dotCount = (sanitized.match(/\./g) || []).length;
+      const dotSuffixLength = sanitized.length - sanitized.lastIndexOf('.') - 1;
+      if (!(dotCount === 1 && dotSuffixLength <= 2)) {
+        normalized = sanitized.replace(/\./g, '');
+      }
+    }
+
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
+
+  const formatRevenueCompact = (
+    amountRaw: string | undefined | null,
+    currencyRaw: string | undefined | null,
+    yearRaw: number | null | undefined
+  ): string | null => {
+    const amountValue = parseAmountToNumber(amountRaw);
+    if (amountValue === null) return null;
+
+    const absoluteValue = Math.abs(amountValue);
+    let scaledValue = absoluteValue;
+    let suffix = '';
+    if (absoluteValue >= 1_000_000_000) {
+      scaledValue = absoluteValue / 1_000_000_000;
+      suffix = 'B';
+    } else if (absoluteValue >= 1_000_000) {
+      scaledValue = absoluteValue / 1_000_000;
+      suffix = 'M';
+    } else if (absoluteValue >= 1_000) {
+      scaledValue = absoluteValue / 1_000;
+      suffix = 'k';
+    }
+
+    const decimals = scaledValue >= 100 ? 0 : scaledValue >= 10 ? 1 : 2;
+    const rounded = Number(scaledValue.toFixed(decimals));
+    const numericPart = `${amountValue < 0 ? '-' : ''}${String(rounded).replace('.', ',')}${suffix}`;
+
+    const currency = String(currencyRaw || '').trim().toUpperCase();
+    const currencySymbol = currency === 'EUR' ? '€' : currency === 'USD' ? '$' : currency === 'GBP' ? '£' : '';
+    const currencyPart = currencySymbol || (currency ? ` ${currency}` : '');
+    const yearPart = yearRaw ? String(yearRaw) : 's/f';
+
+    return `${numericPart}${currencyPart} (${yearPart})`;
+  };
+
+  const getCandidateRevenuePreview = (candidate: Propuesta): string | null => {
+    const enrichment = getCandidateEnrichment(candidate);
+    const revenues = enrichment?.enrichment_payload?.financials?.revenues || [];
+    if (revenues.length === 0) return null;
+
+    const firstWithCompact = revenues.find((entry) => entry?.compact_display && entry.compact_display.trim().length > 0);
+    if (firstWithCompact) return firstWithCompact.compact_display || null;
+
+    const sortedByYearDesc = [...revenues].sort((a, b) => (Number(b?.year || 0) - Number(a?.year || 0)));
+    const best = sortedByYearDesc[0];
+    return formatRevenueCompact(best?.amount, best?.currency, best?.year);
+  };
+
+  const getCandidateLocationPreview = (candidate: Propuesta): string | null => {
+    const locationFromRevision = companyRevisionToHqLocation[candidate.id_company_revision];
+    const enrichment = getCandidateEnrichment(candidate);
+    const foundedYear = enrichment?.enrichment_payload?.founded_year?.value;
+    const foundedYearSuffix = foundedYear ? ` (${foundedYear})` : '';
+
+    if (locationFromRevision) return `${locationFromRevision}${foundedYearSuffix}`;
+
+    if (candidate.country_hq && candidate.country_hq.trim()) {
+      const firstCountry = candidate.country_hq
+        .split(',')
+        .map((value) => value.trim())
+        .filter(Boolean)[0];
+      return firstCountry ? `${firstCountry}${foundedYearSuffix}` : null;
+    }
+    return foundedYear ? `(${foundedYear})` : null;
+  };
+
+  const renderSignalDot = (hasInfo: boolean) => (
+    <span
+      className={`absolute -top-1 -right-1 h-3 w-3 rounded-full border ${
+        hasInfo ? 'bg-green-500 border-green-600' : 'bg-white border-gray-300'
+      }`}
+    />
+  );
+
+  const renderIconActionButton = ({
+    onClick,
+    icon,
+    tooltip,
+    hasInfo,
+    tone = 'default',
+  }: {
+    onClick: () => void;
+    icon: React.ReactNode;
+    tooltip: string;
+    hasInfo?: boolean;
+    tone?: 'default' | 'sky' | 'qanvit';
+  }) => (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          onClick={onClick}
+          className={`relative h-9 w-9 rounded-lg border transition-colors flex items-center justify-center ${
+            tone === 'sky'
+              ? 'border-sky-200 text-sky-700 hover:bg-sky-50'
+              : tone === 'qanvit'
+                ? 'border-[#22183a] bg-[#22183a] text-white hover:bg-[#22183a]/90'
+              : 'border-gray-300 text-navy hover:bg-gray-50'
+          }`}
+        >
+          {icon}
+          {typeof hasInfo === 'boolean' && renderSignalDot(hasInfo)}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{tooltip}</p>
+      </TooltipContent>
+    </Tooltip>
+  );
+
+  const refreshEnrichmentSnapshotForCompany = useCallback(
+    async (companyId: string): Promise<EnrichmentSnapshotRecord | null> => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from('rfx_candidate_company_enrichment' as any)
+          .select(
+            'id, rfx_id, company_id, id_company_revision, id_product_revision, enrichment_payload, stage_classification, confidence, last_agent_run_at, updated_at'
+          )
+          .eq('rfx_id', rfxId)
+          .eq('company_id', companyId)
+          .limit(1)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error refreshing enrichment snapshot:', error);
+        } else if (data) {
+          const snapshot = data as EnrichmentSnapshotRecord;
+          setEnrichmentByCompanyId((prev) => ({ ...prev, [companyId]: snapshot }));
+          if (hasEnrichmentSnapshotData(snapshot)) {
+            updateEnrichmentRunStatus(companyId, 'completed');
+          }
+          return snapshot;
+        }
+
+        // Fallback to canonical latest enrichment if RFX snapshot is missing.
+        const { data: canonicalData, error: canonicalError } = await (supabase as any)
+          .from('company_enrichment_intelligence' as any)
+          .select('id, payload, stage_classification, confidence, last_agent_run_at, updated_at')
+          .eq('company_id', companyId)
+          .eq('is_latest', true)
+          .limit(1)
+          .maybeSingle();
+
+        if (canonicalError) {
+          console.error('Error refreshing canonical enrichment:', canonicalError);
+          return null;
+        }
+        if (!canonicalData) return null;
+
+        const synthesizedSnapshot: EnrichmentSnapshotRecord = {
+          id: String(canonicalData.id || `canonical-${companyId}`),
+          rfx_id: rfxId,
+          company_id: companyId,
+          enrichment_payload: canonicalData.payload || {},
+          stage_classification: canonicalData.stage_classification || null,
+          confidence: canonicalData.confidence ?? null,
+          last_agent_run_at: canonicalData.last_agent_run_at,
+          updated_at: canonicalData.updated_at,
+        };
+        setEnrichmentByCompanyId((prev) => ({ ...prev, [companyId]: synthesizedSnapshot }));
+        if (hasEnrichmentSnapshotData(synthesizedSnapshot)) {
+          updateEnrichmentRunStatus(companyId, 'completed');
+        }
+        return synthesizedSnapshot;
+      } catch (err) {
+        console.error('Error refreshing enrichment snapshot/canonical data:', err);
+        return null;
+      }
+    },
+    [rfxId, updateEnrichmentRunStatus]
+  );
+
+  useEffect(() => {
+    const loadingCompanyIds = Object.entries(enrichmentRunStatusByCompanyId)
+      .filter(([, status]) => status === 'loading')
+      .map(([companyId]) => companyId);
+    if (loadingCompanyIds.length === 0) return;
+
+    let cancelled = false;
+    const pollAndRefresh = async () => {
+      for (const companyId of loadingCompanyIds) {
+        if (cancelled) return;
+        await refreshEnrichmentSnapshotForCompany(companyId);
+      }
+    };
+
+    void pollAndRefresh();
+    const intervalId = window.setInterval(() => {
+      void pollAndRefresh();
+    }, 3000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [enrichmentRunStatusByCompanyId, refreshEnrichmentSnapshotForCompany]);
+
+  /**
+   * Runs enrichment bootstrap for one candidate and synchronizes local card states.
+   */
+  const bootstrapCandidateEnrichment = useCallback(
+    async ({
+      candidate,
+      source,
+      silentError,
+    }: {
+      candidate: Propuesta;
+      source: 'auto' | 'manual';
+      silentError?: boolean;
+    }): Promise<'completed' | 'already_in_progress' | 'already_enriched' | 'error' | 'skipped'> => {
+      const companyId = resolveCandidateCompanyId(candidate);
+      console.log('[RFX AUTO ENRICHMENT] bootstrap start', {
+        source,
+        candidate_company_revision_id: candidate.id_company_revision,
+        company_id: companyId,
+        company_name: candidate.empresa,
+      });
+      if (!companyId) return 'error';
+
+      if (hasEnrichmentSnapshotData(enrichmentByCompanyId[companyId])) {
+        updateEnrichmentRunStatus(companyId, 'completed');
+        console.log('[RFX AUTO ENRICHMENT] bootstrap skipped: already_enriched', { company_id: companyId });
+        return 'already_enriched';
+      }
+      if (inFlightEnrichmentCompanyIdsRef.current.has(companyId)) {
+        updateEnrichmentRunStatus(companyId, 'loading');
+        console.log('[RFX AUTO ENRICHMENT] bootstrap skipped: in_flight_local', { company_id: companyId });
+        return 'already_in_progress';
+      }
+      if (!isReady) {
+        console.warn('[RFX AUTO ENRICHMENT] bootstrap blocked: crypto_not_ready', { company_id: companyId });
+        return 'error';
+      }
+
+      const symmetricKeyBase64 = exportSymmetricKeyToBase64 ? await exportSymmetricKeyToBase64() : null;
+      if (!symmetricKeyBase64) {
+        updateEnrichmentRunStatus(companyId, 'error');
+        console.warn('[RFX AUTO ENRICHMENT] bootstrap blocked: missing_symmetric_key', { company_id: companyId });
+        return 'error';
+      }
+
+      inFlightEnrichmentCompanyIdsRef.current.add(companyId);
+      updateEnrichmentRunStatus(companyId, 'loading');
+      try {
+        const response = await fetch(
+          `${buildCandidatesEnrichmentBackendBaseUrl()}/api/rfx-candidates/${rfxId}/companies/${companyId}/enrichment/bootstrap`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              symmetric_key: symmetricKeyBase64,
+              id_company_revision: candidate.id_company_revision,
+              id_product_revision: candidate.id_product_revision,
+              company_name: candidate.empresa,
+              website: candidate.website || companyWebsites[candidate.id_company_revision] || null,
+            }),
+          }
+        );
+        const payload = await response.json();
+        console.log('[RFX AUTO ENRICHMENT] bootstrap response', {
+          company_id: companyId,
+          ok: response.ok,
+          success: payload?.success,
+          skipped: payload?.skipped,
+          reason: payload?.reason,
+        });
+        if (!response.ok || !payload?.success) {
+          throw new Error(payload?.error || 'Failed to bootstrap enrichment');
+        }
+
+        if (payload?.skipped && payload?.reason === 'already_in_progress') {
+          updateEnrichmentRunStatus(companyId, 'loading');
+          return 'already_in_progress';
+        }
+
+        const refreshed = await refreshEnrichmentSnapshotForCompany(companyId);
+        if (hasEnrichmentSnapshotData(refreshed)) {
+          updateEnrichmentRunStatus(companyId, 'completed');
+          console.log('[RFX AUTO ENRICHMENT] bootstrap completed', { company_id: companyId, source });
+          return payload?.skipped ? 'skipped' : 'completed';
+        }
+
+        updateEnrichmentRunStatus(companyId, 'error');
+        console.warn('[RFX AUTO ENRICHMENT] bootstrap finished without snapshot data', { company_id: companyId, source });
+        return 'error';
+      } catch (error) {
+        updateEnrichmentRunStatus(companyId, 'error');
+        console.error('[RFX AUTO ENRICHMENT] bootstrap error', {
+          company_id: companyId,
+          source,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        if (!silentError) {
+          toast({
+            title: 'Completar info',
+            description:
+              error instanceof Error
+                ? error.message
+                : source === 'auto'
+                  ? 'No se pudo completar la información automática'
+                  : 'No se pudo completar la información',
+            variant: 'destructive',
+          });
+        }
+        return 'error';
+      } finally {
+        inFlightEnrichmentCompanyIdsRef.current.delete(companyId);
+      }
+    },
+    [
+      enrichmentByCompanyId,
+      exportSymmetricKeyToBase64,
+      hasEnrichmentSnapshotData,
+      isReady,
+      refreshEnrichmentSnapshotForCompany,
+      resolveCandidateCompanyId,
+      rfxId,
+      toast,
+      updateEnrichmentRunStatus,
+      companyWebsites,
+    ]
+  );
+
+  /**
+   * Auto-runs enrichment once per page load for the first 10 visible recommended candidates.
+   */
+  useEffect(() => {
+    console.log('[RFX AUTO ENRICHMENT] effect tick', {
+      loop_in_progress: autoEnrichmentLoopInProgressRef.current,
+      isReady,
+      isCryptoLoading,
+      loadingCandidates,
+      hasLoadedCandidates,
+      visible_count: visibleRecommendedCandidates.length,
+    });
+    if (!isReady || isCryptoLoading || loadingCandidates || !hasLoadedCandidates) return;
+    if (!Array.isArray(visibleRecommendedCandidates) || visibleRecommendedCandidates.length === 0) return;
+
+    const firstTenVisibleCandidates = visibleRecommendedCandidates.slice(0, 10);
+    const candidatesWithCompany = firstTenVisibleCandidates.filter((candidate) =>
+      Boolean(resolveCandidateCompanyId(candidate))
+    );
+    console.log('[RFX AUTO ENRICHMENT] candidates selection', {
+      visible_first_10: firstTenVisibleCandidates.length,
+      with_company_id: candidatesWithCompany.length,
+      selected_companies: candidatesWithCompany.map((candidate) => ({
+        id_company_revision: candidate.id_company_revision,
+        company_id: resolveCandidateCompanyId(candidate),
+        company_name: candidate.empresa,
+      })),
+    });
+    if (candidatesWithCompany.length === 0) return;
+    if (autoEnrichmentLoopInProgressRef.current) return;
+
+    let cancelled = false;
+    autoEnrichmentLoopInProgressRef.current = true;
+
+    const runAutoBootstrapQueue = async () => {
+      try {
+        const pendingCandidates = candidatesWithCompany
+          .map((candidate) => {
+            const companyId = resolveCandidateCompanyId(candidate);
+            if (!companyId) return null;
+            if (autoEnrichmentAttemptedCompanyIdsRef.current.has(companyId)) return null;
+            autoEnrichmentAttemptedCompanyIdsRef.current.add(companyId);
+            return { candidate, companyId };
+          })
+          .filter((entry): entry is { candidate: Propuesta; companyId: string } => Boolean(entry));
+
+        await Promise.all(
+          pendingCandidates.map(async ({ candidate, companyId }) => {
+            if (cancelled) return;
+
+            if (hasEnrichmentSnapshotData(enrichmentByCompanyId[companyId])) {
+              updateEnrichmentRunStatus(companyId, 'completed');
+              return;
+            }
+
+            const outcome = await bootstrapCandidateEnrichment({
+              candidate,
+              source: 'auto',
+              silentError: true,
+            });
+            console.log('[RFX AUTO ENRICHMENT] auto bootstrap outcome', {
+              company_id: companyId,
+              company_name: candidate.empresa,
+              outcome,
+            });
+          })
+        );
+      } finally {
+        autoEnrichmentLoopInProgressRef.current = false;
+      }
+    };
+
+    void runAutoBootstrapQueue();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    bootstrapCandidateEnrichment,
+    enrichmentByCompanyId,
+    hasLoadedCandidates,
+    hasEnrichmentSnapshotData,
+    isCryptoLoading,
+    isReady,
+    loadingCandidates,
+    resolveCandidateCompanyId,
+    updateEnrichmentRunStatus,
+    visibleRecommendedCandidates,
+  ]);
 
   // Helper function to extract domain from URL
   const extractDomain = (url: string | null | undefined): string | null => {
@@ -1838,40 +2425,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
       // If URL parsing fails, return null
       return null;
     }
-  };
-
-  const getNewsRelatedStatus = (related: CompanyNews['related']): 'related' | 'unrelated' | 'not_classified' => {
-    if (related === null || related === undefined) return 'not_classified';
-    if (typeof related === 'boolean') return related ? 'related' : 'unrelated';
-
-    const normalized = String(related).trim().toLowerCase();
-    if (!normalized) return 'not_classified';
-    if (['true', 't', '1', 'yes', 'y'].includes(normalized)) return 'related';
-    if (['false', 'f', '0', 'no', 'n'].includes(normalized)) return 'unrelated';
-    return 'not_classified';
-  };
-
-  const getNewsRelatedBadgeClasses = (status: ReturnType<typeof getNewsRelatedStatus>): string => {
-    if (status === 'related') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-    if (status === 'unrelated') return 'bg-rose-50 text-rose-700 border-rose-200';
-    return 'bg-amber-50 text-amber-700 border-amber-200';
-  };
-
-  const getNewsRelatedLabel = (status: ReturnType<typeof getNewsRelatedStatus>): string => {
-    if (status === 'related') return t('rfxs.cand_newsBadge_related');
-    if (status === 'unrelated') return t('rfxs.cand_newsBadge_unrelated');
-    return t('rfxs.cand_newsBadge_notClassified');
-  };
-
-  const getNewsImageCandidates = (news: CompanyNews): string[] => {
-    const domain = extractDomain(news.url);
-    if (!domain) return [];
-
-    return [
-      `https://logo.clearbit.com/${domain}`,
-      `https://icons.duckduckgo.com/ip3/${domain}.ico`,
-      `https://www.google.com/s2/favicons?sz=128&domain=${domain}`,
-    ];
   };
 
   // Detect duplicate company website domains only inside the FQ recommended
@@ -3058,7 +3611,22 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                 const candidateNumber = startIndexRec + index + 1; // Position in the current list
                 const peopleCount = companyPeopleCounts[candidate.id_company_revision] || 0;
                 const newsCount = companyNewsCounts[candidate.id_company_revision] || 0;
-                const hasPeopleOrNews = peopleCount > 0 || newsCount > 0;
+                const candidateEnrichment = getCandidateEnrichment(candidate);
+                const enrichmentRunStatus = getCandidateEnrichmentRunStatus(candidate);
+                const isEnrichmentLoading = enrichmentRunStatus === 'loading';
+                const isEnrichmentCompleted = enrichmentRunStatus === 'completed';
+                const newPeopleCount = candidateEnrichment?.enrichment_payload?.employees?.key_people?.length || 0;
+                const newNewsCount = candidateEnrichment?.enrichment_payload?.news?.new_candidates?.length || 0;
+                const hasPeopleInfo =
+                  peopleCount > 0 ||
+                  newPeopleCount > 0 ||
+                  candidateEnrichment?.enrichment_payload?.employees?.estimated_count !== null &&
+                    candidateEnrichment?.enrichment_payload?.employees?.estimated_count !== undefined;
+                const hasNewsInfo = newsCount > 0 || newNewsCount > 0;
+                const hasFinancialSignals =
+                  (candidateEnrichment?.enrichment_payload?.financials?.revenues?.length || 0) > 0 ||
+                  (candidateEnrichment?.enrichment_payload?.financials?.other_signals?.length || 0) > 0;
+                const hasInvestmentRounds = (candidateEnrichment?.enrichment_payload?.investment_rounds?.length || 0) > 0;
 
                 const isSelected = selectedCandidates.has(candidateKey);
 
@@ -3144,9 +3712,21 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                           </p>
                         )}
                         
-                        {candidate.country_hq && (
+                        {getCandidateStageClassification(candidate) && (
+                          <span className="inline-flex items-center rounded-full border border-[#f4a9aa]/50 bg-[#f4a9aa]/10 px-2 py-0.5 text-xs font-medium text-[#22183a] mt-1">
+                            {getStageLabel(getCandidateStageClassification(candidate))}
+                          </span>
+                        )}
+
+                        {getCandidateRevenuePreview(candidate) && (
+                          <p className="text-xs text-gray-600 mt-1">
+                            Facturación: {getCandidateRevenuePreview(candidate)}
+                          </p>
+                        )}
+
+                        {getCandidateLocationPreview(candidate) && (
                           <p className="text-xs text-gray-500 mt-1">
-                            🌍 {candidate.country_hq}
+                            🌍 {getCandidateLocationPreview(candidate)}
                           </p>
                         )}
                       </div>
@@ -3178,7 +3758,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                             data-onboarding-target="see-fq-match-justification"
                             className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
                           >
-                            {t('rfxs.cand_seeMatchReasoning')}
+                            Razonamiento Qanvit
                           </button>
 
                           <button
@@ -3197,32 +3777,45 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                             className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2"
                           >
                             <ExternalLink size={16} />
-                            {t('rfxs.cand_viewWebsite')}
+                            Sitio web
                           </button>
                         </div>
 
-                        {hasPeopleOrNews && (
-                          <div className="flex gap-2">
-                            {peopleCount > 0 && (
-                              <button
-                                onClick={() => openSupplierInsightsModal(candidate, 'people')}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
-                              >
-                                <Users size={16} />
-                                {t('rfxs.cand_viewPeopleWithCount', { count: peopleCount })}
-                              </button>
-                            )}
-                            {newsCount > 0 && (
-                              <button
-                                onClick={() => openSupplierInsightsModal(candidate, 'latest-news')}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
-                              >
-                                <Newspaper size={16} />
-                                {t('rfxs.cand_viewNewsWithCount', { count: newsCount })}
-                              </button>
-                            )}
+                        <TooltipProvider delayDuration={0}>
+                          <div className="flex flex-wrap gap-2">
+                            {renderIconActionButton({
+                              onClick: () => openCompleteInfoModalAtSection(candidate, 'employees'),
+                              icon: <Users size={16} />,
+                              tooltip: 'Personas',
+                              hasInfo: hasPeopleInfo,
+                            })}
+                            {renderIconActionButton({
+                              onClick: () => openCompleteInfoModalAtSection(candidate, 'news'),
+                              icon: <Newspaper size={16} />,
+                              tooltip: 'Noticias',
+                              hasInfo: hasNewsInfo,
+                            })}
+                            {renderIconActionButton({
+                              onClick: () => openCompleteInfoModalAtSection(candidate, 'financials'),
+                              icon: <Building2 size={16} />,
+                              tooltip: 'Facturación y señales financieras',
+                              hasInfo: hasFinancialSignals,
+                            })}
+                            {renderIconActionButton({
+                              onClick: () => openCompleteInfoModalAtSection(candidate, 'investment_rounds'),
+                              icon: <Package size={16} />,
+                              tooltip: 'Rondas de inversión',
+                              hasInfo: hasInvestmentRounds,
+                            })}
+                            {renderIconActionButton({
+                              onClick: () => openCompleteInfoModal(candidate),
+                              icon: isEnrichmentLoading ? <Loader2 size={16} className="animate-spin" /> : <Bot size={16} />,
+                              tooltip: 'Completar info',
+                              hasInfo: isEnrichmentCompleted,
+                              tone: 'qanvit',
+                            })}
                           </div>
-                        )}
+                        </TooltipProvider>
                       </div>
                     </div>
                     </div>
@@ -3331,7 +3924,22 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                     const candidateNumber = startIndexRec + index + 1; // Position in the current list
                     const peopleCount = companyPeopleCounts[candidate.id_company_revision] || 0;
                     const newsCount = companyNewsCounts[candidate.id_company_revision] || 0;
-                    const hasPeopleOrNews = peopleCount > 0 || newsCount > 0;
+                    const candidateEnrichment = getCandidateEnrichment(candidate);
+                    const enrichmentRunStatus = getCandidateEnrichmentRunStatus(candidate);
+                    const isEnrichmentLoading = enrichmentRunStatus === 'loading';
+                    const isEnrichmentCompleted = enrichmentRunStatus === 'completed';
+                    const newPeopleCount = candidateEnrichment?.enrichment_payload?.employees?.key_people?.length || 0;
+                    const newNewsCount = candidateEnrichment?.enrichment_payload?.news?.new_candidates?.length || 0;
+                    const hasPeopleInfo =
+                      peopleCount > 0 ||
+                      newPeopleCount > 0 ||
+                      candidateEnrichment?.enrichment_payload?.employees?.estimated_count !== null &&
+                        candidateEnrichment?.enrichment_payload?.employees?.estimated_count !== undefined;
+                    const hasNewsInfo = newsCount > 0 || newNewsCount > 0;
+                    const hasFinancialSignals =
+                      (candidateEnrichment?.enrichment_payload?.financials?.revenues?.length || 0) > 0 ||
+                      (candidateEnrichment?.enrichment_payload?.financials?.other_signals?.length || 0) > 0;
+                    const hasInvestmentRounds = (candidateEnrichment?.enrichment_payload?.investment_rounds?.length || 0) > 0;
 
                     return (
                       <div 
@@ -3382,9 +3990,21 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                 </p>
                               )}
                               
-                              {candidate.country_hq && (
+                              {getCandidateStageClassification(candidate) && (
+                                <span className="inline-flex items-center rounded-full border border-[#f4a9aa]/50 bg-[#f4a9aa]/10 px-2 py-0.5 text-xs font-medium text-[#22183a] mt-1">
+                                  {getStageLabel(getCandidateStageClassification(candidate))}
+                                </span>
+                              )}
+
+                              {getCandidateRevenuePreview(candidate) && (
+                                <p className="text-xs text-gray-600 mt-1">
+                                  Facturación: {getCandidateRevenuePreview(candidate)}
+                                </p>
+                              )}
+
+                              {getCandidateLocationPreview(candidate) && (
                                 <p className="text-xs text-gray-500 mt-1">
-                                  🌍 {candidate.country_hq}
+                                  🌍 {getCandidateLocationPreview(candidate)}
                                 </p>
                               )}
                             </div>
@@ -3416,7 +4036,7 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                   data-onboarding-target="see-fq-match-justification"
                                   className="px-4 py-2 bg-gradient-to-r from-sky to-sky/80 hover:from-sky/90 hover:to-sky text-navy text-sm font-bold rounded-lg transition-all duration-300 hover:shadow-md"
                                 >
-                                  {t('rfxs.cand_seeMatchReasoning')}
+                                  Razonamiento Qanvit
                                 </button>
 
                                 <button
@@ -3435,32 +4055,45 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
                                   className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2"
                                 >
                                   <ExternalLink size={16} />
-                                  {t('rfxs.cand_viewWebsite')}
+                                  Sitio web
                                 </button>
                               </div>
 
-                              {hasPeopleOrNews && (
-                                <div className="flex gap-2">
-                                  {peopleCount > 0 && (
-                                    <button
-                                      onClick={() => openSupplierInsightsModal(candidate, 'people')}
-                                      className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
-                                    >
-                                      <Users size={16} />
-                                      {t('rfxs.cand_viewPeopleWithCount', { count: peopleCount })}
-                                    </button>
-                                  )}
-                                  {newsCount > 0 && (
-                                    <button
-                                      onClick={() => openSupplierInsightsModal(candidate, 'latest-news')}
-                                      className="px-4 py-2 border border-gray-300 rounded-lg text-navy hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm"
-                                    >
-                                      <Newspaper size={16} />
-                                      {t('rfxs.cand_viewNewsWithCount', { count: newsCount })}
-                                    </button>
-                                  )}
+                              <TooltipProvider delayDuration={0}>
+                                <div className="flex flex-wrap gap-2">
+                                  {renderIconActionButton({
+                                    onClick: () => openCompleteInfoModalAtSection(candidate, 'employees'),
+                                    icon: <Users size={16} />,
+                                    tooltip: 'Personas',
+                                    hasInfo: hasPeopleInfo,
+                                  })}
+                                  {renderIconActionButton({
+                                    onClick: () => openCompleteInfoModalAtSection(candidate, 'news'),
+                                    icon: <Newspaper size={16} />,
+                                    tooltip: 'Noticias',
+                                    hasInfo: hasNewsInfo,
+                                  })}
+                                  {renderIconActionButton({
+                                    onClick: () => openCompleteInfoModalAtSection(candidate, 'financials'),
+                                    icon: <Building2 size={16} />,
+                                    tooltip: 'Facturación y señales financieras',
+                                    hasInfo: hasFinancialSignals,
+                                  })}
+                                  {renderIconActionButton({
+                                    onClick: () => openCompleteInfoModalAtSection(candidate, 'investment_rounds'),
+                                    icon: <Package size={16} />,
+                                    tooltip: 'Rondas de inversión',
+                                    hasInfo: hasInvestmentRounds,
+                                  })}
+                                  {renderIconActionButton({
+                                    onClick: () => openCompleteInfoModal(candidate),
+                                    icon: isEnrichmentLoading ? <Loader2 size={16} className="animate-spin" /> : <Bot size={16} />,
+                                    tooltip: 'Completar info',
+                                    hasInfo: isEnrichmentCompleted,
+                                    tone: 'qanvit',
+                                  })}
                                 </div>
-                              )}
+                              </TooltipProvider>
                             </div>
                           </div>
                         </div>
@@ -4515,156 +5148,6 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
         </DialogContent>
       </Dialog>
 
-      {/* Supplier Insights Modal (People / Latest News) */}
-      <Dialog
-        open={showSupplierInsightsModal}
-        onOpenChange={(open) => {
-          setShowSupplierInsightsModal(open);
-          if (!open) {
-            setSupplierInsightsCompanyId(null);
-            setSupplierInsightsCandidate(null);
-            setSupplierInsightsNews([]);
-            setSupplierInsightsNewsLoading(false);
-          }
-        }}
-      >
-        <DialogContent className="max-w-6xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {t('rfxs.cand_supplierInsightsTitle', {
-                company: supplierInsightsCandidate?.empresa || t('rfxs.cand_supplierFallback'),
-              })}
-            </DialogTitle>
-            <DialogDescription>
-              {t('rfxs.cand_supplierInsightsDescription')}
-            </DialogDescription>
-          </DialogHeader>
-
-          {supplierInsightsCandidate && supplierInsightsCompanyId ? (
-            <Tabs
-              value={supplierInsightsTab}
-              onValueChange={(value) => setSupplierInsightsTab(value as 'people' | 'latest-news')}
-              className="w-full"
-            >
-              <TabsList className="grid w-full grid-cols-2 h-14 bg-[#f1f1f1] rounded-2xl p-1.5 mb-6 border border-white/60 shadow-inner">
-                <TabsTrigger value="people" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
-                  <Users className="w-4 h-4" />
-                  {t('rfxs.cand_viewPeopleWithCount', { count: companyPeopleCounts[supplierInsightsCandidate.id_company_revision] || 0 })}
-                </TabsTrigger>
-                <TabsTrigger value="latest-news" className="group flex items-center gap-2 rounded-lg px-5 py-2 font-semibold text-[#22183a]/70 hover:bg-white/70 hover:text-[#22183a] transition-all duration-200 ease-out data-[state=active]:bg-white data-[state=active]:text-[#22183a] data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#f4a9aa]/40 data-[state=active]:ring-1 data-[state=active]:ring-[#f4a9aa]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f4a9aa]/60">
-                  <Newspaper className="w-4 h-4" />
-                  {t('rfxs.cand_viewNewsWithCount', { count: companyNewsCounts[supplierInsightsCandidate.id_company_revision] || 0 })}
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="people" className="mt-0">
-                <LinkedInPeopleTab companyId={supplierInsightsCompanyId} />
-              </TabsContent>
-
-              <TabsContent value="latest-news" className="mt-0">
-                <Card className="shadow-sm border-0 bg-white">
-                  <CardHeader>
-                    <CardTitle className="text-navy">{t('rfxs.cand_latestNewsTitle')}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {supplierInsightsNewsLoading ? (
-                      <div className="space-y-4">
-                        <div className="rounded-lg border p-4">
-                          <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            {t('rfxs.cand_latestNewsLoading')}
-                          </div>
-                        </div>
-                      </div>
-                    ) : supplierInsightsNews.length === 0 ? (
-                      <p className="text-muted-foreground">{t('rfxs.cand_latestNewsEmpty')}</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {supplierInsightsNews.map((news) => (
-                          <div key={news.id} className="rounded-lg border p-4">
-                            <div className="flex items-start gap-4">
-                              <div className="w-16 h-16 rounded-lg border bg-gray-50 overflow-hidden flex items-center justify-center flex-shrink-0">
-                                {(() => {
-                                  const candidates = getNewsImageCandidates(news);
-                                  const currentAttempt = supplierInsightsNewsThumbnailAttempt[news.id] ?? 0;
-                                  const currentImage = candidates[currentAttempt];
-                                  if (!currentImage) {
-                                    return <Newspaper className="w-6 h-6 text-gray-400" />;
-                                  }
-                                  return (
-                                    <img
-                                      src={currentImage}
-                                      alt={news.title || 'News source'}
-                                      className="w-full h-full object-cover"
-                                      loading="lazy"
-                                      onError={() => {
-                                        setSupplierInsightsNewsThumbnailAttempt((prev) => ({
-                                          ...prev,
-                                          [news.id]: currentAttempt + 1,
-                                        }));
-                                      }}
-                                    />
-                                  );
-                                })()}
-                              </div>
-                              <div className="flex-1">
-                                <h3 className="font-semibold text-navy">
-                                  {news.url ? (
-                                    <a
-                                      href={news.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="hover:underline inline-flex items-center gap-2"
-                                    >
-                                      {news.title || 'Untitled news'}
-                                      <ExternalLink className="w-4 h-4" />
-                                    </a>
-                                  ) : (
-                                    news.title || 'Untitled news'
-                                  )}
-                                </h3>
-                                <div className="mt-2">
-                                  {(() => {
-                                    const status = getNewsRelatedStatus(news.related);
-                                    return (
-                                      <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${getNewsRelatedBadgeClasses(status)}`}>
-                                        {getNewsRelatedLabel(status)}
-                                      </span>
-                                    );
-                                  })()}
-                                </div>
-                                {(news.source || news.time) && (
-                                  <p className="text-sm text-muted-foreground mt-1">
-                                    {[news.source, news.time].filter(Boolean).join(' - ')}
-                                  </p>
-                                )}
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {extractDomain(news.url) || 'Unknown source'}
-                                </p>
-                                {news.snippet && (
-                                  <p className="text-sm text-gray-700 mt-3">{news.snippet}</p>
-                                )}
-                              </div>
-                              <p className="text-xs text-muted-foreground whitespace-nowrap">
-                                {new Date(news.scraped_at).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          ) : (
-            <div className="text-sm text-muted-foreground">
-              {t('rfxs.cand_supplierInsightsNoData')}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
       {/* Workflow In Progress Dialog */}
       <AlertDialog open={showWorkflowInProgressDialog} onOpenChange={(open) => {
         if (!open && !workflowInProgress) {
@@ -4755,6 +5238,46 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
           open={showJustificationModal}
           onOpenChange={setShowJustificationModal}
           propuesta={selectedCandidate}
+        />
+      )}
+
+      {completeInfoCandidate && (
+        <RFXCandidateCompleteInfoModal
+          open={showCompleteInfoModal}
+          onOpenChange={(open) => {
+            setShowCompleteInfoModal(open);
+            if (!open) {
+              setCompleteInfoInitialSection(null);
+            }
+          }}
+          rfxId={rfxId}
+          candidate={completeInfoCandidate}
+          initialSection={completeInfoInitialSection}
+          onBootstrapStateChange={({ companyId, status }) => {
+            if (!companyId) return;
+            if (status === 'loading') {
+              inFlightEnrichmentCompanyIdsRef.current.add(companyId);
+              updateEnrichmentRunStatus(companyId, 'loading');
+              return;
+            }
+            inFlightEnrichmentCompanyIdsRef.current.delete(companyId);
+            if (status === 'completed') {
+              updateEnrichmentRunStatus(companyId, 'completed');
+              return;
+            }
+            updateEnrichmentRunStatus(companyId, 'error');
+          }}
+          onSnapshotUpdated={(snapshot) => {
+            if (!snapshot?.company_id) return;
+            inFlightEnrichmentCompanyIdsRef.current.delete(snapshot.company_id);
+            setEnrichmentByCompanyId((prev) => ({
+              ...prev,
+              [snapshot.company_id]: snapshot,
+            }));
+            if (hasEnrichmentSnapshotData(snapshot)) {
+              updateEnrichmentRunStatus(snapshot.company_id, 'completed');
+            }
+          }}
         />
       )}
 

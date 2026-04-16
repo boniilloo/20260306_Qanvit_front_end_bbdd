@@ -8,6 +8,7 @@ import {
   MAX_MESSAGES,
   type RFXChatMessage,
 } from '@/utils/rfxChatMessageUtils';
+import { getRfxAgentHttpBaseUrl, getRfxCandidatesWsUrl as resolveRfxCandidatesWsUrl } from '@/utils/rfxAgentHttpBaseUrl';
 
 export interface PublicCryptoContext {
   encrypt: (text: string) => Promise<string>;
@@ -31,24 +32,19 @@ interface UseRFXCandidatesChatControllerConfig {
   publicCrypto?: PublicCryptoContext;
 }
 
-const RFX_CANDIDATES_WS_URL =
-  import.meta.env.DEV
-    ? (import.meta.env.VITE_WS_RFX_AGENT_LOCAL_URL || 'ws://localhost:8000/ws-rfx-agent').replace(
-        /ws-rfx-agent/g,
-        'ws-rfx-candidates'
-      )
-    : import.meta.env.VITE_WS_RFX_AGENT_URL.replace(/ws-rfx-agent/g, 'ws-rfx-candidates');
-
-const getRfxCandidatesWsUrl = () => RFX_CANDIDATES_WS_URL;
+const getRfxCandidatesWsUrl = () => resolveRfxCandidatesWsUrl();
 
 type RfxCandidatesWsPayload =
   | { type: 'loading'; data?: { status?: string } | string }
   | { type: 'text_stream'; data?: unknown }
   | { type: 'text'; data?: unknown }
   | { type: 'agent_ready'; data?: { status?: string } }
+  | { type: 'cancelled'; data?: unknown }
   | { type: 'error'; data?: unknown };
 
 const CANDIDATES_LOADING_STATUS_KEY = 'candidates_loading';
+const createMessageId = (prefix: string) =>
+  `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`}`;
 
 export function useRFXCandidatesChatController({
   rfxId,
@@ -109,11 +105,7 @@ export function useRFXCandidatesChatController({
     if (!isReady) return;
     if (!rfxId) return;
 
-    const wsUrl = getRfxCandidatesWsUrl();
-    const backendBaseUrl = wsUrl
-      .replace('ws://', 'http://')
-      .replace('wss://', 'https://')
-      .replace('/ws-rfx-candidates', '');
+    const backendBaseUrl = getRfxAgentHttpBaseUrl();
 
     try {
       const resp = await fetch(
@@ -181,7 +173,7 @@ export function useRFXCandidatesChatController({
       }
 
       const statusMsg: RFXChatMessage = {
-        id: `status-${Date.now()}`,
+        id: createMessageId('status'),
         type: 'status',
         content: statusText,
         timestamp: new Date(),
@@ -285,7 +277,7 @@ export function useRFXCandidatesChatController({
                 );
               }
               const newMessage: RFXChatMessage = {
-                id: `msg-${Date.now()}`,
+                id: createMessageId('msg'),
                 type: 'assistant',
                 content: streamToken,
                 timestamp: new Date(),
@@ -313,7 +305,7 @@ export function useRFXCandidatesChatController({
                 );
               }
               const newMessage: RFXChatMessage = {
-                id: `msg-${Date.now()}`,
+                id: createMessageId('msg'),
                 type: 'assistant',
                 content: text,
                 timestamp: new Date(),
@@ -339,6 +331,30 @@ export function useRFXCandidatesChatController({
             return;
           }
 
+          if (msgType === 'cancelled') {
+            removeLoadingStatus();
+            setIsLoading(false);
+            setAgentReady(true);
+            setMessages(prev => {
+              const withStoppedStreaming = prev.map((m, i) =>
+                i === prev.length - 1 && m.type === 'assistant' && m.isStreaming
+                  ? { ...m, isStreaming: false }
+                  : m
+              );
+              const cancellationStatus: RFXChatMessage = {
+                id: createMessageId('status-cancelled'),
+                type: 'status',
+                content: 'Response stopped by user.',
+                timestamp: new Date(),
+                statusKey: 'cancelled',
+                statusState: 'success',
+              };
+              const next = [...withStoppedStreaming, cancellationStatus];
+              return next.length > MAX_MESSAGES ? next.slice(-MAX_MESSAGES) : next;
+            });
+            return;
+          }
+
           if (msgType === 'error') {
             const errData = (parsed as any)?.data;
             const errText =
@@ -351,7 +367,7 @@ export function useRFXCandidatesChatController({
             setMessages(prev => [
               ...prev,
               {
-                id: `msg-${Date.now()}`,
+                id: createMessageId('msg'),
                 type: 'assistant',
                 content: `Error: ${errText}`,
                 timestamp: new Date(),
@@ -432,11 +448,7 @@ export function useRFXCandidatesChatController({
     setIsResetting(true);
     try {
       try {
-        const wsUrl = getRfxCandidatesWsUrl();
-        const backendBaseUrl = wsUrl
-          .replace('ws://', 'http://')
-          .replace('wss://', 'https://')
-          .replace('/ws-rfx-candidates', '');
+        const backendBaseUrl = getRfxAgentHttpBaseUrl();
 
         const resp = await fetch(
           `${backendBaseUrl}/api/rfx-candidates/${rfxId}/reset`,
@@ -469,6 +481,26 @@ export function useRFXCandidatesChatController({
     }
   }, [connect, disconnect, isResetting, rfxId, welcomeMessage, toast]);
 
+  const cancelResponse = useCallback(() => {
+    if (isPublicMode) return false;
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      return false;
+    }
+
+    try {
+      ws.send(
+        JSON.stringify({
+          type: 'cancel',
+          rfx_id: rfxId,
+        })
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }, [isPublicMode, rfxId]);
+
   useEffect(() => {
     if (isPublicMode) return;
     if (!shouldConnect) return;
@@ -497,6 +529,7 @@ export function useRFXCandidatesChatController({
     connect,
     disconnect,
     sendMessage,
+    cancelResponse,
     resetConversation,
   };
 }

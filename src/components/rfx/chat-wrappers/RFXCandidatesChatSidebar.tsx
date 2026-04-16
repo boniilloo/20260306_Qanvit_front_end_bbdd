@@ -13,6 +13,9 @@ import RFXChatMessageList from '../chat/RFXChatMessageList';
 import RFXChatResetDialog from '../chat/RFXChatResetDialog';
 import RFXCandidatesChatInputArea from '../chat/RFXCandidatesChatInputArea';
 
+const createMessageId = (prefix: string) =>
+  `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`}`;
+
 export interface RFXCandidatesChatSidebarProps {
   rfxId: string;
   rfxName: string;
@@ -50,6 +53,8 @@ const RFXCandidatesChatSidebar: React.FC<RFXCandidatesChatSidebarProps> = ({
 
   const [inputValue, setInputValue] = useState('');
   const [showResetConfirmDialog, setShowResetConfirmDialog] = useState(false);
+  const [canCancel, setCanCancel] = useState(false);
+  const cancelEnableTimerRef = useRef<number | null>(null);
 
   const controller = useRFXCandidatesChatController({
     rfxId,
@@ -68,22 +73,44 @@ const RFXCandidatesChatSidebar: React.FC<RFXCandidatesChatSidebarProps> = ({
     messages,
     setMessages,
     decryptFile,
+    cancelResponse,
   } = controller;
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToLastUserMessage = useCallback(() => {
+    lastUserMessageRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
-
-  useEffect(() => {
-    // Pin to latest content (including streaming token updates).
-    setTimeout(scrollToBottom, 50);
-  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     if (isExpanded && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isExpanded]);
+
+  useEffect(() => {
+    if (cancelEnableTimerRef.current) {
+      window.clearTimeout(cancelEnableTimerRef.current);
+      cancelEnableTimerRef.current = null;
+    }
+
+    if (isLoading && !agentReady) {
+      setCanCancel(false);
+      cancelEnableTimerRef.current = window.setTimeout(() => {
+        setCanCancel(true);
+      }, 2000);
+      return;
+    }
+
+    setCanCancel(false);
+  }, [agentReady, isLoading]);
+
+  useEffect(() => {
+    return () => {
+      if (cancelEnableTimerRef.current) {
+        window.clearTimeout(cancelEnableTimerRef.current);
+        cancelEnableTimerRef.current = null;
+      }
+    };
+  }, []);
 
   const toggleExpanded = () => {
     const next = !isExpanded;
@@ -103,7 +130,7 @@ const RFXCandidatesChatSidebar: React.FC<RFXCandidatesChatSidebarProps> = ({
     if (!agentReady || isLoading) return;
 
     const userMessage: RFXChatMessage = {
-      id: `msg-${Date.now()}`,
+      id: createMessageId('msg'),
       type: 'user',
       content: prompt,
       timestamp: new Date(),
@@ -113,6 +140,9 @@ const RFXCandidatesChatSidebar: React.FC<RFXCandidatesChatSidebarProps> = ({
       const next = [...prev, userMessage];
       return next.length > MAX_MESSAGES ? next.slice(-MAX_MESSAGES) : next;
     });
+    setTimeout(() => {
+      scrollToLastUserMessage();
+    }, 100);
 
     setInputValue('');
     setTimeout(() => {
@@ -124,7 +154,7 @@ const RFXCandidatesChatSidebar: React.FC<RFXCandidatesChatSidebarProps> = ({
     } catch {
       // Errors are handled via connectionError/toasts in the controller.
     }
-  }, [agentReady, controller, inputValue, isLoading, readOnly, setMessages]);
+  }, [agentReady, controller, inputValue, isLoading, readOnly, scrollToLastUserMessage, setMessages]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey && agentReady && !isLoading) {
@@ -132,6 +162,11 @@ const RFXCandidatesChatSidebar: React.FC<RFXCandidatesChatSidebarProps> = ({
       void handleSendMessage();
     }
   };
+
+  const handleCancelResponse = useCallback(() => {
+    if (!canCancel) return;
+    cancelResponse();
+  }, [cancelResponse, canCancel]);
 
   const onSelectPrompt = (text: string) => {
     setInputValue(text);
@@ -187,6 +222,8 @@ const RFXCandidatesChatSidebar: React.FC<RFXCandidatesChatSidebarProps> = ({
           rfxDescription={rfxDescription}
           isLoading={isLoading}
           agentReady={agentReady}
+          canCancel={canCancel}
+          onCancel={handleCancelResponse}
           readOnly={readOnly}
           inputRef={inputRef}
         />

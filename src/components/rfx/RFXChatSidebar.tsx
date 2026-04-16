@@ -30,10 +30,9 @@ import RFXFileUploadPreview from './RFXFileUploadPreview';
 import RFXEncryptedImage from './RFXEncryptedImage';
 import RFXEncryptedDocument from './RFXEncryptedDocument';
 import { useTranslation } from 'react-i18next';
+import { getRfxAgentHttpBaseUrl, getRfxAgentWsUrl } from '@/utils/rfxAgentHttpBaseUrl';
 
-// La línea sin comentar es la URL que se usa (producción = Vercel; local = dev).
-//const RFX_AGENT_WS_URL = 'ws://localhost:8000/ws-rfx-agent';
-const RFX_AGENT_WS_URL = 'wss://web-production-c08e9.up.railway.app/ws-rfx-agent';
+const RFX_AGENT_WS_URL = getRfxAgentWsUrl();
 
 // Toggle to enable extra console diagnostics for WS resume/debugging.
 // Keep it false for normal use to avoid spamming the console.
@@ -1125,7 +1124,7 @@ toast({
       disconnectWebSocket();
       
       // Call backend to reset RFX conversation state (uses dedicated RFX endpoint)
-      const backendBaseUrl = RFX_AGENT_WS_URL.replace('ws://', 'http://').replace('wss://', 'https://').replace('/ws-rfx-agent', '');
+      const backendBaseUrl = getRfxAgentHttpBaseUrl();
       console.log(`🔄 [RFX Reset] Calling ${backendBaseUrl}/api/rfx-conversations/${conversationId}/reset`);
       
       const response = await fetch(`${backendBaseUrl}/api/rfx-conversations/${conversationId}/reset`, {

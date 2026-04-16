@@ -1,5 +1,5 @@
 import React, { RefObject } from 'react';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import RFXChatQuickPrompts from './RFXChatQuickPrompts';
@@ -19,6 +19,8 @@ interface RFXCandidatesChatInputAreaProps {
 
   isLoading: boolean;
   agentReady: boolean;
+  canCancel: boolean;
+  onCancel: () => void;
   readOnly: boolean;
 
   inputRef: RefObject<HTMLTextAreaElement | null>;
@@ -36,6 +38,8 @@ const RFXCandidatesChatInputArea: React.FC<RFXCandidatesChatInputAreaProps> = ({
   showQuickPrompts = false,
   isLoading,
   agentReady,
+  canCancel,
+  onCancel,
   readOnly,
   inputRef,
 }) => {
@@ -79,16 +83,31 @@ const RFXCandidatesChatInputArea: React.FC<RFXCandidatesChatInputAreaProps> = ({
           rows={1}
         />
 
-        <Button
-          onClick={onSend}
-          disabled={!canSend}
-          size="sm"
-          className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
-          aria-label="Send message"
-          title={agentReady ? 'Send' : isLoading ? 'Loading...' : 'Please wait'}
-        >
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-        </Button>
+        {isLoading && !agentReady ? (
+          <Button
+            onClick={onCancel}
+            disabled={!canCancel}
+            size="sm"
+            className={`text-white transition-all ${
+              canCancel ? 'bg-gray-500 hover:bg-gray-600' : 'bg-gray-300 cursor-not-allowed'
+            }`}
+            aria-label="Stop response"
+            title={canCancel ? 'Stop response' : 'Please wait...'}
+          >
+            <Square className="h-4 w-4 fill-current" />
+          </Button>
+        ) : (
+          <Button
+            onClick={onSend}
+            disabled={!canSend}
+            size="sm"
+            className="bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
+            aria-label="Send message"
+            title={agentReady ? 'Send' : isLoading ? 'Loading...' : 'Please wait'}
+          >
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          </Button>
+        )}
       </div>
     </div>
   );

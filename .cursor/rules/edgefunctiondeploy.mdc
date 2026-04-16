@@ -2,4 +2,4 @@
 alwaysApply: true
 ---
 
-Cuando se quiera actualizar la edge function de billing-webhook hay que hacerlo con el comando de supabase functions deploy billing-webhook --no-verify-jwt para evitar que salga un error de missing header.
+Cuando se actualicen edge functions, valida primero si requieren `verify_jwt = false` en `supabase/config.toml` antes de desplegar.

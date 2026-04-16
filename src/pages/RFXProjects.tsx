@@ -347,7 +347,7 @@ const RFXProjects = () => {
 
     setIsCheckingCreateEligibility(true);
     try {
-      // 1) Check if user has an active paid plan from Stripe (via billing-manage-subscription).
+      // 1) Check if user has an active paid plan from manual billing info.
       const { data: billingInfo, error: billingError } = await supabase.functions.invoke(
         'billing-manage-subscription',
         {

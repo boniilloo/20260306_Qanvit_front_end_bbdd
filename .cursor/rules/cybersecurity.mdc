@@ -169,4 +169,3 @@ Para evitar condiciones de carrera donde se intenta descifrar datos antes de ten
 2.  **Desarrollo Local:** Usar `.env.local` para secretos.
 3.  **Revisión:** Verificar que no haya secretos hardcodeados.
 4.  **Despliegue:** Configurar secretos en Supabase Dashboard antes de desplegar Edge Functions.
-- Cuando se quiera actualizar la edge function de billing-webhook hay que hacerlo con el comando de supabase functions deploy billing-webhook --no-verify-jwt para evitar que salga un error de missing header.

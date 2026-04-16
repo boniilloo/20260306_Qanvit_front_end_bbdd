@@ -313,12 +313,10 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
-# Edge Functions: disable JWT verification for webhooks and cron-invoked functions
-# so deploy does not re-enable it. See https://supabase.com/docs/guides/functions/function-configuration
-[functions.billing-webhook]
+[functions.send-rfx-analysis-completed-email]
 verify_jwt = false
 
-[functions.send-rfx-analysis-completed-email]
+[functions.billing-manage-subscription]
 verify_jwt = false
 
 [functions.chat-unread-email-notifier]

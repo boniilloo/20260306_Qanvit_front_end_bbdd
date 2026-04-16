@@ -28,6 +28,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -120,6 +121,8 @@ const Home = () => {
   const [intent, setIntent] = useState('');
   const [isBootstrapping, setIsBootstrapping] = useState(false);
   const [isBootstrapRequestPending, setIsBootstrapRequestPending] = useState(false);
+  const [isCheckingCreateEligibility, setIsCheckingCreateEligibility] = useState(false);
+  const [isPlanLimitModalOpen, setIsPlanLimitModalOpen] = useState(false);
   const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = useState(false);
   const [pendingIntent, setPendingIntent] = useState('');
   const [workspaceChoice, setWorkspaceChoice] = useState<string>('none');
@@ -227,7 +230,35 @@ const Home = () => {
       navigate('/auth');
       return;
     }
-    if (isBootstrapping || isBootstrapRequestPending) return;
+    if (isBootstrapping || isBootstrapRequestPending || isCheckingCreateEligibility) return;
+
+    setIsCheckingCreateEligibility(true);
+    try {
+      // Match /rfxs behavior: free users can only own one RFX.
+      const { data: billingInfo, error: billingError } = await supabase.functions.invoke(
+        'billing-manage-subscription',
+        {
+          body: { action: 'get_info' },
+        },
+      );
+
+      if (!billingError && !billingInfo?.error) {
+        const isPaidMember = !!billingInfo?.is_paid_member;
+        if (!isPaidMember) {
+          const { count, error: countError } = await supabase
+            .from('rfxs' as any)
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id);
+
+          if (!countError && (count || 0) >= 1) {
+            setIsPlanLimitModalOpen(true);
+            return;
+          }
+        }
+      }
+    } finally {
+      setIsCheckingCreateEligibility(false);
+    }
 
     setPendingIntent(trimmed);
     setWorkspaceChoice('none');
@@ -437,6 +468,33 @@ const Home = () => {
           </div>
         </DialogContent>
       </Dialog>
+      <Dialog open={isPlanLimitModalOpen} onOpenChange={setIsPlanLimitModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('rfxs.limitReached')}</DialogTitle>
+            <DialogDescription>
+              {t('rfxs.limitReachedDesc')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsPlanLimitModalOpen(false)}
+            >
+              {t('rfxs.close')}
+            </Button>
+            <Button
+              className="bg-[#22183a] hover:bg-[#22183a]/90 text-white"
+              onClick={() => {
+                setIsPlanLimitModalOpen(false);
+                navigate('/my-subscription');
+              }}
+            >
+              {t('rfxs.goToMySubscription')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="w-full relative overflow-hidden flex flex-col items-center justify-center flex-1">
         <div className="w-full px-4 sm:px-6 py-8 sm:py-12 relative z-10 flex flex-col items-center justify-center">
@@ -476,10 +534,10 @@ const Home = () => {
                 <div className="flex justify-center">
                   <Button
                     type="submit"
-                    disabled={isBootstrapping || isBootstrapRequestPending || authLoading || intent.trim().length < 3}
+                    disabled={isBootstrapping || isBootstrapRequestPending || isCheckingCreateEligibility || authLoading || intent.trim().length < 3}
                     className="h-12 border-0 rounded-[8px] px-6 py-3 bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a] font-semibold whitespace-nowrap"
                   >
-                    {isBootstrapping ? (
+                    {(isBootstrapping || isCheckingCreateEligibility) ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                         {t('landing.intentSubmitting')}

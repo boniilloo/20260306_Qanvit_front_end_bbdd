@@ -20,7 +20,6 @@ http://127.0.0.1:54321/functions/v1/[nombre-función]
 
 - **create-subscription**: `http://127.0.0.1:54321/functions/v1/create-subscription`
 - **manage-subscription**: `http://127.0.0.1:54321/functions/v1/manage-subscription`
-- **billing-webhook**: `http://127.0.0.1:54321/functions/v1/billing-webhook`
 - **send-notification-email**: `http://127.0.0.1:54321/functions/v1/send-notification-email`
 - **send-rfx-review-email**: `http://127.0.0.1:54321/functions/v1/send-rfx-review-email`
 - **send-company-invitation-email**: `http://127.0.0.1:54321/functions/v1/send-company-invitation-email`
@@ -139,12 +138,6 @@ Para debuggear las edge functions:
 
 Basado en el código, estas son las variables que necesitas configurar:
 
-#### Funciones de Stripe:
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET_BUYERS` (solo para billing-webhook)
-- `STRIPE_PRICE_ANNUAL_ID`
-- `STRIPE_PORTAL_CONFIGURATION_ID` (solo para manage-subscription)
-
 #### Funciones de Email (Resend):
 - `RESEND_API_KEY`
 
@@ -213,9 +206,6 @@ supabase functions logs create-subscription
 
 # Listar secrets
 supabase secrets list
-
-# Configurar un secret
-supabase secrets set STRIPE_SECRET_KEY=sk_test_...
 
 # Detener Supabase
 supabase stop

@@ -36,7 +36,6 @@ import RFXPublicPlaceholderPage from "@/pages/RFXPublicPlaceholderPage";
 import NotificationsCenter from "@/pages/NotificationsCenter";
 import DeveloperSubscriptions from "@/pages/DeveloperSubscriptions";
 import MySubscription from "@/pages/MySubscription";
-import PaymentSuccess from "@/pages/PaymentSuccess";
 import NotFound from "./pages/NotFound";
 
 import Settings from "./pages/Settings";
@@ -117,9 +116,6 @@ const App = () => {
                 {/* Ruta sin sidebar */}
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                {/* Public payment success page — no auth, no sidebar, for financial officers */}
-                <Route path="/payment-success" element={<PaymentSuccess />} />
-              
                 {/* Rutas con layout persistente - evita parpadeo del Sidebar */}
                 <Route element={<LayoutWrapper />}>
                   {/* Rutas con sidebar y layout */}

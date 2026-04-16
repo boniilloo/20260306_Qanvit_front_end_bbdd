@@ -499,7 +499,7 @@ export function useRFXInvitations() {
       throw new Error('User not authenticated');
     }
 
-    // Paid-seat guard before accepting collaborator invitation (resolved via Stripe-backed get_info).
+    // Paid-seat guard before accepting collaborator invitation (resolved via manual billing get_info).
     const { data: billingInfo, error: billingError } = await supabase.functions.invoke(
       'billing-manage-subscription',
       {

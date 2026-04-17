@@ -56,7 +56,7 @@ export function useRFXCandidateEnrichmentController({
   const { toast } = useToast();
   const { key: rfxKey, isReady, isLoading: isCryptoLoading, decrypt } = useRFXCrypto(rfxId);
   const [snapshot, setSnapshot] = useState<EnrichmentSnapshotRecord | null>(null);
-  const [isBootstrapping, setIsBootstrapping] = useState(false);
+  const [bootstrappingCompanyIds, setBootstrappingCompanyIds] = useState<Set<string>>(new Set());
   const [isLoadingSnapshot, setIsLoadingSnapshot] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [agentReady, setAgentReady] = useState(false);
@@ -89,6 +89,31 @@ export function useRFXCandidateEnrichmentController({
   }, [snapshot]);
 
   const canRun = useMemo(() => Boolean(rfxId && companyId), [rfxId, companyId]);
+  const isBootstrapping = useMemo(() => bootstrappingCompanyIds.size > 0, [bootstrappingCompanyIds]);
+  const isBootstrappingCurrentCompany = useMemo(
+    () => Boolean(companyId && bootstrappingCompanyIds.has(companyId)),
+    [bootstrappingCompanyIds, companyId]
+  );
+
+  const markCompanyBootstrapInProgress = useCallback((targetCompanyId: string) => {
+    if (!targetCompanyId) return;
+    setBootstrappingCompanyIds((previousCompanyIds) => {
+      if (previousCompanyIds.has(targetCompanyId)) return previousCompanyIds;
+      const nextCompanyIds = new Set(previousCompanyIds);
+      nextCompanyIds.add(targetCompanyId);
+      return nextCompanyIds;
+    });
+  }, []);
+
+  const unmarkCompanyBootstrapInProgress = useCallback((targetCompanyId: string) => {
+    if (!targetCompanyId) return;
+    setBootstrappingCompanyIds((previousCompanyIds) => {
+      if (!previousCompanyIds.has(targetCompanyId)) return previousCompanyIds;
+      const nextCompanyIds = new Set(previousCompanyIds);
+      nextCompanyIds.delete(targetCompanyId);
+      return nextCompanyIds;
+    });
+  }, []);
 
   const computeSymmetricKeyBase64 = useCallback(async () => {
     if (!rfxKey) throw new Error('Encryption key not available.');
@@ -296,7 +321,7 @@ export function useRFXCandidateEnrichmentController({
 
   const bootstrap = useCallback(async () => {
     if (!canRun || !isReady) return;
-    setIsBootstrapping(true);
+    markCompanyBootstrapInProgress(companyId);
     setConnectionError(null);
     onBootstrapStateChangeRef.current?.({
       companyId,
@@ -352,7 +377,7 @@ export function useRFXCandidateEnrichmentController({
         variant: 'destructive',
       });
     } finally {
-      setIsBootstrapping(false);
+      unmarkCompanyBootstrapInProgress(companyId);
     }
   }, [
     canRun,
@@ -364,8 +389,10 @@ export function useRFXCandidateEnrichmentController({
     isReady,
     loadChatHistory,
     loadSnapshot,
+    markCompanyBootstrapInProgress,
     rfxId,
     toast,
+    unmarkCompanyBootstrapInProgress,
     website,
   ]);
 
@@ -459,6 +486,7 @@ export function useRFXCandidateEnrichmentController({
     isLoading: isLoading || isCryptoLoading,
     isLoadingSnapshot,
     isBootstrapping,
+    isBootstrappingCurrentCompany,
     connectionError,
     agentReady,
     bootstrap,

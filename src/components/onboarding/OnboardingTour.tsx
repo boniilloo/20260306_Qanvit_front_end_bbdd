@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Joyride, { CallBackProps, STATUS, Step, Styles, ACTIONS } from 'react-joyride';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +11,7 @@ interface OnboardingTourProps {
 }
 
 const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onComplete }) => {
+  const { t } = useTranslation();
   const [run, setRun] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const navigate = useNavigate();
@@ -67,14 +69,18 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">1</span>
             <h2 className="text-2xl font-bold" style={{ color: '#22183a' }}>
-              Welcome to Qanvit! 🎉
+              {t('onboardingTour.welcomeTitle')}
             </h2>
           </div>
           <p className="text-base">
-            Qanvit helps <strong>buyers</strong> find the best specialized suppliers in specific industry verticals (currently open Machine Vision, more coming soon).
+            {t('onboardingTour.welcomeDescriptionLine1Prefix')}{' '}
+            <strong>{t('onboardingTour.welcomeDescriptionLine1Highlight')}</strong>{' '}
+            {t('onboardingTour.welcomeDescriptionLine1Suffix')}
           </p>
           <p className="text-base">
-            At the same time, we help <strong>suppliers</strong> to get discovered in a simple and intuitive way.
+            {t('onboardingTour.welcomeDescriptionLine2Prefix')}{' '}
+            <strong>{t('onboardingTour.welcomeDescriptionLine2Highlight')}</strong>{' '}
+            {t('onboardingTour.welcomeDescriptionLine2Suffix')}
           </p>
         </div>
       ),
@@ -107,14 +113,18 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">1</span>
             <h2 className="text-2xl font-bold" style={{ color: '#22183a' }}>
-              Welcome to Qanvit! 🎉
+              {t('onboardingTour.welcomeTitle')}
             </h2>
           </div>
           <p className="text-base">
-            Qanvit helps <strong>buyers</strong> find the best specialized suppliers in specific industry verticals (currently open Machine Vision, more coming soon).
+            {t('onboardingTour.welcomeDescriptionLine1Prefix')}{' '}
+            <strong>{t('onboardingTour.welcomeDescriptionLine1Highlight')}</strong>{' '}
+            {t('onboardingTour.welcomeDescriptionLine1Suffix')}
           </p>
           <p className="text-base">
-            At the same time, we help <strong>suppliers</strong> to get discovered in a simple and intuitive way.
+            {t('onboardingTour.welcomeDescriptionLine2Prefix')}{' '}
+            <strong>{t('onboardingTour.welcomeDescriptionLine2Highlight')}</strong>{' '}
+            {t('onboardingTour.welcomeDescriptionLine2Suffix')}
           </p>
           <div className="mt-4 space-y-3">
             <div className="bg-blue-50 p-3 rounded-lg">
@@ -1156,11 +1166,11 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         },
       }}
       locale={{
-        back: 'Back',
-        close: 'Close',
-        last: 'Finish',
-        next: 'Next',
-        skip: 'Skip',
+        back: t('onboardingTour.back'),
+        close: t('onboardingTour.close'),
+        last: t('onboardingTour.finish'),
+        next: t('onboardingTour.next'),
+        skip: t('onboardingTour.skip'),
       }}
     />
   );

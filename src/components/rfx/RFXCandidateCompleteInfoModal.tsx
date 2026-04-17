@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Loader2 } from 'lucide-react';
 import type { Propuesta } from '@/types/chat';
 import { useRFXCandidateEnrichmentController } from '@/hooks/useRFXCandidateEnrichmentController';
 import type { EnrichmentSnapshotRecord } from '@/types/rfxEnrichment';
@@ -75,6 +76,13 @@ function formatRevenueKeyValue(payload: EnrichmentSnapshotRecord['enrichment_pay
   return `${amount}${currency}${year}`.trim();
 }
 
+function hasSnapshotEnrichmentData(snapshot: EnrichmentSnapshotRecord | null | undefined): boolean {
+  if (!snapshot) return false;
+  const payload = snapshot.enrichment_payload;
+  if (payload && typeof payload === 'object' && Object.keys(payload).length > 0) return true;
+  return Boolean(snapshot.stage_classification || snapshot.last_agent_run_at);
+}
+
 function getNewsRelatedStatus(related: string | boolean | null | undefined): 'related' | 'unrelated' | 'not_classified' {
   if (related === null || related === undefined) return 'not_classified';
   if (typeof related === 'boolean') return related ? 'related' : 'unrelated';
@@ -122,6 +130,9 @@ const RFXCandidateCompleteInfoModal: React.FC<RFXCandidateCompleteInfoModalProps
   const payload = controller.snapshot?.enrichment_payload;
   const hasPayload = Boolean(payload);
   const isCompanyReady = Boolean(candidate?.company_id);
+  const hasEnrichmentData = hasSnapshotEnrichmentData(controller.snapshot);
+  const shouldShowMissingEnrichmentWarning = isCompanyReady && !hasEnrichmentData;
+  const isEnrichmentBootstrapInProgress = controller.isBootstrappingCurrentCompany;
   const sectionState = useMemo(
     () => ({
       founded: payload?.founded_year?.value,
@@ -328,6 +339,39 @@ const RFXCandidateCompleteInfoModal: React.FC<RFXCandidateCompleteInfoModalProps
         {!isCompanyReady && (
           <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
             Este candidato no tiene `company_id` disponible, por lo que no se puede ejecutar el enriquecimiento todavía.
+          </div>
+        )}
+
+        {shouldShowMissingEnrichmentWarning && (
+          <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+            <p className="font-medium">
+              Esta empresa todavia no ha sido enriquecida con la IA de Qanvit.
+            </p>
+            <p className="mt-1 text-amber-800">
+              Puedes lanzar ahora el enrichment para generar el informe y completar los datos.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                void controller.bootstrap();
+              }}
+              disabled={isEnrichmentBootstrapInProgress}
+              className="mt-3 inline-flex items-center rounded-md bg-[#22183a] px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-[#22183a]/90 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isEnrichmentBootstrapInProgress ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 size={14} className="animate-spin" />
+                  Enrichment en curso...
+                </span>
+              ) : (
+                'Lanzar enrichment'
+              )}
+            </button>
+            {isEnrichmentBootstrapInProgress && (
+              <p className="mt-2 text-xs text-amber-800">
+                Este proceso tarda aproximadamente 1 minuto. Aprovecha para relajarte mientras que Qanvit hace el trabajo pesado!
+              </p>
+            )}
           </div>
         )}
 

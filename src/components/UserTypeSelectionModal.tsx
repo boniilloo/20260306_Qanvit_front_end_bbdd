@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Users, Building2, Search, Plus } from 'lucide-react';
@@ -22,17 +22,17 @@ interface UserTypeSelectionModalProps {
 }
 
 const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectionModalProps) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
-  const [userType, setUserType] = useState<'buyer' | 'supplier' | ''>('');
-  const [step, setStep] = useState<'selection' | 'supplier-details' | 'buyer-details' | 'add-company'>('selection');
+  const [step, setStep] = useState<'selection' | 'company-profile-details' | 'open-innovation-details' | 'add-company'>('selection');
   
-  // Supplier states
+  // Company profile management states
   const [companies, setCompanies] = useState<Company[]>([]);
   const [selectedCompanyId, setSelectedCompanyId] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
   
-  // Buyer states
+  // Open innovation challenge states
   const [buyerCompanyName, setBuyerCompanyName] = useState('');
   const [buyerCompanyUrl, setBuyerCompanyUrl] = useState('');
   
@@ -40,9 +40,9 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
   const [newCompanyUrl, setNewCompanyUrl] = useState('');
   const [newCompanyComment, setNewCompanyComment] = useState('');
 
-  // Search companies for supplier selection (server-side, avoids missing results due to default limits)
+  // Search companies for company profile management selection (server-side, avoids missing results due to default limits)
   useEffect(() => {
-    if (step !== 'supplier-details') return;
+    if (step !== 'company-profile-details') return;
 
     const query = searchQuery.trim();
     if (query.length < 2) {
@@ -85,8 +85,8 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
       } catch (error) {
         console.error('Error searching companies:', error);
         toast({
-          title: "Error",
-          description: "Failed to search companies. Please try again.",
+          title: t('onboardingIntent.errorTitle'),
+          description: t('onboardingIntent.errorSearchCompanies'),
           variant: "destructive",
         });
       } finally {
@@ -98,20 +98,19 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
     return () => clearTimeout(debounceTimer);
   }, [step, searchQuery, selectedCompanyId]);
 
-  const handleUserTypeSelection = (type: 'buyer' | 'supplier') => {
-    setUserType(type);
-    if (type === 'buyer') {
-      setStep('buyer-details');
+  const handleUserTypeSelection = (type: 'open_innovation_challenges' | 'company_profile_management') => {
+    if (type === 'open_innovation_challenges') {
+      setStep('open-innovation-details');
     } else {
-      setStep('supplier-details');
+      setStep('company-profile-details');
     }
   };
 
-  const handleSupplierSubmit = async () => {
+  const handleCompanyProfileSubmit = async () => {
     if (!selectedCompanyId) {
       toast({
-        title: "Error",
-        description: "Please select a company.",
+        title: t('onboardingIntent.errorTitle'),
+        description: t('onboardingIntent.errorSelectCompany'),
         variant: "destructive",
       });
       return;
@@ -121,12 +120,12 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
     try {
       const selectedCompany = companies.find(c => c.id === selectedCompanyId);
       
-      // First, create the user type selection
+      // First, create the onboarding intent selection
       const { error: userTypeError } = await supabase
         .from('user_type_selections')
         .insert({
           user_id: userId,
-          user_type: 'supplier',
+          user_type: 'company_profile_management',
           company_id: selectedCompanyId,
           company_name: selectedCompany?.nombre_empresa || '',
         });
@@ -147,16 +146,16 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
       if (adminRequestError) throw adminRequestError;
 
       toast({
-        title: "Profile completed",
-        description: "Your supplier profile has been set up and your company admin request has been submitted successfully. We'll review it and get back to you.",
+        title: t('onboardingIntent.successProfileCompletedTitle'),
+        description: t('onboardingIntent.successCompanyProfileFlow'),
       });
 
       onComplete();
     } catch (error) {
-      console.error('Error saving supplier selection:', error);
+      console.error('Error saving company profile management selection:', error);
       toast({
-        title: "Error",
-        description: "Failed to save your selection. Please try again.",
+        title: t('onboardingIntent.errorTitle'),
+        description: t('onboardingIntent.errorSaveSelection'),
         variant: "destructive",
       });
     } finally {
@@ -164,11 +163,11 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
     }
   };
 
-  const handleBuyerSubmit = async () => {
+  const handleOpenInnovationSubmit = async () => {
     if (!buyerCompanyName.trim() || !buyerCompanyUrl.trim()) {
       toast({
-        title: "Error",
-        description: "Please fill in all required fields.",
+        title: t('onboardingIntent.errorTitle'),
+        description: t('onboardingIntent.errorFillRequiredFields'),
         variant: "destructive",
       });
       return;
@@ -180,7 +179,7 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
         .from('user_type_selections')
         .insert({
           user_id: userId,
-          user_type: 'buyer',
+          user_type: 'open_innovation_challenges',
           company_name: buyerCompanyName.trim(),
           company_url: buyerCompanyUrl.trim(),
         });
@@ -188,16 +187,16 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
       if (error) throw error;
 
       toast({
-        title: "Profile completed",
-        description: "Your buyer profile has been set up successfully.",
+        title: t('onboardingIntent.successProfileCompletedTitle'),
+        description: t('onboardingIntent.successOpenInnovationFlow'),
       });
 
       onComplete();
     } catch (error) {
-      console.error('Error saving buyer selection:', error);
+      console.error('Error saving open innovation selection:', error);
       toast({
-        title: "Error",
-        description: "Failed to save your selection. Please try again.",
+        title: t('onboardingIntent.errorTitle'),
+        description: t('onboardingIntent.errorSaveSelection'),
         variant: "destructive",
       });
     } finally {
@@ -208,8 +207,8 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
   const handleAddCompanyRequest = async () => {
     if (!newCompanyUrl.trim()) {
       toast({
-        title: "Error",
-        description: "Company URL is required.",
+        title: t('onboardingIntent.errorTitle'),
+        description: t('onboardingIntent.errorCompanyUrlRequired'),
         variant: "destructive",
       });
       return;
@@ -228,12 +227,12 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
 
       if (companyRequestError) throw companyRequestError;
 
-      // Save user type selection without company_id (since it's not added yet)
+      // Save onboarding intent without company_id (since it's not added yet)
       const { error: userTypeError } = await supabase
         .from('user_type_selections')
         .insert({
           user_id: userId,
-          user_type: 'supplier',
+          user_type: 'company_profile_management',
           company_name: 'Pending company request',
           company_url: newCompanyUrl.trim(),
         });
@@ -241,16 +240,16 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
       if (userTypeError) throw userTypeError;
 
       toast({
-        title: "Request submitted",
-        description: "Your company addition request has been submitted. We'll review it and add it to our database.",
+        title: t('onboardingIntent.successRequestSubmittedTitle'),
+        description: t('onboardingIntent.successCompanyAdditionRequest'),
       });
 
       onComplete();
     } catch (error) {
       console.error('Error submitting company request:', error);
       toast({
-        title: "Error",
-        description: "Failed to submit your request. Please try again.",
+        title: t('onboardingIntent.errorTitle'),
+        description: t('onboardingIntent.errorSubmitRequest'),
         variant: "destructive",
       });
     } finally {
@@ -261,35 +260,35 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
   const renderSelectionStep = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-lg font-medium mb-2">What type of user are you?</h3>
+        <h3 className="text-lg font-medium mb-2">{t('onboardingIntent.selectionTitle')}</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          This will help us customize your experience on the platform.
+          {t('onboardingIntent.selectionDescription')}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card 
           className="cursor-pointer hover:bg-accent transition-colors" 
-          onClick={() => handleUserTypeSelection('buyer')}
+          onClick={() => handleUserTypeSelection('open_innovation_challenges')}
         >
           <CardHeader className="text-center">
             <Users className="w-12 h-12 mx-auto mb-2 text-primary" />
-            <CardTitle className="text-lg">Buyer</CardTitle>
+            <CardTitle className="text-lg">{t('onboardingIntent.openInnovationCardTitle')}</CardTitle>
             <CardDescription>
-              I'm looking for suppliers and services for my company
+              {t('onboardingIntent.openInnovationCardDescription')}
             </CardDescription>
           </CardHeader>
         </Card>
 
         <Card 
           className="cursor-pointer hover:bg-accent transition-colors"
-          onClick={() => handleUserTypeSelection('supplier')}
+          onClick={() => handleUserTypeSelection('company_profile_management')}
         >
           <CardHeader className="text-center">
             <Building2 className="w-12 h-12 mx-auto mb-2 text-primary" />
-            <CardTitle className="text-lg">Supplier</CardTitle>
+            <CardTitle className="text-lg">{t('onboardingIntent.companyProfileCardTitle')}</CardTitle>
             <CardDescription>
-              I represent a company that provides products or services
+              {t('onboardingIntent.companyProfileCardDescription')}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -297,23 +296,23 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
     </div>
   );
 
-  const renderSupplierStep = () => (
+  const renderCompanyProfileStep = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-lg font-medium mb-2">Select Your Company</h3>
+        <h3 className="text-lg font-medium mb-2">{t('onboardingIntent.companyProfileStepTitle')}</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          Find your company in our database or request to add it.
+          {t('onboardingIntent.companyProfileStepDescription')}
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="company-search">Search for your company</Label>
+          <Label htmlFor="company-search">{t('onboardingIntent.searchCompanyLabel')}</Label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               id="company-search"
-              placeholder="Type company name..."
+              placeholder={t('onboardingIntent.searchCompanyPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -323,13 +322,13 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
 
         {searchQuery.trim().length >= 2 && searchLoading && (
           <div className="text-center py-6 text-muted-foreground">
-            <p className="text-sm">Searching...</p>
+            <p className="text-sm">{t('onboardingIntent.searching')}</p>
           </div>
         )}
 
         {searchQuery.trim().length >= 2 && !searchLoading && companies.length > 0 && (
           <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-2">
-            <Label className="text-sm font-medium">Available companies:</Label>
+            <Label className="text-sm font-medium">{t('onboardingIntent.availableCompanies')}</Label>
             {companies.map((company) => (
               <div
                 key={company.id}
@@ -349,14 +348,14 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
         {searchQuery.trim().length >= 2 && !searchLoading && companies.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <Building2 className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p>No companies found matching "{searchQuery}"</p>
-            <p className="text-sm">You can request to add your company below.</p>
+            <p>{t('onboardingIntent.noCompaniesFound', { query: searchQuery })}</p>
+            <p className="text-sm">{t('onboardingIntent.noCompaniesFoundDescription')}</p>
           </div>
         )}
 
         {/* Always show "Company not here?" option */}
         <div className="flex items-center justify-center gap-2 py-2">
-          <p className="text-sm text-muted-foreground">Company not here?</p>
+          <p className="text-sm text-muted-foreground">{t('onboardingIntent.companyNotHere')}</p>
           <Button
             variant="outline"
             size="sm"
@@ -364,17 +363,17 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
             className="h-auto px-2 py-1 text-sm text-muted-foreground hover:text-foreground border-muted-foreground/30"
           >
             <Plus className="w-3 h-3 mr-0.5" />
-            Add Company
+            {t('onboardingIntent.addCompany')}
           </Button>
         </div>
 
         <div className="space-y-2">
           <Button
-            onClick={handleSupplierSubmit}
+            onClick={handleCompanyProfileSubmit}
             disabled={!selectedCompanyId || loading}
             className="w-full"
           >
-            {loading ? "Saving..." : "Confirm Selection"}
+            {loading ? t('onboardingIntent.saving') : t('onboardingIntent.confirmSelection')}
           </Button>
         </div>
 
@@ -383,27 +382,27 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
           onClick={() => setStep('selection')}
           className="w-full"
         >
-          Back
+          {t('onboardingIntent.back')}
         </Button>
       </div>
     </div>
   );
 
-  const renderBuyerStep = () => (
+  const renderOpenInnovationStep = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-lg font-medium mb-2">Company Information</h3>
+        <h3 className="text-lg font-medium mb-2">{t('onboardingIntent.openInnovationStepTitle')}</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          Tell us about the company you work for.
+          {t('onboardingIntent.openInnovationStepDescription')}
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="buyer-company-name">Company Name *</Label>
+          <Label htmlFor="buyer-company-name">{t('onboardingIntent.companyNameLabel')}</Label>
           <Input
             id="buyer-company-name"
-            placeholder="Enter your company name"
+            placeholder={t('onboardingIntent.companyNamePlaceholder')}
             value={buyerCompanyName}
             onChange={(e) => setBuyerCompanyName(e.target.value)}
             required
@@ -411,11 +410,11 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="buyer-company-url">Company Website *</Label>
+          <Label htmlFor="buyer-company-url">{t('onboardingIntent.companyWebsiteLabel')}</Label>
           <Input
             id="buyer-company-url"
             type="url"
-            placeholder="https://example.com"
+            placeholder={t('onboardingIntent.urlPlaceholder')}
             value={buyerCompanyUrl}
             onChange={(e) => setBuyerCompanyUrl(e.target.value)}
             required
@@ -424,11 +423,11 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
 
         <div className="flex gap-2">
           <Button
-            onClick={handleBuyerSubmit}
+            onClick={handleOpenInnovationSubmit}
             disabled={!buyerCompanyName.trim() || !buyerCompanyUrl.trim() || loading}
             className="flex-1"
           >
-            {loading ? "Saving..." : "Complete Profile"}
+            {loading ? t('onboardingIntent.saving') : t('onboardingIntent.completeProfile')}
           </Button>
 
           <Button
@@ -436,7 +435,7 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
             onClick={() => setStep('selection')}
             disabled={loading}
           >
-            Back
+            {t('onboardingIntent.back')}
           </Button>
         </div>
       </div>
@@ -446,19 +445,19 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
   const renderAddCompanyStep = () => (
     <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-lg font-medium mb-2">Request Company Addition</h3>
+        <h3 className="text-lg font-medium mb-2">{t('onboardingIntent.requestCompanyAdditionTitle')}</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          We'll review your request and add the company to our database.
+          {t('onboardingIntent.requestCompanyAdditionDescription')}
         </p>
       </div>
 
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="new-company-url">Company URL *</Label>
+          <Label htmlFor="new-company-url">{t('onboardingIntent.companyUrlLabel')}</Label>
           <Input
             id="new-company-url"
             type="url"
-            placeholder="https://example.com"
+            placeholder={t('onboardingIntent.urlPlaceholder')}
             value={newCompanyUrl}
             onChange={(e) => setNewCompanyUrl(e.target.value)}
             required
@@ -466,10 +465,10 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="new-company-comment">Additional Comments (optional)</Label>
+          <Label htmlFor="new-company-comment">{t('onboardingIntent.additionalCommentsLabel')}</Label>
           <Textarea
             id="new-company-comment"
-            placeholder="Add any additional information about this company..."
+            placeholder={t('onboardingIntent.additionalCommentsPlaceholder')}
             value={newCompanyComment}
             onChange={(e) => setNewCompanyComment(e.target.value)}
             rows={3}
@@ -482,15 +481,15 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
             disabled={!newCompanyUrl.trim() || loading}
             className="flex-1"
           >
-            {loading ? "Submitting..." : "Submit Request"}
+            {loading ? t('onboardingIntent.submitting') : t('onboardingIntent.submitRequest')}
           </Button>
 
           <Button
             variant="ghost"
-            onClick={() => setStep('supplier-details')}
+            onClick={() => setStep('company-profile-details')}
             disabled={loading}
           >
-            Back
+            {t('onboardingIntent.back')}
           </Button>
         </div>
       </div>
@@ -501,10 +500,10 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
     switch (step) {
       case 'selection':
         return renderSelectionStep();
-      case 'supplier-details':
-        return renderSupplierStep();
-      case 'buyer-details':
-        return renderBuyerStep();
+      case 'company-profile-details':
+        return renderCompanyProfileStep();
+      case 'open-innovation-details':
+        return renderOpenInnovationStep();
       case 'add-company':
         return renderAddCompanyStep();
       default:
@@ -520,9 +519,9 @@ const UserTypeSelectionModal = ({ isOpen, userId, onComplete }: UserTypeSelectio
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>Account Setup</DialogTitle>
+          <DialogTitle>{t('onboardingIntent.dialogTitle')}</DialogTitle>
           <DialogDescription>
-            Complete your account setup to start using the platform.
+            {t('onboardingIntent.dialogDescription')}
           </DialogDescription>
         </DialogHeader>
         

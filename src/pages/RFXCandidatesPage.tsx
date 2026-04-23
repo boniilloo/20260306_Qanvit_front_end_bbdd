@@ -58,6 +58,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
   const [rfx, setRfx] = useState<RFX | null>(null);
   const [loading, setLoading] = useState(true);
   const { record: selectedRecord, load: loadSelected, save: saveSelected, loading: selectedLoading } = useRFXSelectedCandidates(rfxId, isPublicExample ? publicCrypto : undefined);
+  const [selectedCandidatesCount, setSelectedCandidatesCount] = useState(0);
   const [activeTab, setActiveTab] = useState<'recommended' | 'manual' | 'selected' | 'specs'>('recommended');
   const [isChatExpanded, setIsChatExpanded] = useState(true);
   const { setOpen: setSidebarOpen, state: sidebarState } = useSidebar();
@@ -307,7 +308,14 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
 
   // Check if there are candidates
   const hasCandidates = evaluationResults.length > 0;
-  const hasSelectedCandidates = !!(selectedRecord && Array.isArray((selectedRecord as any).selected) && (selectedRecord as any).selected.length > 0);
+  const persistedSelectedCount = selectedRecord && Array.isArray((selectedRecord as any).selected)
+    ? (selectedRecord as any).selected.length
+    : 0;
+  const hasSelectedCandidates = selectedCandidatesCount > 0;
+
+  useEffect(() => {
+    setSelectedCandidatesCount(persistedSelectedCount);
+  }, [persistedSelectedCount]);
 
   // Onboarding integration: allow tour to switch to Manual selection tab programmatically
   useEffect(() => {
@@ -327,6 +335,34 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       window.removeEventListener('onboarding-switch-to-recommended-tab', handleOnboardingSwitchToRecommended);
     };
   }, []);
+
+  useEffect(() => {
+    if (!rfxId) return;
+
+    /**
+     * Keep selected candidates state in sync across components/tabs.
+     * This ensures header actions react immediately after auto-save updates.
+     */
+    const selectedCandidatesChannel = supabase
+      .channel(`rfx-selected-candidates-${rfxId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'rfx_selected_candidates',
+          filter: `rfx_id=eq.${rfxId}`,
+        },
+        () => {
+          void loadSelected?.();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(selectedCandidatesChannel);
+    };
+  }, [rfxId, loadSelected]);
 
   // When switching to Manual tab, scroll to the Manual Search card inside CandidatesSection
   useEffect(() => {
@@ -561,14 +597,14 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                     onClick={() => {
                       if (!rfxId) return;
                       if (isPublicExample || readOnly) {
-                        navigate(`/rfx-example/sending/${rfxId}`);
+                        navigate(`/rfx-example/startups_workflow/${rfxId}`);
                       } else {
-                        navigate(`/rfxs/sending/${rfxId}`);
+                        navigate(`/rfxs/startups_workflow/${rfxId}`);
                       }
                     }}
                     className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-black"
                   >
-                    {t('rfxs.candidates_goToValidation')}
+                    {t('rfxs.candidates_goToWorkflow')}
                   </Button>
                 ) : (
                   <TooltipProvider delayDuration={100}>
@@ -580,7 +616,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                             className="bg-[#f4a9aa] text-black opacity-70 cursor-not-allowed"
                             aria-disabled="true"
                           >
-                            {t('rfxs.candidates_goToValidation')}
+                            {t('rfxs.candidates_goToWorkflow')}
                           </Button>
                         </span>
                       </TooltipTrigger>
@@ -684,6 +720,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 rfxId={rfxId}
                 currentSpecs={currentSpecs}
                 onResultsUpdated={onCandidatesResultsUpdated}
+                onSelectedCandidatesCountChange={setSelectedCandidatesCount}
                 evaluationResults={evaluationResults}
                 viewMode="recommended"
                 rfxStatus={rfx.status}
@@ -700,6 +737,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                 rfxId={rfxId}
                 currentSpecs={currentSpecs}
                 onResultsUpdated={onCandidatesResultsUpdated}
+                onSelectedCandidatesCountChange={setSelectedCandidatesCount}
                 evaluationResults={evaluationResults}
                 viewMode="manual"
                 rfxStatus={rfx.status}

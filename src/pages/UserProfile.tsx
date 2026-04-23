@@ -11,10 +11,12 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
 import InterfaceSettings from '@/components/settings/InterfaceSettings';
+import NdaTemplateManager from '@/components/rfx/workflow/NdaTemplateManager';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { useAvatarUpload } from '@/hooks/useAvatarUpload';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useTranslation } from 'react-i18next';
 interface Company {
   id: string;
   company_id: string;
@@ -22,6 +24,7 @@ interface Company {
 }
 const UserProfile = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     user,
     loading: authLoading
@@ -306,8 +309,9 @@ const UserProfile = () => {
             </div>
             {/* Tabbed Interface */}
             <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-1">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="nda">{t('workflow.nda.template.userTabTitle')}</TabsTrigger>
               </TabsList>
               <TabsContent value="profile" className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -375,6 +379,21 @@ const UserProfile = () => {
                     </CardContent>
                   </Card>
                 </div>
+              </TabsContent>
+              <TabsContent value="nda" className="space-y-6">
+                <Card className="bg-white shadow-fq rounded-fq">
+                  <CardHeader>
+                    <CardTitle className="font-intro text-navy font-bold text-xl">
+                      {t('workflow.nda.template.userSectionTitle')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <NdaTemplateManager
+                      scope={{ kind: 'user' }}
+                      description={t('workflow.nda.template.userHelper') as string}
+                    />
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
         </div>

@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import MarkdownText from '@/components/rfx/analysis/MarkdownText';
+import MarkdownText from '@/components/rfx/supplier-qna/MarkdownText';
 
 type DbQnaRow = {
   id: string;

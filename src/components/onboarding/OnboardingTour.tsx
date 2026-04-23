@@ -339,98 +339,11 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
       disableBeacon: true,
     },
     {
-      target: '[data-onboarding-target="nda-section"]',
-      content: (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">10</span>
-            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
-              Launching - Protect your RFX with an NDA 🔒
-            </h3>
-          </div>
-          <p className="text-base">
-            You can upload an <strong>NDA (Non-Disclosure Agreement)</strong> that suppliers must sign before accessing your RFX details.
-          </p>          
-          <p className="text-base">
-            Suppliers will not be able to review the RFX untill NDA is signed and validated by Qanvit experts.
-          </p>
-          <p className="text-sm text-gray-600 mt-2">
-            This ensures your sensitive information remains confidential throughout the sourcing process.
-          </p>
-        </div>
-      ),
-      placement: 'bottom',
-      disableBeacon: true,
-    },
-    {
-      target: '[data-onboarding-target="send-rfx-section"]',
-      content: (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">11</span>
-            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
-              Validate & Send 🚀
-            </h3>
-          </div>
-          <p className="text-base">
-            Before sending the RFX to suppliers, <strong>all RFX members must validate</strong> the specifications and candidate selection.
-          </p>
-          <p className="text-base">
-            Once everyone has approved, the "Send to Suppliers" button will become active.
-          </p>
-        </div>
-      ),
-      placement: 'top',
-      disableBeacon: true,
-    },
-    {
-      target: '[data-onboarding-target="rfx-progress-item-responses"]',
-      content: (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">12</span>
-            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
-              Responses & AI Analysis 📊
-            </h3>
-          </div>
-          <p className="text-base">
-            Once the RFX is launched, this area becomes the next active step for reviewing supplier responses.
-          </p>
-          <p className="text-base">
-            Here you'll compare proposals, analyze answers and move the process toward the final decision.
-          </p>
-        </div>
-      ),
-      placement: 'left',
-      disableBeacon: true,
-    },
-    {
-      target: '[data-onboarding-target="rfx-progress-item-responses"]',
-      content: (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">13</span>
-            <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
-              Responses & AI Analysis 📊
-            </h3>
-          </div>
-          <p className="text-base">
-            This is where you'll review supplier proposals.
-          </p>
-          <p className="text-base">
-            You can analyze them yourself, or use our <strong>AI Agent</strong> to compare responses, highlight key differences, iterate with suppliers and score them against your requirements (AI features under development).
-          </p>
-        </div>
-      ),
-      placement: 'left',
-      disableBeacon: true,
-    },
-    {
       target: 'body',
       content: (
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">14</span>
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">10</span>
             <h3 className="text-xl font-bold" style={{ color: '#22183a' }}>
               Supplier Database 🌍
             </h3>
@@ -451,7 +364,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
       content: (
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">15</span>
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-bold text-lg">11</span>
             <h3 className="text-2xl font-bold" style={{ color: '#22183a' }}>
               You're All Set! 🚀
             </h3>
@@ -779,165 +692,31 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
         }
 
         // Special case: When moving from step 16 (index 8) to step 17 (NDA on sending page),
-        // navigate to sending page
+        // Special case: After Manual Selection (last candidates step), jump straight to Supplier Database
         if (index === 8) {
           setRun(false);
-          
-          // Get the RFX ID from the current URL
-          const currentPath = window.location.pathname;
-          const rfxIdMatch = currentPath.match(/\/rfx-example\/candidates\/([^/]+)/) || currentPath.match(/\/rfx-example\/([^/]+)/);
-          
-          if (rfxIdMatch) {
-            const rfxId = rfxIdMatch[1];
-            navigate(`/rfx-example/sending/${rfxId}`);
-            
-            // Wait for sending page to load and find NDA section
-            const waitForNdaSection = (retries = 20): void => {
-              const ndaSection = document.querySelector('[data-onboarding-target="nda-section"]') as HTMLElement | null;
-
-              if (ndaSection) {
-                // Dispatch event to expand NDA section
-                window.dispatchEvent(new CustomEvent('onboarding-expand-nda-section'));
-                
-                // Wait a bit for the expansion animation to complete
-                setTimeout(() => {
-                  ndaSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  setTimeout(() => {
-                    setStepIndex(9);
-                    setRun(true);
-                  }, 500);
-                }, 300);
-              } else if (retries > 0) {
-                setTimeout(() => waitForNdaSection(retries - 1), 300);
-              } else {
-                setStepIndex(9);
-                setRun(true);
-              }
-            };
-
-            setTimeout(() => {
-              waitForNdaSection();
-            }, 1000);
-          } else {
+          setTimeout(() => {
             setStepIndex(9);
             setRun(true);
-          }
-          return;
-        }
-
-        // Special case: When moving from step 17 (index 9) to step 18 (Send RFX section),
-        // need to expand the send RFX section first before advancing
-        if (index === 9) {
-          // Dispatch event to expand Send RFX section
-          window.dispatchEvent(new CustomEvent('onboarding-expand-send-section'));
-          
-          setRun(false);
-          
-          // Wait for the section to expand and then find the element
-          const waitForSendSection = (retries = 20): void => {
-            const sendSection = document.querySelector('[data-onboarding-target="send-rfx-section"]') as HTMLElement | null;
-
-            if (sendSection) {
-              sendSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              setTimeout(() => {
-                setStepIndex(10);
-                setRun(true);
-              }, 500);
-            } else if (retries > 0) {
-              setTimeout(() => waitForSendSection(retries - 1), 300);
-            } else {
-              setStepIndex(10);
-              setRun(true);
-            }
-          };
-
-          setTimeout(() => {
-            waitForSendSection();
           }, 300);
           return;
         }
 
-        // Special case: When moving from sending back to the overview,
-        // navigate to the responses step card
-        if (index === 10) {
-          setRun(false);
-          
-          const currentPath = window.location.pathname;
-          const rfxIdMatch = currentPath.match(/\/rfx-example\/sending\/([^/]+)/) || currentPath.match(/\/rfx-example\/([^/]+)/);
-          
-          if (rfxIdMatch) {
-            const rfxId = rfxIdMatch[1];
-            navigate(`/rfx-example/${rfxId}`);
-            
-            // Wait for overview page to load and find responses item
-            const waitForResponsesItem = (retries = 20): void => {
-              const item = document.querySelector('[data-onboarding-target="rfx-progress-item-responses"]') as HTMLElement | null;
-
-              if (item) {
-                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                setTimeout(() => {
-                  setStepIndex(11);
-                  setRun(true);
-                }, 500);
-              } else if (retries > 0) {
-                setTimeout(() => waitForResponsesItem(retries - 1), 300);
-              } else {
-                setStepIndex(11);
-                setRun(true);
-              }
-            };
-
-            setTimeout(() => {
-              waitForResponsesItem();
-            }, 1000);
-          } else {
-            setStepIndex(11);
-            setRun(true);
-          }
-          return;
-        }
-
-        // Special case: When moving from step 20 (index 12 - Responses) to step 21 (Supplier Search),
-        // navigate to supplier search page
-        if (index === 12) {
-          setRun(false);
-          navigate('/supplier-search');
-
-          const waitForSupplierPage = (retries = 20): void => {
-            const page = document.querySelector('[data-onboarding-target="supplier-search-page"]') as HTMLElement | null;
-            if (page) {
-              setTimeout(() => {
-                setStepIndex(13);
-                setRun(true);
-              }, 500);
-            } else if (retries > 0) {
-              setTimeout(() => waitForSupplierPage(retries - 1), 300);
-            } else {
-              setStepIndex(13);
-              setRun(true);
-            }
-          };
-
-          setTimeout(() => waitForSupplierPage(), 1000);
-          return;
-        }
-
-        // Special case: When moving from step 21 (index 13) to step 22 (Final landing),
-        // navigate to home
-        if (index === 13) {
+        // Special case: When moving from Supplier Database to the final landing, navigate home
+        if (index === 9) {
           setRun(false);
           navigate('/');
-          
+
           setTimeout(() => {
-            setStepIndex(14);
+            setStepIndex(10);
             setRun(true);
           }, 1000);
           return;
         }
 
-        // Special case: When moving to final completion (after step 22, index 14),
+        // Special case: When moving to final completion,
         // complete onboarding
-        if (index === 14) {
+        if (index === 10) {
           setRun(false);
           setStepIndex(0); // Reset to first step for next time
           
@@ -980,55 +759,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
           return;
         }
         
-        // Back from step 17 (index 9) to step 16 (index 8): Navigate to RFX overview
-        if (index === 9) {
-          setRun(false);
-          const currentPath = window.location.pathname;
-          const rfxIdMatch = currentPath.match(/\/rfx-example\/specs\/([^/]+)/) || currentPath.match(/\/rfx-example\/([^/]+)/);
-          if (rfxIdMatch) {
-            const rfxId = rfxIdMatch[1];
-            navigate(`/rfx-example/${rfxId}`);
-            
-            // Wait for overview page to load, then select the specs item and find the button
-            setTimeout(() => {
-              // First, dispatch event to select the specs item to make the button visible
-              const selectEvent = new CustomEvent('onboarding-select-item', { detail: { itemId: 'specs' } });
-              window.dispatchEvent(selectEvent);
-              
-              // Now wait for the button to appear after selection
-              const waitForButton = (retries = 20): void => {
-                const targetButton = document.querySelector('button[data-onboarding-target="go-to-rfx-specs-button"]') as HTMLElement | null;
-                
-                if (targetButton) {
-                  targetButton.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  setTimeout(() => {
-                    setStepIndex(8);
-                    setRun(true);
-                  }, 500);
-                } else if (retries > 0) {
-                  setTimeout(() => waitForButton(retries - 1), 200);
-                } else {
-                  // If button not found, still set the step index
-                  setStepIndex(8);
-                  setRun(true);
-                }
-              };
-              
-              // Give the selection event time to be processed before looking for the button
-              setTimeout(() => {
-                waitForButton();
-              }, 300);
-            }, 1000);
-          } else {
-            setTimeout(() => {
-              setStepIndex(8);
-              setRun(true);
-            }, 800);
-          }
-          return;
-        }
-        
-        // Back from step 14 (index 6) to step 13 (index 5): Navigate to specs page
+        // Back from step (index 6 - ask-fq-agent-button) to step (index 5 - body on specs): Navigate to specs page
         if (index === 6) {
           setRun(false);
           const currentPath = window.location.pathname;
@@ -1043,77 +774,35 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({ isOpen, userId, onCompl
           }, 800);
           return;
         }
-        
-        // Back from step 18 (index 10) to step 17 (index 9): Navigate to candidates page
+
+        // Back from Manual Selection (index 8) to recommended list (index 7): Switch back to FQ Recommended tab
+        if (index === 8) {
+          setRun(false);
+
+          // Dispatch event to switch to recommended tab
+          window.dispatchEvent(new Event('onboarding-switch-to-recommended-tab'));
+
+          // Wait for the tab to switch before advancing
+          setTimeout(() => {
+            setStepIndex(7);
+            setRun(true);
+          }, 500);
+
+          return;
+        }
+
+        // Back from final landing (index 10) to Supplier Database (index 9): Navigate to RFX overview
         if (index === 10) {
           setRun(false);
-          const currentPath = window.location.pathname;
-          const rfxIdMatch = currentPath.match(/\/rfx-example\/sending\/([^/]+)/) || currentPath.match(/\/rfx-example\/([^/]+)/);
-          if (rfxIdMatch) {
-            const rfxId = rfxIdMatch[1];
-            navigate(`/rfx-example/candidates/${rfxId}`);
-          }
+          navigate('/rfx-example/eac78558-4c3e-4d05-847e-a954c469868a');
           setTimeout(() => {
             setStepIndex(9);
             setRun(true);
           }, 800);
           return;
         }
-        
-        // Back from step 16 (index 8) to step 15 (index 7): Switch back to FQ Recommended tab
-        if (index === 8) {
-          setRun(false);
-          
-          // Dispatch event to switch to recommended tab
-          window.dispatchEvent(new Event('onboarding-switch-to-recommended-tab'));
-          
-          // Wait for the tab to switch before advancing
-          setTimeout(() => {
-            setStepIndex(7); // visual step 15
-            setRun(true);
-          }, 500);
 
-          return;
-        }
-        
-        // Back from step 19 (index 11) to step 18 (index 10): Navigate to sending page
-        if (index === 11) {
-          setRun(false);
-          const currentPath = window.location.pathname;
-          const rfxIdMatch = currentPath.match(/\/rfx-example\/([^/]+)/);
-          if (rfxIdMatch) {
-            const rfxId = rfxIdMatch[1];
-            navigate(`/rfx-example/sending/${rfxId}`);
-          }
-          setTimeout(() => {
-            setStepIndex(10);
-            setRun(true);
-          }, 800);
-          return;
-        }
-        
-        // Back from step 20 (index 12) to step 19 (index 11): Navigate to RFX overview
-        if (index === 12) {
-          setRun(false);
-          navigate('/rfx-example/eac78558-4c3e-4d05-847e-a954c469868a');
-          setTimeout(() => {
-            setStepIndex(11);
-            setRun(true);
-          }, 800);
-          return;
-        }
-        
-        // Back from step 21 (index 13) to step 20 (index 12): Navigate to supplier search
-        if (index === 13) {
-          setRun(false);
-          navigate('/supplier-search');
-          setTimeout(() => {
-            setStepIndex(12);
-            setRun(true);
-          }, 800);
-          return;
-        }
-        
+
         // Default back behavior (no route change needed)
         setStepIndex(index - 1);
       }

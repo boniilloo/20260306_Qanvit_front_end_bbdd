@@ -787,31 +787,24 @@ const RFXDetail = () => {
           <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-[40%_calc(60%-1.5rem)] gap-6">
               {/* Left Column - RFX Progress (Todo List) */}
-              <RFXTodoList 
-                specsCompletion={getSpecsCompletion()} 
+              <RFXTodoList
+                specsCompletion={getSpecsCompletion()}
                 candidatesCompletion={candidatesCompletion}
                 candidatesProgress={progressData.candidatesProgress}
-                validationProgress={progressData.validationProgress}
-                rfxStatus={rfx.status}
                 activeItem={selectedTodoItem}
                 onItemClick={handleTodoItemClick}
-                versionMismatchWarning={versionMismatchWarning}
               />
-              
+
               {/* Right Column - Next Step */}
-              <NextStep 
-                specsCompletion={getSpecsCompletion()} 
+              <NextStep
+                specsCompletion={getSpecsCompletion()}
                 candidatesCompletion={candidatesCompletion}
                 candidatesProgress={progressData.candidatesProgress}
-                validationProgress={progressData.validationProgress}
-                rfxStatus={rfx.status}
                 onGoToSpecs={() => navigate(`/rfxs/specs/${id}`)}
                 onGoToCandidates={() => navigate(`/rfxs/candidates/${id}`)}
-                onGoToSending={() => navigate(`/rfxs/sending/${id}`)}
-                onGoToResponses={() => navigate(`/rfxs/responses/${id}`)}
+                onGoToWorkflow={() => navigate(`/rfxs/startups_workflow/${id}`)}
                 rfxId={id}
                 selectedItem={selectedTodoItem}
-                versionMismatchWarning={versionMismatchWarning}
               />
             </div>
           </div>

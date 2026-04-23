@@ -306,12 +306,6 @@ const RFXPublicExample: React.FC = () => {
                 hasEvaluationResults: false,
                 hasSelectedCandidates: false,
               }}
-              validationProgress={{
-                totalMembers: 0,
-                validatedMembers: 0,
-                allMembersValidated: false,
-              }}
-              rfxStatus={'draft' as any}
               activeItem={selectedTodoItem}
               onItemClick={(itemId) =>
                 setSelectedTodoItem((current) => (current === itemId ? undefined : itemId))
@@ -331,16 +325,9 @@ const RFXPublicExample: React.FC = () => {
                 hasEvaluationResults: false,
                 hasSelectedCandidates: false,
               }}
-              validationProgress={{
-                totalMembers: 0,
-                validatedMembers: 0,
-                allMembersValidated: false,
-              }}
-              rfxStatus={'draft'}
               onGoToSpecs={() => rfxId && navigate(`/rfx-example/specs/${rfxId}`)}
               onGoToCandidates={() => rfxId && navigate(`/rfx-example/candidates/${rfxId}`)}
-              onGoToSending={() => rfxId && navigate(`/rfx-example/sending/${rfxId}`)}
-              onGoToResponses={() => rfxId && navigate(`/rfx-example/responses/${rfxId}`)}
+              onGoToWorkflow={() => rfxId && navigate(`/rfx-example/startups_workflow/${rfxId}`)}
               rfxId={rfxId}
               selectedItem={selectedTodoItem}
               forceButtonsEnabled={true}

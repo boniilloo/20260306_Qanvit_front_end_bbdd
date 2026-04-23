@@ -59,6 +59,7 @@ interface CandidatesSectionProps {
   rfxStatus?: 'draft' | 'revision requested by buyer' | 'waiting for supplier proposals' | 'closed' | 'cancelled';
   archived?: boolean;
   publicCrypto?: PublicCryptoContext;
+  onSelectedCandidatesCountChange?: (count: number) => void;
 }
 
 interface WebSocketMessage {
@@ -159,7 +160,7 @@ type StepTiming = {
   durationMs?: number;
 };
 
-const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpecs, onResultsUpdated, evaluationResults = [], viewMode = 'all', rfxStatus, archived = false, publicCrypto }) => {
+const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpecs, onResultsUpdated, evaluationResults = [], viewMode = 'all', rfxStatus, archived = false, publicCrypto, onSelectedCandidatesCountChange }) => {
   const { toast } = useToast();
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -672,6 +673,10 @@ const CandidatesSection: React.FC<CandidatesSectionProps> = ({ rfxId, currentSpe
   const [removingCandidates, setRemovingCandidates] = useState<Set<string>>(new Set());
   // Track loading of initial selection from database
   const [loadingInitialSelection, setLoadingInitialSelection] = useState(false);
+
+  useEffect(() => {
+    onSelectedCandidatesCountChange?.(selectedCandidates.size);
+  }, [selectedCandidates, onSelectedCandidatesCountChange]);
   
   // Manual search state
   const [manualSearchQuery, setManualSearchQuery] = useState('');

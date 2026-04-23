@@ -14,8 +14,7 @@ import RFXProjects from "./pages/RFXProjects";
 import RFXDetail from "./pages/RFXDetail";
 import RFXSpecsPage from "./pages/RFXSpecsPage";
 import RFXCandidatesPage from "./pages/RFXCandidatesPage";
-import RFXSendingPage from "./pages/RFXSendingPage";
-import RFXResponsesPage from "./pages/RFXResponsesPage";
+import RFXStartupsWorkflowPage from "./pages/RFXStartupsWorkflowPage";
 import FQAgent from "./pages/FQAgent";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
@@ -31,6 +30,7 @@ import RFXManagement from "./pages/RFXManagement";
 import DeveloperMailAllMembers from "@/pages/DeveloperMailAllMembers";
 import RFXViewer from "@/pages/RFXViewer";
 import RFXPublicExample from "@/pages/RFXPublicExample";
+import RFXPublicQuestionnairePage from "@/pages/RFXPublicQuestionnairePage";
 import RFXPublicSpecsPage from "@/pages/RFXPublicSpecsPage";
 import RFXPublicPlaceholderPage from "@/pages/RFXPublicPlaceholderPage";
 import NotificationsCenter from "@/pages/NotificationsCenter";
@@ -247,18 +247,14 @@ const App = () => {
                       <RFXCandidatesPage readOnly isPublicExample />
                     </FooterLayout>
                   } />
-                  <Route path="/rfx-example/sending/:id" element={
+                  <Route path="/rfx-example/startups_workflow/:id" element={
                     <FooterLayout>
-                      <RFXSendingPage readOnly isPublicExample />
+                      <RFXStartupsWorkflowPage readOnly isPublicExample />
                     </FooterLayout>
                   } />
-                  <Route path="/rfx-example/responses/:id" element={
-                    <FooterLayout>
-                      <RFXResponsesPage readOnly isPublicExample />
-                    </FooterLayout>
-                  } />
-                  
-                  {/* Ruta protegida para Admin Requests - Solo desarrolladores */}
+                  {/* Cuestionario público para startups (por token, sin auth) */}
+                  <Route path="/questionnaire/:token" element={<RFXPublicQuestionnairePage />} />
+{/* Ruta protegida para Admin Requests - Solo desarrolladores */}
                   <Route path="/admin-requests" element={
                     <ProtectedRoute>
                       <AdminRequests />
@@ -364,22 +360,12 @@ const App = () => {
                       <RFXCandidatesPage />
                     </ProtectedSupplierRoute>
                   } />
-                  <Route path="/rfxs/sending/:rfxId" element={
+                  <Route path="/rfxs/startups_workflow/:rfxId" element={
                     <ProtectedSupplierRoute>
-                      <FooterLayout>
-                        <RFXSendingPage />
-                      </FooterLayout>
+                      <RFXStartupsWorkflowPage />
                     </ProtectedSupplierRoute>
                   } />
-                  <Route path="/rfxs/responses/:rfxId" element={
-                    <ProtectedSupplierRoute>
-                      <FooterLayout>
-                        <RFXResponsesPage />
-                      </FooterLayout>
-                    </ProtectedSupplierRoute>
-                  } />
-                  
-                  {/* Discovery Agent - Chat route */}
+{/* Discovery Agent - Chat route */}
                   <Route path="/chat" element={<FQAgent />} />
                   <Route path="/chat/:id" element={<FQAgent />} />
                   

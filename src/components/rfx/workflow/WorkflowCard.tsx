@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   RefreshCw,
   Loader2,
+  ClipboardList,
   type LucideIcon,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -46,6 +47,7 @@ interface WorkflowCardProps {
   onSendNda?: (card: WorkflowCardModel) => void;
   onRefreshNda?: (card: WorkflowCardModel) => void;
   refreshingNda?: boolean;
+  pendingTaskCount?: number;
 }
 
 // Estados del envelope DocuSign que permiten (re)enviar. El resto bloquean el CTA.
@@ -108,6 +110,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   onSendNda,
   onRefreshNda,
   refreshingNda = false,
+  pendingTaskCount = 0,
 }) => {
   const { t } = useTranslation();
   const name = candidate?.empresa || t('workflow.card.unknownCompany');
@@ -153,6 +156,15 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         >
           {name}
         </h4>
+        {!isDiscarded && pendingTaskCount > 0 && (
+          <span
+            className="shrink-0 inline-flex items-center gap-0.5 text-[10px] font-semibold text-[#22183a] bg-[#f4a9aa]/40 border border-[#f4a9aa] rounded-full px-1.5 h-5"
+            title={t('workflow.tasks.card.countTooltip', { count: pendingTaskCount }) as string}
+          >
+            <ClipboardList className="h-3 w-3" />
+            {pendingTaskCount}
+          </span>
+        )}
         {onDiscard && !isDiscarded && (
           <button
             type="button"
@@ -184,7 +196,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         <>
           <div className="space-y-1 mb-2">
             <MetricBar label={t('workflow.metrics.technology')} value={candidate?.match} />
-            <MetricBar label={t('workflow.metrics.traction')} value={null} />
             <MetricBar label={t('workflow.metrics.fit')} value={candidate?.company_match ?? null} />
           </div>
 

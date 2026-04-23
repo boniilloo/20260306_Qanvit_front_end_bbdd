@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileText, Loader2, ExternalLink, FileText as FileTextIcon, Cog, Building2, Users, Trash2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, FileText, Loader2, ExternalLink, FileText as FileTextIcon, Cog, Building2, Users, Trash2, AlertCircle, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,8 +31,10 @@ import { useRFXSpecs } from '@/hooks/useRFXSpecs';
 import { usePublicRFXCrypto } from '@/hooks/usePublicRFXCrypto';
 import { useTranslation } from 'react-i18next';
 import { RFXCandidatesChatSidebar } from '@/components/rfx/chat-wrappers';
-import { useSidebar } from '@/components/ui/sidebar';
+import { useCollapseSidebarOnRoute } from '@/hooks/useCollapseSidebarOnRoute';
 import { normalizeBestMatchRow } from '@/utils/rfxCandidateNormalize';
+import PromptEditorModal from '@/components/rfx/PromptEditorModal';
+import { useIsDeveloper } from '@/hooks/useIsDeveloper';
 
 interface RFXCandidatesPageProps {
   /** When true, renders the page in read-only mode (no writes, public example) */
@@ -61,7 +63,7 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
   const [selectedCandidatesCount, setSelectedCandidatesCount] = useState(0);
   const [activeTab, setActiveTab] = useState<'recommended' | 'manual' | 'selected' | 'specs'>('recommended');
   const [isChatExpanded, setIsChatExpanded] = useState(true);
-  const { setOpen: setSidebarOpen, state: sidebarState } = useSidebar();
+  useCollapseSidebarOnRoute();
   const [companyLogos, setCompanyLogos] = useState<{[key: string]: string | null}>({});
   const [companyWebsites, setCompanyWebsites] = useState<{[key: string]: string | null}>({});
   // PDF preview modal state
@@ -94,6 +96,11 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
   
   // Modal state for archived status
   const [showArchivedModal, setShowArchivedModal] = useState(false);
+
+  // Editor de prompts (solo visible para desarrolladores y fuera de modo público)
+  const { isDeveloper } = useIsDeveloper();
+  const canEditPrompts = isDeveloper && !readOnly && !isPublicExample;
+  const [showPromptEditor, setShowPromptEditor] = useState(false);
   
   // Refs for accessing buttons in CandidatesSection
   const askAgentButtonRef = useRef<HTMLButtonElement>(null);
@@ -118,20 +125,6 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
       fetchRFX();
       // fetchSpecs handled by hook
     }
-  }, [rfxId]);
-
-  // Collapse main sidebar on enter; restore on leave if it was open before (deps: rfxId only — avoid re-run when sidebarState changes)
-  useEffect(() => {
-    const wasCollapsed = sidebarState === 'collapsed';
-    if (!wasCollapsed) {
-      setSidebarOpen(false);
-    }
-    return () => {
-      if (!wasCollapsed) {
-        setSidebarOpen(true);
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- sidebarState intentionally omitted: including it re-triggers cleanup and toggles the sidebar in a loop
   }, [rfxId]);
 
   // Update currentSpecs when specs from hook are loaded
@@ -592,6 +585,17 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
             </div>
             <div className="flex flex-col items-end gap-2 shrink-0">
               <div className="flex items-center gap-2">
+                {canEditPrompts && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowPromptEditor(true)}
+                    className="border-dashed"
+                    title={t('rfxs.candidates_editPromptTooltip')}
+                  >
+                    <Code className="h-4 w-4 mr-2" />
+                    {t('rfxs.candidates_editPrompt')}
+                  </Button>
+                )}
                 {hasSelectedCandidates ? (
                   <Button
                     onClick={() => {
@@ -1203,6 +1207,97 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {canEditPrompts && (
+        <PromptEditorModal
+          open={showPromptEditor}
+          onOpenChange={setShowPromptEditor}
+          title={t('rfxs.candidates_promptEditor_title')}
+          groups={[
+            {
+              id: 'chat',
+              label: t('rfxs.candidates_promptEditor_tab_chat'),
+              description: t('rfxs.candidates_promptEditor_desc_chat'),
+              prompts: [
+                {
+                  key: 'candidates_prompt',
+                  rows: 16,
+                },
+              ],
+            },
+            {
+              id: 'rubric',
+              label: t('rfxs.candidates_promptEditor_tab_rubric'),
+              description: t('rfxs.candidates_promptEditor_desc_rubric'),
+              prompts: [
+                {
+                  key: 'evaluation_rubric_prompt',
+                  rows: 16,
+                },
+              ],
+            },
+            {
+              id: 'technical-evaluation',
+              label: t('rfxs.candidates_promptEditor_tab_technicalEvaluation'),
+              description: t('rfxs.candidates_promptEditor_desc_technicalEvaluation'),
+              prompts: [
+                {
+                  key: 'evaluations_system_prompt',
+                  label: t('rfxs.candidates_promptEditor_field_systemPrompt'),
+                  rows: 12,
+                },
+                {
+                  key: 'evaluations_user_prompt',
+                  label: t('rfxs.candidates_promptEditor_field_userPrompt'),
+                  rows: 8,
+                },
+              ],
+            },
+            {
+              id: 'company-evaluation',
+              label: t('rfxs.candidates_promptEditor_tab_companyEvaluation'),
+              description: t('rfxs.candidates_promptEditor_desc_companyEvaluation'),
+              prompts: [
+                {
+                  key: 'company_evaluation_system_prompt',
+                  label: t('rfxs.candidates_promptEditor_field_systemPrompt'),
+                  rows: 12,
+                },
+                {
+                  key: 'company_evaluation_user_prompt',
+                  label: t('rfxs.candidates_promptEditor_field_userPrompt'),
+                  rows: 8,
+                },
+              ],
+            },
+            {
+              id: 'enrichment',
+              label: t('rfxs.candidates_promptEditor_tab_enrichment'),
+              description: t('rfxs.candidates_promptEditor_desc_enrichment'),
+              prompts: [
+                {
+                  key: 'candidates_enrichment_prompt',
+                  label: t('rfxs.candidates_promptEditor_field_enrichmentSystem'),
+                  hint: t('rfxs.candidates_promptEditor_hint_enrichmentSystem'),
+                  rows: 16,
+                },
+                {
+                  key: 'candidates_enrichment_bootstrap_user_prompt',
+                  label: t('rfxs.candidates_promptEditor_field_enrichmentBootstrap'),
+                  hint: t('rfxs.candidates_promptEditor_hint_enrichmentBootstrap'),
+                  rows: 6,
+                },
+                {
+                  key: 'candidates_enrichment_followup_user_template',
+                  label: t('rfxs.candidates_promptEditor_field_enrichmentFollowup'),
+                  hint: t('rfxs.candidates_promptEditor_hint_enrichmentFollowup'),
+                  rows: 6,
+                },
+              ],
+            },
+          ]}
+        />
+      )}
     </div>
   );
 };

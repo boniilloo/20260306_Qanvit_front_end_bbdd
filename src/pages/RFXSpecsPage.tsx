@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, Save, Download, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, Download, AlertCircle, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -14,7 +14,7 @@ import RFXVersionControl from '@/components/rfx/RFXVersionControl';
 import { useRFXVersionControl } from '@/hooks/useRFXVersionControl';
 import { useRFXCommitStatus } from '@/hooks/useRFXCommitStatus';
 import { useNavigation } from '@/contexts/NavigationContext';
-import { useSidebar } from '@/components/ui/sidebar';
+import { useCollapseSidebarOnRoute } from '@/hooks/useCollapseSidebarOnRoute';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,6 +27,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { NDAPdfViewerModal } from '@/components/rfx/NDAPdfViewerModal';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import PromptEditorModal from '@/components/rfx/PromptEditorModal';
+import { useIsDeveloper } from '@/hooks/useIsDeveloper';
 
 import { useRFXSpecs } from '@/hooks/useRFXSpecs';
 import { useTranslation } from 'react-i18next';
@@ -143,9 +145,9 @@ const RFXSpecsPage = () => {
   const [isChatExpanded, setIsChatExpanded] = useState(true); // Start with chat expanded
   const [specsKey, setSpecsKey] = useState(0); // Key to force RFXSpecs reload
 
-  // Sidebar state management
-  const { setOpen: setSidebarOpen, state: sidebarState } = useSidebar();
-  const [sidebarWasCollapsedByUser, setSidebarWasCollapsedByUser] = useState(false);
+  // Sidebar state management: colapsa al entrar y restaura al salir, coordinado
+  // con otras páginas auto-colapso mediante contador compartido.
+  useCollapseSidebarOnRoute();
   
   // Chat animation state
   const [shouldAnimateChat, setShouldAnimateChat] = useState(false);
@@ -216,6 +218,10 @@ const RFXSpecsPage = () => {
   /** First message for RFX agent sidebar (Home bootstrap); cleared after auto-send */
   const [bootstrapInitialPrompt, setBootstrapInitialPrompt] = useState<string | null>(null);
 
+  // Editor de prompts (solo visible para desarrolladores)
+  const { isDeveloper } = useIsDeveloper();
+  const [showPromptEditor, setShowPromptEditor] = useState(false);
+
   useEffect(() => {
     if (!rfxId) {
       setBootstrapInitialPrompt(null);
@@ -241,25 +247,6 @@ const RFXSpecsPage = () => {
       // fetchSpecs call removed as it is handled by useRFXSpecs hook
     }
   }, [rfxId]);
-
-  // Sidebar management: collapse on mount, expand on unmount (if user didn't collapse it)
-  useEffect(() => {
-    // Check if sidebar was already collapsed by user before entering this page
-    const wasCollapsed = sidebarState === 'collapsed';
-    setSidebarWasCollapsedByUser(wasCollapsed);
-    
-    // Collapse sidebar when entering RFX Specs page
-    if (!wasCollapsed) {
-      setSidebarOpen(false);
-    }
-
-    // Cleanup function: expand sidebar when leaving (if user didn't collapse it)
-    return () => {
-      if (!wasCollapsed) {
-        setSidebarOpen(true);
-      }
-    };
-  }, [rfxId]); // Solo dependemos de rfxId para evitar el bucle infinito
 
   // Trigger chat animation when entering RFX Specs page
   useEffect(() => {
@@ -1034,6 +1021,17 @@ const RFXSpecsPage = () => {
                 </div>
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   <div className="flex items-center gap-2">
+                    {isDeveloper && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowPromptEditor(true)}
+                        className="border-dashed"
+                        title={t('rfxs.specs_editPromptTooltip')}
+                      >
+                        <Code className="h-4 w-4 mr-2" />
+                        {t('rfxs.specs_editPrompt')}
+                      </Button>
+                    )}
                     {canProceedToCandidates ? (
                       <Button
                         onClick={() => navigate(`/rfxs/candidates/${rfxId}`)}
@@ -1435,6 +1433,28 @@ const RFXSpecsPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {isDeveloper && (
+        <PromptEditorModal
+          open={showPromptEditor}
+          onOpenChange={setShowPromptEditor}
+          title={t('rfxs.specs_promptEditor_title', {
+            prompt: t('rfxs.specs_promptEditor_rfxAssistantLabel'),
+          })}
+          groups={[
+            {
+              id: 'rfx-assistant',
+              label: t('rfxs.specs_promptEditor_rfxAssistantLabel'),
+              prompts: [
+                {
+                  key: 'rfx_conversational_system_prompt',
+                  rows: 16,
+                },
+              ],
+            },
+          ]}
+        />
+      )}
     </div>
   );
 };

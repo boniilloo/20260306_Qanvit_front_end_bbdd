@@ -32,6 +32,11 @@ import CallShortlistDialog from '@/components/rfx/workflow/CallShortlistDialog';
 import CallSummaryViewDialog from '@/components/rfx/workflow/CallSummaryViewDialog';
 import WorkflowTimeline from '@/components/rfx/workflow/WorkflowTimeline';
 import DdTemplateManager from '@/components/rfx/workflow/DdTemplateManager';
+import WorkflowTasksPanel from '@/components/rfx/workflow/WorkflowTasksPanel';
+import CustomTaskDialog from '@/components/rfx/workflow/CustomTaskDialog';
+import type { CustomTask, UnifiedTask } from '@/components/rfx/workflow/workflowTasks';
+import { useWorkflowTasks } from '@/hooks/useWorkflowTasks';
+import { useCustomTasks } from '@/hooks/useCustomTasks';
 import { useDdTemplate } from '@/hooks/useDdTemplate';
 import { useRFXMembers } from '@/hooks/useRFXMembers';
 import { useNdaEnvelope } from '@/hooks/useNdaEnvelope';
@@ -51,7 +56,7 @@ import { useRFXQuestionnaire } from '@/hooks/useRFXQuestionnaire';
 import { useRFXEvaluationRubric } from '@/hooks/useRFXEvaluationRubric';
 import { useRFXEvaluation } from '@/hooks/useRFXEvaluation';
 import { useCandidateWebsites } from '@/hooks/useCandidateWebsites';
-import { useSidebar } from '@/components/ui/sidebar';
+import { useCollapseSidebarOnRoute } from '@/hooks/useCollapseSidebarOnRoute';
 import {
   ACTIVE_STAGES,
   PILOT_STAGES,
@@ -124,17 +129,15 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
   const summaryGenerator = useCallSummaryGenerator();
   const [shortlistOpen, setShortlistOpen] = useState(false);
   const callShortlist = useCallShortlist(rfxId ?? null);
+  // Estado del diálogo de tareas custom: null = cerrado; task=null => crear nueva.
+  const [customTaskDialog, setCustomTaskDialog] = useState<{
+    task: CustomTask | null;
+    lockedCardId?: string | null;
+  } | null>(null);
 
-  // Comprimir el sidebar al entrar y restaurarlo al salir (mismo patrón que RFXSpecsPage).
-  const { setOpen: setSidebarOpen, state: sidebarState } = useSidebar();
-  useEffect(() => {
-    const wasCollapsed = sidebarState === 'collapsed';
-    if (!wasCollapsed) setSidebarOpen(false);
-    return () => {
-      if (!wasCollapsed) setSidebarOpen(true);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rfxId]);
+  // Comprimir el sidebar al entrar y restaurarlo al salir. La lógica se coordina
+  // con otras páginas auto-colapso (Candidates, Specs) vía contador compartido.
+  useCollapseSidebarOnRoute();
 
   // Enruta el CTA de la tarjeta según la columna donde esté.
   const handleOpenCardActions = (card: WorkflowCardModel) => {
@@ -227,6 +230,24 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
     rfxId ? { kind: 'rfx', rfxId } : { kind: 'user' },
   );
 
+  // Tareas del reto: derivadas (auto) + custom (persistidas). Toda la lógica de
+  // cálculo vive en el hook; aquí solo consumimos el output.
+  const taskRfxState = useMemo(
+    () => ({
+      questionnairePublished,
+      rubricPublished,
+      hasCandidates: selectedCandidates.length > 0,
+    }),
+    [questionnairePublished, rubricPublished, selectedCandidates.length],
+  );
+  const {
+    groups: taskGroups,
+    openCount: taskOpenCount,
+    openCountByCardId: taskCountByCardId,
+    loading: loadingTasks,
+  } = useWorkflowTasks({ rfxId, rfxState: readOnly ? undefined : taskRfxState });
+  const customTasksApi = useCustomTasks({ rfxId });
+
   // Websites de los candidatos para mostrar el favicon en la tarjeta.
   const websitesByCandidate = useCandidateWebsites(
     useMemo(() => cards.map((c) => c.candidate_id), [cards]),
@@ -317,6 +338,127 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
     const pilots = cards.filter((c) => PILOT_STAGES.includes(c.stage)).length;
     return { total, active, pilots };
   }, [cards]);
+
+  // Nombre humano por tarjeta: el panel de tareas lo usa para rotular cada fila.
+  const candidateNameByCardId = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const c of cards) {
+      const name =
+        candidatesById.get(c.candidate_id)?.empresa ||
+        t('workflow.card.unknownCompany');
+      m.set(c.id, name);
+    }
+    return m;
+  }, [cards, candidatesById, t]);
+
+  // Lista de tarjetas activas ordenadas por nombre para el select del diálogo de tarea.
+  const taskCardOptions = useMemo(
+    () =>
+      cards
+        .filter((c) => c.stage !== 'discarded')
+        .map((c) => ({
+          id: c.id,
+          label:
+            candidatesById.get(c.candidate_id)?.empresa ||
+            t('workflow.card.unknownCompany'),
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [cards, candidatesById, t],
+  );
+
+  // Enruta el click sobre una tarea al flujo correcto. Las derivadas se mapean a
+  // diálogos existentes (revisar respuestas, enviar NDA...) o al drawer general;
+  // las custom abren el diálogo de edición.
+  const handleTaskClick = (task: UnifiedTask) => {
+    if (task.source === 'custom') {
+      setCustomTaskDialog({ task, lockedCardId: task.card_id });
+      return;
+    }
+    // Tareas a nivel reto (sin card_id): diálogos de setup o navegación.
+    if (task.card_id === null) {
+      switch (task.kind) {
+        case 'publish_questionnaire':
+          setQuestionnaireOpen(true);
+          return;
+        case 'publish_rubric':
+          setRubricOpen(true);
+          return;
+        case 'seed_candidates':
+          if (rfxId) navigate(`/rfxs/candidates/${rfxId}`);
+          return;
+        default:
+          return;
+      }
+    }
+    const card = cards.find((c) => c.id === task.card_id);
+    if (!card) return;
+    switch (task.kind) {
+      case 'review_responses':
+        setReviewCard(card);
+        return;
+      case 'send_nda':
+        setSendNdaCard(card);
+        return;
+      case 'schedule_call':
+        setCallDialog({ card, mode: 'create' });
+        return;
+      default:
+        // register_call_outcome, chase_nda_signature, request/review_dd_item,
+        // stale_contact: el drawer general da acceso a todas las acciones de la
+        // tarjeta (NDA, DD, timeline, contacto), por lo que lo reutilizamos.
+        setActionsCard(card);
+    }
+  };
+
+  const handleSubmitCustomTask = async (payload: {
+    title: string;
+    description: string | null;
+    status: CustomTask['status'];
+    due_date: string | null;
+    card_id: string | null;
+  }) => {
+    if (!customTaskDialog) return;
+    const editing = customTaskDialog.task;
+    if (editing) {
+      const ok = await customTasksApi.update(editing.id, payload);
+      if (ok) {
+        toast({ title: t('workflow.tasks.toasts.updated') });
+        setCustomTaskDialog(null);
+      } else {
+        toast({
+          title: t('common.error'),
+          description: customTasksApi.error ?? undefined,
+          variant: 'destructive',
+        });
+      }
+      return;
+    }
+    const created = await customTasksApi.create(payload);
+    if (created) {
+      toast({ title: t('workflow.tasks.toasts.created') });
+      setCustomTaskDialog(null);
+    } else {
+      toast({
+        title: t('common.error'),
+        description: customTasksApi.error ?? undefined,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleDeleteCustomTask = async (id: string) => {
+    const ok = await customTasksApi.remove(id);
+    if (ok) {
+      toast({ title: t('workflow.tasks.toasts.deleted') });
+      setCustomTaskDialog(null);
+    } else {
+      toast({
+        title: t('common.error'),
+        description: customTasksApi.error ?? undefined,
+        variant: 'destructive',
+      });
+    }
+  };
 
   const handleDropCard = async (targetStage: WorkflowStage, index: number) => {
     if (!draggingCard) return;
@@ -717,6 +859,17 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
         </div>
       </div>
 
+      {!readOnly && rfxId && (
+        <WorkflowTasksPanel
+          groups={taskGroups}
+          openCount={taskOpenCount}
+          loading={loadingTasks}
+          candidateNameByCardId={candidateNameByCardId}
+          onNewTask={() => setCustomTaskDialog({ task: null })}
+          onTaskClick={handleTaskClick}
+        />
+      )}
+
       <div className="flex-1 flex min-h-0">
         <WorkflowTriggersSidebar readOnly={readOnly} onTriggerClick={handleTriggerClick} />
 
@@ -831,6 +984,7 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
                   suggestionByCard={suggestionByCard}
                   renderCardExtras={renderCardExtras}
                   headerAction={headerAction}
+                  taskCountByCardId={taskCountByCardId}
                   overlay={overlay}
                 />
               );
@@ -1114,6 +1268,19 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
             />
           </DialogContent>
         </Dialog>
+      )}
+
+      {!readOnly && customTaskDialog && rfxId && (
+        <CustomTaskDialog
+          open={!!customTaskDialog}
+          onOpenChange={(o) => !o && setCustomTaskDialog(null)}
+          editing={customTaskDialog.task}
+          lockedCardId={customTaskDialog.lockedCardId}
+          cardOptions={taskCardOptions}
+          submitting={customTasksApi.saving}
+          onSubmit={handleSubmitCustomTask}
+          onDelete={customTaskDialog.task ? handleDeleteCustomTask : undefined}
+        />
       )}
 
       {actionsCard && rfxId && (

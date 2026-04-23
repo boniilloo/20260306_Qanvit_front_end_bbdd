@@ -11,7 +11,7 @@ import RFXSpecs from '@/components/rfx/RFXSpecs';
 import { NDAPdfViewerModal } from '@/components/rfx/NDAPdfViewerModal';
 import RFXFooter from '@/components/rfx/RFXFooter';
 import { usePublicRFXCrypto } from '@/hooks/usePublicRFXCrypto';
-import { useSidebar } from '@/components/ui/sidebar';
+import { useCollapseSidebarOnRoute } from '@/hooks/useCollapseSidebarOnRoute';
 
 interface RfxInfo {
   id: string;
@@ -53,9 +53,9 @@ const RFXPublicSpecsPage: React.FC = () => {
   const [showPDFModal, setShowPDFModal] = useState(false);
   const [pdfBlobUrl, setPdfBlobUrl] = useState<string | null>(null);
   
-  // Sidebar state management
-  const { setOpen: setSidebarOpen, state: sidebarState } = useSidebar();
-  const [sidebarWasCollapsedByUser, setSidebarWasCollapsedByUser] = useState(false);
+  // Sidebar state management: colapsa al entrar y restaura al salir, coordinado
+  // con otras páginas auto-colapso mediante contador compartido.
+  useCollapseSidebarOnRoute();
   
   // Use public crypto hook to decrypt RFX content
   const publicCrypto = usePublicRFXCrypto(rfxId || null);
@@ -217,25 +217,6 @@ const RFXPublicSpecsPage: React.FC = () => {
 
     loadData();
   }, [rfxId, navigate, toast, publicCrypto.isReady]);
-
-  // Sidebar management: collapse on mount, expand on unmount (if user didn't collapse it)
-  useEffect(() => {
-    // Check if sidebar was already collapsed by user before entering this page
-    const wasCollapsed = sidebarState === 'collapsed';
-    setSidebarWasCollapsedByUser(wasCollapsed);
-    
-    // Collapse sidebar when entering RFX Specs page
-    if (!wasCollapsed) {
-      setSidebarOpen(false);
-    }
-
-    // Cleanup function: expand sidebar when leaving (if user didn't collapse it)
-    return () => {
-      if (!wasCollapsed) {
-        setSidebarOpen(true);
-      }
-    };
-  }, [rfxId]); // Solo dependemos de rfxId para evitar el bucle infinito
 
   if (loading) {
     return (

@@ -31,6 +31,7 @@ interface WorkflowColumnProps {
   refreshingCardId?: string | null;
   renderCardExtras?: (card: WorkflowCardModel) => React.ReactNode;
   headerAction?: React.ReactNode;
+  taskCountByCardId?: Map<string, number>;
   overlay?: {
     label: string;
     ctaLabel: string;
@@ -57,6 +58,7 @@ const WorkflowColumn: React.FC<WorkflowColumnProps> = ({
   refreshingCardId,
   renderCardExtras,
   headerAction,
+  taskCountByCardId,
   overlay,
 }) => {
   const { t } = useTranslation();
@@ -150,6 +152,7 @@ const WorkflowColumn: React.FC<WorkflowColumnProps> = ({
               onSendNda={!readOnly && !dimmed ? onSendNda : undefined}
               onRefreshNda={!readOnly && !dimmed ? onRefreshNda : undefined}
               refreshingNda={refreshingCardId === card.id}
+              pendingTaskCount={taskCountByCardId?.get(card.id) ?? 0}
             />
           </div>
         ))}

@@ -292,6 +292,22 @@ const deriveTasks = (rfxId: string, input: DerivedInputs): DerivedTask[] => {
       }
     }
 
+    // contact_candidate: hasta que el usuario marque la tarjeta como contactada
+    // (o la startup conteste y un trigger la mueva a 'review_responses'), aparece
+    // como tarea pendiente. Urgencia alta: es la acción inicial del flujo.
+    if (card.stage === 'contact_and_maturity' && !card.contacted_at) {
+      result.push(
+        makeDerived(
+          'contact_candidate',
+          card.id,
+          rfxId,
+          card.created_at,
+          {},
+          10,
+        ),
+      );
+    }
+
     // stale_contact: tarjeta en la primera columna sin movimiento más allá del umbral.
     if (card.stage === 'contact_and_maturity') {
       const days = daysSince(card.updated_at);

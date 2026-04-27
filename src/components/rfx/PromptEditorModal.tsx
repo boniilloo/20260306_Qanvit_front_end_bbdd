@@ -10,40 +10,56 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { History, RefreshCw, Save, Upload, User, Code } from 'lucide-react';
 
 export interface PromptFieldDef {
-  /** Columna de `agent_prompt_backups_v2` */
   key: string;
-  /** Etiqueta del campo (si en el tab hay más de uno) */
   label?: string;
   placeholder?: string;
-  /** Pista debajo del campo (ej: "Debe contener {user_input}") */
   hint?: string;
   rows?: number;
 }
 
+export type PromptParamType =
+  | 'model'
+  | 'reasoning_effort'
+  | 'verbosity'
+  | 'temperature'
+  | 'max_tokens';
+
+export interface PromptParamDef {
+  /** Columna de `agent_prompt_backups_v2` */
+  key: string;
+  type: PromptParamType;
+  /** Label custom (por defecto se usa uno estándar según el tipo) */
+  label?: string;
+}
+
 export interface PromptGroupDef {
-  /** Identificador único del tab */
   id: string;
-  /** Nombre visible del tab */
   label: string;
-  /** Descripción corta del grupo (opcional) */
   description?: string;
-  /** Uno o varios prompts en este tab */
   prompts: PromptFieldDef[];
+  /** Parámetros LLM editables en este tab (opcional) */
+  params?: PromptParamDef[];
 }
 
 interface PromptEditorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Título del modal (ej: "Prompts — Candidatos") */
   title: string;
-  /** Grupos de prompts (cada grupo = 1 tab) */
   groups: PromptGroupDef[];
 }
 
@@ -58,6 +74,33 @@ interface BackupRow {
 
 const MODAL_EMPTY_ID = '00000000-0000-0000-0000-000000000000';
 
+const REASONING_EFFORT_OPTIONS = ['minimal', 'low', 'medium', 'high'] as const;
+const VERBOSITY_OPTIONS = ['low', 'medium', 'high'] as const;
+
+/** Convierte el valor bruto de BBDD (any) a string para el editor. */
+const valueToString = (raw: unknown): string => {
+  if (raw === null || raw === undefined) return '';
+  return String(raw);
+};
+
+/** Convierte el string editado al tipo correcto antes de guardar. */
+const parseParamValue = (
+  type: PromptParamType,
+  raw: string,
+): string | number | null => {
+  const trimmed = raw.trim();
+  if (trimmed === '') return null;
+  if (type === 'temperature') {
+    const n = Number(trimmed);
+    return Number.isFinite(n) ? n : null;
+  }
+  if (type === 'max_tokens') {
+    const n = parseInt(trimmed, 10);
+    return Number.isFinite(n) ? n : null;
+  }
+  return trimmed;
+};
+
 const PromptEditorModal = ({
   open,
   onOpenChange,
@@ -66,8 +109,12 @@ const PromptEditorModal = ({
 }: PromptEditorModalProps) => {
   const { t } = useTranslation();
 
-  const allKeys = useMemo(
+  const allPromptKeys = useMemo(
     () => groups.flatMap((g) => g.prompts.map((p) => p.key)),
+    [groups],
+  );
+  const allParams = useMemo(
+    () => groups.flatMap((g) => g.params ?? []),
     [groups],
   );
 
@@ -75,8 +122,10 @@ const PromptEditorModal = ({
   const [saving, setSaving] = useState<boolean>(false);
   const [activeBackup, setActiveBackup] = useState<BackupRow | null>(null);
   const [backups, setBackups] = useState<BackupRow[]>([]);
-  const [values, setValues] = useState<Record<string, string>>({});
-  const [originalValues, setOriginalValues] = useState<Record<string, string>>({});
+  const [promptValues, setPromptValues] = useState<Record<string, string>>({});
+  const [originalPromptValues, setOriginalPromptValues] = useState<Record<string, string>>({});
+  const [paramValues, setParamValues] = useState<Record<string, string>>({});
+  const [originalParamValues, setOriginalParamValues] = useState<Record<string, string>>({});
   const [comment, setComment] = useState<string>('');
   const [userName, setUserName] = useState<string>('');
   const [showHistory, setShowHistory] = useState<boolean>(false);
@@ -98,12 +147,19 @@ const PromptEditorModal = ({
       const active = rows.find((r) => r.is_active === true) || rows[0] || null;
       setActiveBackup(active);
 
-      const initial: Record<string, string> = {};
-      for (const key of allKeys) {
-        initial[key] = ((active?.[key] as string) ?? '') as string;
+      const initialPrompts: Record<string, string> = {};
+      for (const key of allPromptKeys) {
+        initialPrompts[key] = valueToString(active?.[key]);
       }
-      setValues(initial);
-      setOriginalValues(initial);
+      setPromptValues(initialPrompts);
+      setOriginalPromptValues(initialPrompts);
+
+      const initialParams: Record<string, string> = {};
+      for (const p of allParams) {
+        initialParams[p.key] = valueToString(active?.[p.key]);
+      }
+      setParamValues(initialParams);
+      setOriginalParamValues(initialParams);
     } catch (err) {
       console.error('Error cargando prompts:', err);
       toast({
@@ -114,7 +170,7 @@ const PromptEditorModal = ({
     } finally {
       setLoading(false);
     }
-  }, [allKeys, t]);
+  }, [allPromptKeys, allParams, t]);
 
   const loadUserName = useCallback(async () => {
     try {
@@ -145,14 +201,28 @@ const PromptEditorModal = ({
     loadUserName();
   }, [open, groups, loadData, loadUserName]);
 
-  const dirtyKeys = useMemo(
-    () => allKeys.filter((k) => (values[k] ?? '') !== (originalValues[k] ?? '')),
-    [allKeys, values, originalValues],
+  const dirtyPromptKeys = useMemo(
+    () =>
+      allPromptKeys.filter(
+        (k) => (promptValues[k] ?? '') !== (originalPromptValues[k] ?? ''),
+      ),
+    [allPromptKeys, promptValues, originalPromptValues],
   );
-  const isDirty = dirtyKeys.length > 0;
+  const dirtyParamKeys = useMemo(
+    () =>
+      allParams
+        .map((p) => p.key)
+        .filter((k) => (paramValues[k] ?? '') !== (originalParamValues[k] ?? '')),
+    [allParams, paramValues, originalParamValues],
+  );
+  const isDirty = dirtyPromptKeys.length > 0 || dirtyParamKeys.length > 0;
+  const totalDirty = dirtyPromptKeys.length + dirtyParamKeys.length;
 
-  const updateValue = (key: string, val: string) => {
-    setValues((prev) => ({ ...prev, [key]: val }));
+  const updatePrompt = (key: string, val: string) => {
+    setPromptValues((prev) => ({ ...prev, [key]: val }));
+  };
+  const updateParam = (key: string, val: string) => {
+    setParamValues((prev) => ({ ...prev, [key]: val }));
   };
 
   const handleSave = async () => {
@@ -183,8 +253,6 @@ const PromptEditorModal = ({
 
       if (deactivateError) throw deactivateError;
 
-      // Copiamos toda la config activa y sustituimos sólo las claves editadas,
-      // para no perder otros prompts/parámetros que no pertenecen a este modal.
       const {
         id: _ignoreId,
         created_at: _ignoreCreatedAt,
@@ -194,9 +262,12 @@ const PromptEditorModal = ({
         ...restConfig
       } = activeBackup;
 
-      const overrides: Record<string, string> = {};
-      for (const key of allKeys) {
-        overrides[key] = values[key] ?? '';
+      const overrides: Record<string, unknown> = {};
+      for (const key of allPromptKeys) {
+        overrides[key] = promptValues[key] ?? '';
+      }
+      for (const p of allParams) {
+        overrides[p.key] = parseParamValue(p.type, paramValues[p.key] ?? '');
       }
 
       const newRow = {
@@ -269,6 +340,109 @@ const PromptEditorModal = ({
     }
   };
 
+  const renderParam = (p: PromptParamDef) => {
+    const current = paramValues[p.key] ?? '';
+    const label = p.label ?? t(`rfxs.specs_promptEditor_param_${p.type}`);
+    const id = `param-${p.key}`;
+
+    if (p.type === 'reasoning_effort') {
+      return (
+        <div key={p.key}>
+          <Label htmlFor={id}>{label}</Label>
+          <Select
+            value={current}
+            onValueChange={(v) => updateParam(p.key, v)}
+          >
+            <SelectTrigger id={id} className="mt-1">
+              <SelectValue placeholder={t('rfxs.specs_promptEditor_param_selectPlaceholder')} />
+            </SelectTrigger>
+            <SelectContent className="z-[10210]">
+              {REASONING_EFFORT_OPTIONS.map((opt) => (
+                <SelectItem key={opt} value={opt}>
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    if (p.type === 'verbosity') {
+      return (
+        <div key={p.key}>
+          <Label htmlFor={id}>{label}</Label>
+          <Select
+            value={current}
+            onValueChange={(v) => updateParam(p.key, v)}
+          >
+            <SelectTrigger id={id} className="mt-1">
+              <SelectValue placeholder={t('rfxs.specs_promptEditor_param_selectPlaceholder')} />
+            </SelectTrigger>
+            <SelectContent className="z-[10210]">
+              {VERBOSITY_OPTIONS.map((opt) => (
+                <SelectItem key={opt} value={opt}>
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      );
+    }
+
+    if (p.type === 'temperature') {
+      return (
+        <div key={p.key}>
+          <Label htmlFor={id}>{label}</Label>
+          <Input
+            id={id}
+            type="number"
+            step="0.1"
+            min={0}
+            max={2}
+            value={current}
+            onChange={(e) => updateParam(p.key, e.target.value)}
+            placeholder="0.0 - 2.0"
+            className="mt-1"
+          />
+        </div>
+      );
+    }
+
+    if (p.type === 'max_tokens') {
+      return (
+        <div key={p.key}>
+          <Label htmlFor={id}>{label}</Label>
+          <Input
+            id={id}
+            type="number"
+            min={1}
+            max={200000}
+            value={current}
+            onChange={(e) => updateParam(p.key, e.target.value)}
+            placeholder="1 - 200000"
+            className="mt-1"
+          />
+        </div>
+      );
+    }
+
+    // model (text input)
+    return (
+      <div key={p.key}>
+        <Label htmlFor={id}>{label}</Label>
+        <Input
+          id={id}
+          value={current}
+          onChange={(e) => updateParam(p.key, e.target.value)}
+          placeholder="e.g. gpt-5-mini"
+          className="mt-1"
+        />
+      </div>
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -292,13 +466,17 @@ const PromptEditorModal = ({
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="flex flex-wrap h-auto justify-start">
                 {groups.map((g) => {
-                  const groupHasChanges = g.prompts.some(
-                    (p) => (values[p.key] ?? '') !== (originalValues[p.key] ?? ''),
+                  const groupPromptDirty = g.prompts.some(
+                    (p) => (promptValues[p.key] ?? '') !== (originalPromptValues[p.key] ?? ''),
                   );
+                  const groupParamsDirty = (g.params ?? []).some(
+                    (p) => (paramValues[p.key] ?? '') !== (originalParamValues[p.key] ?? ''),
+                  );
+                  const dirty = groupPromptDirty || groupParamsDirty;
                   return (
                     <TabsTrigger key={g.id} value={g.id} className="relative">
                       {g.label}
-                      {groupHasChanges && (
+                      {dirty && (
                         <span className="ml-2 inline-block h-2 w-2 rounded-full bg-[#f4a9aa]" />
                       )}
                     </TabsTrigger>
@@ -313,13 +491,11 @@ const PromptEditorModal = ({
                   )}
                   {g.prompts.map((p) => (
                     <div key={p.key}>
-                      {p.label && (
-                        <Label htmlFor={`prompt-${p.key}`}>{p.label}</Label>
-                      )}
+                      {p.label && <Label htmlFor={`prompt-${p.key}`}>{p.label}</Label>}
                       <Textarea
                         id={`prompt-${p.key}`}
-                        value={values[p.key] ?? ''}
-                        onChange={(e) => updateValue(p.key, e.target.value)}
+                        value={promptValues[p.key] ?? ''}
+                        onChange={(e) => updatePrompt(p.key, e.target.value)}
                         rows={p.rows ?? 14}
                         className="mt-1 font-mono text-sm"
                         placeholder={
@@ -332,6 +508,16 @@ const PromptEditorModal = ({
                       )}
                     </div>
                   ))}
+                  {(g.params ?? []).length > 0 && (
+                    <div className="border-t pt-4">
+                      <h4 className="text-sm font-semibold mb-3">
+                        {t('rfxs.specs_promptEditor_paramsTitle')}
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {(g.params ?? []).map(renderParam)}
+                      </div>
+                    </div>
+                  )}
                 </TabsContent>
               ))}
             </Tabs>
@@ -350,7 +536,7 @@ const PromptEditorModal = ({
               />
               {isDirty && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  {t('rfxs.specs_promptEditor_dirtyCount', { count: dirtyKeys.length })}
+                  {t('rfxs.specs_promptEditor_dirtyCount', { count: totalDirty })}
                 </p>
               )}
             </div>
@@ -418,9 +604,7 @@ const PromptEditorModal = ({
                               {new Date(backup.created_at).toLocaleString()}
                             </span>
                           </div>
-                          {backup.comment && (
-                            <p className="text-sm">{backup.comment}</p>
-                          )}
+                          {backup.comment && <p className="text-sm">{backup.comment}</p>}
                         </div>
                         <Button
                           variant="outline"

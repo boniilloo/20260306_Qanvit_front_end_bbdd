@@ -223,7 +223,12 @@ export type Database = {
           created_at: string
           created_by: string
           embedding_model: number | null
+          evaluation_rubric_max_tokens: number | null
+          evaluation_rubric_model: string | null
           evaluation_rubric_prompt: string | null
+          evaluation_rubric_reasoning_effort: string | null
+          evaluation_rubric_temperature: number | null
+          evaluation_rubric_verbosity: string | null
           evaluations_system_prompt: string | null
           evaluations_user_prompt: string | null
           general_model: string | null
@@ -277,7 +282,12 @@ export type Database = {
           created_at?: string
           created_by: string
           embedding_model?: number | null
+          evaluation_rubric_max_tokens?: number | null
+          evaluation_rubric_model?: string | null
           evaluation_rubric_prompt?: string | null
+          evaluation_rubric_reasoning_effort?: string | null
+          evaluation_rubric_temperature?: number | null
+          evaluation_rubric_verbosity?: string | null
           evaluations_system_prompt?: string | null
           evaluations_user_prompt?: string | null
           general_model?: string | null
@@ -331,7 +341,12 @@ export type Database = {
           created_at?: string
           created_by?: string
           embedding_model?: number | null
+          evaluation_rubric_max_tokens?: number | null
+          evaluation_rubric_model?: string | null
           evaluation_rubric_prompt?: string | null
+          evaluation_rubric_reasoning_effort?: string | null
+          evaluation_rubric_temperature?: number | null
+          evaluation_rubric_verbosity?: string | null
           evaluations_system_prompt?: string | null
           evaluations_user_prompt?: string | null
           general_model?: string | null

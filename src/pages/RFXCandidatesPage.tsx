@@ -1224,6 +1224,12 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                   rows: 16,
                 },
               ],
+              params: [
+                { key: 'candidates_model', type: 'model' },
+                { key: 'candidates_temperature', type: 'temperature' },
+                { key: 'candidates_reasoning_effort', type: 'reasoning_effort' },
+                { key: 'candidates_verbosity', type: 'verbosity' },
+              ],
             },
             {
               id: 'rubric',
@@ -1234,6 +1240,13 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                   key: 'evaluation_rubric_prompt',
                   rows: 16,
                 },
+              ],
+              params: [
+                { key: 'evaluation_rubric_model', type: 'model' },
+                { key: 'evaluation_rubric_temperature', type: 'temperature' },
+                { key: 'evaluation_rubric_reasoning_effort', type: 'reasoning_effort' },
+                { key: 'evaluation_rubric_verbosity', type: 'verbosity' },
+                { key: 'evaluation_rubric_max_tokens', type: 'max_tokens' },
               ],
             },
             {
@@ -1252,22 +1265,12 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                   rows: 8,
                 },
               ],
-            },
-            {
-              id: 'company-evaluation',
-              label: t('rfxs.candidates_promptEditor_tab_companyEvaluation'),
-              description: t('rfxs.candidates_promptEditor_desc_companyEvaluation'),
-              prompts: [
-                {
-                  key: 'company_evaluation_system_prompt',
-                  label: t('rfxs.candidates_promptEditor_field_systemPrompt'),
-                  rows: 12,
-                },
-                {
-                  key: 'company_evaluation_user_prompt',
-                  label: t('rfxs.candidates_promptEditor_field_userPrompt'),
-                  rows: 8,
-                },
+              params: [
+                { key: 'get_evaluations_model', type: 'model' },
+                { key: 'get_evaluations_temperature', type: 'temperature' },
+                { key: 'get_evaluations_max_tokens', type: 'max_tokens' },
+                { key: 'get_evaluations_reasoning_effort', type: 'reasoning_effort' },
+                { key: 'get_evaluations_verbosity', type: 'verbosity' },
               ],
             },
             {
@@ -1293,6 +1296,12 @@ const RFXCandidatesPage: React.FC<RFXCandidatesPageProps> = ({
                   hint: t('rfxs.candidates_promptEditor_hint_enrichmentFollowup'),
                   rows: 6,
                 },
+              ],
+              params: [
+                { key: 'candidates_enrichment_model', type: 'model' },
+                { key: 'candidates_enrichment_temperature', type: 'temperature' },
+                { key: 'candidates_enrichment_reasoning_effort', type: 'reasoning_effort' },
+                { key: 'candidates_enrichment_verbosity', type: 'verbosity' },
               ],
             },
           ]}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import WorkflowCard, { type DiscardSuggestion } from './WorkflowCard';
@@ -22,7 +22,6 @@ interface WorkflowColumnProps {
   onDragStartCard: (card: WorkflowCardModel) => void;
   onDragEndCard: () => void;
   onDropCard: (stage: WorkflowStage, index: number) => void;
-  onAddTrigger?: (stage: WorkflowStage) => void;
   onOpenCardActions?: (card: WorkflowCardModel) => void;
   onDiscardCard?: (card: WorkflowCardModel, suggestedReason?: DiscardReason) => void;
   suggestionByCard?: Map<string, DiscardSuggestion>;
@@ -32,6 +31,7 @@ interface WorkflowColumnProps {
   renderCardExtras?: (card: WorkflowCardModel) => React.ReactNode;
   headerAction?: React.ReactNode;
   taskCountByCardId?: Map<string, number>;
+  onOpenMatchJustification?: (card: WorkflowCardModel) => void;
   overlay?: {
     label: string;
     ctaLabel: string;
@@ -49,7 +49,6 @@ const WorkflowColumn: React.FC<WorkflowColumnProps> = ({
   onDragStartCard,
   onDragEndCard,
   onDropCard,
-  onAddTrigger,
   onOpenCardActions,
   onDiscardCard,
   suggestionByCard,
@@ -59,6 +58,7 @@ const WorkflowColumn: React.FC<WorkflowColumnProps> = ({
   renderCardExtras,
   headerAction,
   taskCountByCardId,
+  onOpenMatchJustification,
   overlay,
 }) => {
   const { t } = useTranslation();
@@ -89,43 +89,48 @@ const WorkflowColumn: React.FC<WorkflowColumnProps> = ({
   };
 
   const dimmed = Boolean(overlay);
+  // Una columna se considera "urgente" cuando alguna de sus cards tiene una
+  // sugerencia activa (ej. la IA recomienda descartar). Lo resaltamos con un
+  // dot coral en el header para que el usuario detecte qué necesita acción.
+  const hasUrgent = !readOnly && Boolean(
+    suggestionByCard && cards.some((c) => suggestionByCard.has(c.id)),
+  );
 
   return (
     <div
       className={cn(
-        'relative flex flex-col bg-gray-50 rounded-lg min-w-[260px] w-[260px] shrink-0',
+        'relative flex flex-col rounded-lg min-w-[300px] w-[300px] shrink-0',
         isOver && 'ring-2 ring-[#f4a9aa]',
       )}
       onDragLeave={handleDragLeave}
     >
-      <div className="px-3 pt-3 pb-2 space-y-2">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-[#22183a] font-intro">
+      <div className="px-1 pt-1 pb-3 space-y-2">
+        <div
+          className={cn(
+            'flex items-center gap-2 pb-2 border-b',
+            hasUrgent ? 'border-[#f4a9aa]' : 'border-gray-200',
+          )}
+        >
+          {hasUrgent && (
+            <span
+              className="h-1.5 w-1.5 rounded-full bg-[#f4a9aa] animate-pulse"
+              aria-hidden
+            />
+          )}
+          <h3 className="text-sm font-semibold text-[#22183a] font-intro tracking-tight">
             {t(STAGE_I18N_KEYS[stage])}
           </h3>
-          <span className="text-xs text-gray-500 tabular-nums">{sorted.length}</span>
+          <span className="flex-1" />
+          <span className="text-[11px] tabular-nums text-[#22183a]/70 bg-[#f1e8f4] rounded-full px-2 py-0.5 min-w-[22px] text-center">
+            {sorted.length}
+          </span>
         </div>
         {headerAction && !dimmed && <div>{headerAction}</div>}
       </div>
 
-      {!readOnly && !dimmed && (
-        <button
-          type="button"
-          onClick={() => onAddTrigger?.(stage)}
-          className={cn(
-            'mx-3 mb-2 flex items-center justify-center gap-1 text-xs text-gray-600',
-            'border border-dashed border-gray-300 rounded-md py-1.5 bg-white',
-            'hover:border-[#f4a9aa] hover:text-[#22183a] transition-colors',
-          )}
-        >
-          <Plus className="h-3 w-3" />
-          {t('workflow.column.addTrigger')}
-        </button>
-      )}
-
       <div
         className={cn(
-          'flex-1 px-3 pb-3 space-y-2 overflow-y-auto min-h-[80px] transition-all',
+          'flex-1 px-1 pb-3 space-y-2.5 overflow-y-auto min-h-[80px] transition-all',
           dimmed && 'opacity-40 blur-[2px] pointer-events-none select-none',
         )}
         onDragOver={(e) => handleDragOver(e, sorted.length)}
@@ -153,6 +158,7 @@ const WorkflowColumn: React.FC<WorkflowColumnProps> = ({
               onRefreshNda={!readOnly && !dimmed ? onRefreshNda : undefined}
               refreshingNda={refreshingCardId === card.id}
               pendingTaskCount={taskCountByCardId?.get(card.id) ?? 0}
+              onOpenMatchJustification={onOpenMatchJustification}
             />
           </div>
         ))}

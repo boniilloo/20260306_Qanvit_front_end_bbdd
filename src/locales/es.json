@@ -3,7 +3,9 @@
     "loading": "Cargando...",
     "error": "Error",
     "cancel": "Cancelar",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "create": "Crear",
+    "save": "Guardar"
   },
   "onboardingIntent": {
     "dialogTitle": "Configuración de cuenta",
@@ -477,6 +479,13 @@
     "specs_editPrompt": "Editar prompt",
     "specs_editPromptTooltip": "Editar el prompt del asistente de RFX (solo desarrolladores)",
     "specs_promptEditor_rfxAssistantLabel": "RFX Assistant",
+    "specs_promptEditor_rfxAssistantDescription": "System prompt y parámetros del chat conversacional del sidebar (/ws-rfx-agent).",
+    "specs_promptEditor_proposeEditsLabel": "Propose Edits",
+    "specs_promptEditor_proposeEditsDescription": "Prompt y parámetros de la tool que genera propuestas de edición sobre las especificaciones.",
+    "specs_promptEditor_specsTitle": "Prompts — Especificaciones",
+    "specs_promptEditor_field_systemPrompt": "System prompt",
+    "specs_promptEditor_field_defaultLanguage": "Idioma por defecto",
+    "specs_promptEditor_hint_defaultLanguage": "Código o nombre del idioma que la tool debe asumir cuando la conversación no lo especifica (ej: 'es', 'en').",
     "specs_promptEditor_title": "Editor de prompt — {{prompt}}",
     "specs_promptEditor_description": "Modifica el prompt y guarda una nueva versión. Todas las versiones quedan registradas en el historial.",
     "specs_promptEditor_loading": "Cargando configuración...",
@@ -505,8 +514,15 @@
     "specs_promptEditor_saveError": "No se ha podido guardar el prompt.",
     "specs_promptEditor_activateError": "No se ha podido activar esta versión.",
     "specs_promptEditor_noActiveConfig": "No se encontró una configuración activa de referencia.",
-    "specs_promptEditor_dirtyCount_one": "Hay {{count}} prompt con cambios sin guardar.",
-    "specs_promptEditor_dirtyCount_other": "Hay {{count}} prompts con cambios sin guardar.",
+    "specs_promptEditor_dirtyCount_one": "Hay {{count}} campo con cambios sin guardar.",
+    "specs_promptEditor_dirtyCount_other": "Hay {{count}} campos con cambios sin guardar.",
+    "specs_promptEditor_paramsTitle": "Parámetros del modelo",
+    "specs_promptEditor_param_model": "Modelo",
+    "specs_promptEditor_param_reasoning_effort": "Reasoning effort",
+    "specs_promptEditor_param_verbosity": "Verbosidad",
+    "specs_promptEditor_param_temperature": "Temperatura",
+    "specs_promptEditor_param_max_tokens": "Max tokens",
+    "specs_promptEditor_param_selectPlaceholder": "Selecciona una opción",
     "specs_completeFieldsToProceed": "Completa los campos obligatorios para continuar",
     "specs_back": "Volver",
     "specs_generatingPdf": "Generando PDF...",
@@ -605,12 +621,10 @@
     "candidates_promptEditor_tab_chat": "Chat asistente",
     "candidates_promptEditor_tab_rubric": "Rúbrica",
     "candidates_promptEditor_tab_technicalEvaluation": "Evaluación técnica",
-    "candidates_promptEditor_tab_companyEvaluation": "Evaluación de empresa",
     "candidates_promptEditor_tab_enrichment": "Enrichment",
     "candidates_promptEditor_desc_chat": "System prompt del asistente del sidebar de candidatos (responde preguntas sobre los resultados de la evaluación).",
     "candidates_promptEditor_desc_rubric": "System prompt usado para generar la rúbrica de evaluación a partir de los requisitos del RFX.",
     "candidates_promptEditor_desc_technicalEvaluation": "Prompts que evalúan cada producto/candidato frente a la rúbrica técnica.",
-    "candidates_promptEditor_desc_companyEvaluation": "Prompts que evalúan la conformidad de la empresa frente a los requisitos de empresa.",
     "candidates_promptEditor_desc_enrichment": "Prompts del agente de enriquecimiento de empresas (noticias, personas, rondas, facturación, clasificación de etapa).",
     "candidates_promptEditor_field_systemPrompt": "System prompt",
     "candidates_promptEditor_field_userPrompt": "User prompt",
@@ -896,7 +910,7 @@
       "copyQuestionnaireLink": "Copiar link del cuestionario",
       "questionnaireLink": "Link del cuestionario",
       "tabQuestionnaire": "Cuestionario",
-      "tabDd": "Due Diligence",
+      "tabDd": "DD",
       "tabTimeline": "Historial",
       "specificEmpty": "Aún no hay preguntas específicas para esta empresa.",
       "specificGenerate": "Generar específicas",
@@ -964,6 +978,7 @@
       "addNoteRfx": "Añadir nota al reto",
       "addNoteCta": "Publicar nota",
       "placeholder": "Escribe lo que quieras que el equipo recuerde sobre esta tarjeta…",
+      "placeholderRfx": "Escribe lo que quieras que el equipo recuerde sobre este reto…",
       "editHint": "Podrás editar o borrar tu nota durante las 24 h posteriores.",
       "emptyCard": "Aún no hay eventos ni notas en esta tarjeta.",
       "emptyRfx": "Aún no hay notas del equipo en este reto.",
@@ -1001,7 +1016,11 @@
     "metrics": {
       "technology": "Tecnología",
       "traction": "Tracción",
-      "fit": "Encaje"
+      "fit": "Encaje",
+      "match": "Match"
+    },
+    "matchJustification": {
+      "openTooltip": "Ver razonamiento del match"
     },
     "badges": {
       "ndaSigned": "NDA firmado",
@@ -1082,7 +1101,10 @@
         "overduePrefix": "Fecha pasada",
         "noDate": "Sin fecha",
         "historyCount_one": "{{count}} reunión anterior",
-        "historyCount_other": "{{count}} reuniones anteriores"
+        "historyCount_other": "{{count}} reuniones anteriores",
+        "heldOn": "Reunión hecha el {{date}}",
+        "addSummary": "Añadir resumen",
+        "scheduleNext": "Programar otra"
       },
       "briefing": {
         "dialogTitle": "Briefing para la call con {{name}}",
@@ -1114,7 +1136,14 @@
           "medium": "media",
           "high": "alta"
         },
-        "disclaimer": "Generado por IA a partir de tus notas. Es un punto de partida, no una conclusión."
+        "disclaimer": "Generado por IA a partir de tus notas. Es un punto de partida, no una conclusión.",
+        "editNotes": "Editar notas",
+        "saveAndRegenerate": "Guardar y regenerar resumen",
+        "cancelEdit": "Cancelar",
+        "notesPlaceholder": "Escribe aquí las notas de la call",
+        "regenerating": "Generando resumen con IA…",
+        "regenerateError": "No se pudo regenerar el resumen.",
+        "savedToast": "Resumen actualizado"
       },
       "shortlist": {
         "headerGenerate": "Generar shortlist",
@@ -1189,31 +1218,10 @@
       }
     },
     "column": {
-      "addTrigger": "+ Add trigger",
       "questionnaireRequiredDesc": "Genera el cuestionario para empezar a contactar a estas startups.",
       "generateQuestionnaire": "Generar cuestionario",
       "rubricRequiredDesc": "Define y publica la rúbrica para poder evaluar las respuestas.",
       "generateRubric": "Definir rúbrica"
-    },
-    "sidebar": {
-      "sectionLabel": "Interview",
-      "addTrigger": "Add trigger",
-      "workingWithTriggers": "Working with triggers"
-    },
-    "triggers": {
-      "sendMessage": "Enviar mensaje",
-      "addNote": "Añadir nota",
-      "tagCandidate": "Etiquetar candidato",
-      "shareTeam": "Compartir con equipo",
-      "adviceFit": "Consejos y encaje",
-      "talkQanvit": "Hablar con Qanvit",
-      "scheduleSession": "Programar sesión",
-      "sendNda": "Enviar NDA",
-      "requestExpert": "Solicitar experto",
-      "evaluateMarket": "Evaluar mercado",
-      "advanceComment": "Avanzar y comentar",
-      "sendRfxTest": "Enviar test RFX",
-      "restrict": "Restringir"
     },
     "header": {
       "back": "Volver",
@@ -1229,6 +1237,7 @@
       "rfxTimelineTooltip": "Bitácora del reto: notas del equipo y eventos clave de todas las tarjetas.",
       "rfxTimelineDesc": "Notas del equipo y eventos ordenados cronológicamente. Las notas son editables por su autor durante 24 h.",
       "rubricNeedsQuestionnaire": "Publica primero el cuestionario para poder definir la rúbrica.",
+      "resourcesAria": "Recursos del reto",
       "stats": {
         "total": "Total",
         "active": "Activas",
@@ -1236,8 +1245,6 @@
       }
     },
     "toasts": {
-      "triggerComingSoonTitle": "Próximamente",
-      "triggerComingSoonDesc": "El trigger \"{{trigger}}\" estará disponible muy pronto.",
       "comingSoonTitle": "Próximamente",
       "addStartupDesc": "La opción para añadir startups manualmente llegará en una próxima iteración."
     },
@@ -1362,6 +1369,8 @@
         "request_dd_item_other": "{{count}} documentos por pedir",
         "review_dd_item": "{{count}} documento por revisar",
         "review_dd_item_other": "{{count}} documentos por revisar",
+        "contact_candidate": "{{count}} empresa por contactar",
+        "contact_candidate_other": "{{count}} empresas por contactar",
         "stale_contact": "{{count}} contacto sin respuesta",
         "stale_contact_other": "{{count}} contactos sin respuesta"
       },
@@ -1383,13 +1392,15 @@
         "chaseNdaSignature": "Perseguir firma de NDA",
         "requestDdItem": "Pedir documento DD",
         "reviewDdItem": "Revisar documento DD",
+        "contactCandidate": "Contactar con la empresa",
         "staleContact": "Sin respuesta al contacto",
         "noMovement": "Tarjeta sin movimiento"
       },
       "row": {
         "daysWaiting": "Hace {{count}} día",
         "daysWaiting_other": "Hace {{count}} días",
-        "due": "Vence {{date}}"
+        "due": "Vence {{date}}",
+        "markContacted": "Marcar como contactada"
       },
       "card": {
         "countTooltip": "{{count}} tarea pendiente en esta tarjeta",

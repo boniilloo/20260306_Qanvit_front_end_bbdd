@@ -77,38 +77,6 @@ interface AgentConfig {
   ai_company_completion_verbosity?: string;
   ai_company_completion_language?: string;
   
-  // Technical Info Node parameters
-  technical_info_node_prompt?: string;
-  technical_info_node_model?: string;
-  technical_info_node_temperature?: number;
-  technical_info_node_max_tokens?: number;
-  technical_info_node_verbosity?: string;
-  technical_info_node_reasoning_effort?: string;
-  
-  // Technical Decision Node parameters
-  technical_decision_node_prompt?: string;
-  technical_decision_node_model?: string;
-  technical_decision_node_temperature?: number;
-  technical_decision_node_max_tokens?: number;
-  technical_decision_node_verbosity?: string;
-  technical_decision_node_reasoning_effort?: string;
-  
-  // Company Info Node parameters
-  company_info_node_prompt?: string;
-  company_info_node_model?: string;
-  company_info_node_temperature?: number;
-  company_info_node_max_tokens?: number;
-  company_info_node_verbosity?: string;
-  company_info_node_reasoning_effort?: string;
-  
-  // Company Decision Node parameters
-  company_decision_node_prompt?: string;
-  company_decision_node_model?: string;
-  company_decision_node_temperature?: number;
-  company_decision_node_max_tokens?: number;
-  company_decision_node_verbosity?: string;
-  company_decision_node_reasoning_effort?: string;
-  
   // Evaluation Node parameters
   evaluation_node_prompt?: string;
   evaluation_node_model?: string;
@@ -117,23 +85,13 @@ interface AgentConfig {
   evaluation_node_verbosity?: string;
   evaluation_node_reasoning_effort?: string;
   
-  // Company Evaluation parameters
-  company_evaluation_system_prompt?: string;
-  company_evaluation_user_prompt?: string;
-  company_evaluation_model?: string;
-  company_evaluation_temperature?: number;
-  company_evaluation_max_tokens?: number;
-  company_evaluation_verbosity?: string;
-  company_evaluation_reasoning_effort?: string;
-  company_evaluation_response_format?: string;
-  
   // RFX Conversational parameters
   rfx_conversational_system_prompt?: string;
-  
+
   // Propose Edits parameters
   propose_edits_system_prompt?: string;
   propose_edits_default_language?: string;
-  
+
   // RFX Analysis parameters
   rfx_analysis_system_prompt?: string;
   rfx_analysis_user_prompt?: string;
@@ -219,38 +177,6 @@ interface BackupConfig {
   ai_company_completion_verbosity?: string;
   ai_company_completion_language?: string;
   
-  // Technical Info Node parameters
-  technical_info_node_prompt?: string;
-  technical_info_node_model?: string;
-  technical_info_node_temperature?: number;
-  technical_info_node_max_tokens?: number;
-  technical_info_node_verbosity?: string;
-  technical_info_node_reasoning_effort?: string;
-  
-  // Technical Decision Node parameters
-  technical_decision_node_prompt?: string;
-  technical_decision_node_model?: string;
-  technical_decision_node_temperature?: number;
-  technical_decision_node_max_tokens?: number;
-  technical_decision_node_verbosity?: string;
-  technical_decision_node_reasoning_effort?: string;
-  
-  // Company Info Node parameters
-  company_info_node_prompt?: string;
-  company_info_node_model?: string;
-  company_info_node_temperature?: number;
-  company_info_node_max_tokens?: number;
-  company_info_node_verbosity?: string;
-  company_info_node_reasoning_effort?: string;
-  
-  // Company Decision Node parameters
-  company_decision_node_prompt?: string;
-  company_decision_node_model?: string;
-  company_decision_node_temperature?: number;
-  company_decision_node_max_tokens?: number;
-  company_decision_node_verbosity?: string;
-  company_decision_node_reasoning_effort?: string;
-  
   // Evaluation Node parameters
   evaluation_node_prompt?: string;
   evaluation_node_model?: string;
@@ -258,20 +184,10 @@ interface BackupConfig {
   evaluation_node_max_tokens?: number;
   evaluation_node_verbosity?: string;
   evaluation_node_reasoning_effort?: string;
-  
-  // Company Evaluation parameters
-  company_evaluation_system_prompt?: string;
-  company_evaluation_user_prompt?: string;
-  company_evaluation_model?: string;
-  company_evaluation_temperature?: number;
-  company_evaluation_max_tokens?: number;
-  company_evaluation_verbosity?: string;
-  company_evaluation_reasoning_effort?: string;
-  company_evaluation_response_format?: string;
-  
+
   // RFX Conversational parameters
   rfx_conversational_system_prompt?: string;
-  
+
   // Propose Edits parameters
   propose_edits_system_prompt?: string;
   propose_edits_default_language?: string;
@@ -493,144 +409,6 @@ const LLMGroupExtended = ({
   </Card>
 );
 
-// Company Evaluation Group with system_prompt, user_prompt, and response_format
-const CompanyEvaluationGroup = ({ 
-  title, 
-  prefix, 
-  description, 
-  config,
-  updateConfigValue
-}: { 
-  title: string; 
-  prefix: string; 
-  description: string;
-  config: AgentConfig;
-  updateConfigValue: (key: keyof AgentConfig, value: any) => void;
-}) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2">
-        <Bot className="h-5 w-5" />
-        {title}
-      </CardTitle>
-      <CardDescription>{description}</CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div>
-        <Label htmlFor={`${prefix}_system_prompt`}>System Prompt</Label>
-        <Textarea
-          id={`${prefix}_system_prompt`}
-          value={config[`${prefix}_system_prompt` as keyof AgentConfig] as string || ''}
-          onChange={(e) => updateConfigValue(`${prefix}_system_prompt` as keyof AgentConfig, e.target.value)}
-          rows={8}
-          className="mt-1"
-          placeholder="System prompt for company evaluation..."
-        />
-      </div>
-      
-      <div>
-        <Label htmlFor={`${prefix}_user_prompt`}>User Prompt</Label>
-        <Textarea
-          id={`${prefix}_user_prompt`}
-          value={config[`${prefix}_user_prompt` as keyof AgentConfig] as string || ''}
-          onChange={(e) => updateConfigValue(`${prefix}_user_prompt` as keyof AgentConfig, e.target.value)}
-          rows={8}
-          className="mt-1"
-          placeholder="User prompt template for company evaluation..."
-        />
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor={`${prefix}_model`}>Model</Label>
-          <Input
-            id={`${prefix}_model`}
-            value={config[`${prefix}_model` as keyof AgentConfig] as string || ''}
-            onChange={(e) => updateConfigValue(`${prefix}_model` as keyof AgentConfig, e.target.value)}
-            placeholder="e.g., gpt-5-nano, gpt-4o-mini"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor={`${prefix}_temperature`}>Temperature</Label>
-          <Input
-            id={`${prefix}_temperature`}
-            type="number"
-            step="0.1"
-            min="0"
-            max="2"
-            value={config[`${prefix}_temperature` as keyof AgentConfig] as number || 0.1}
-            onChange={(e) => updateConfigValue(`${prefix}_temperature` as keyof AgentConfig, parseFloat(e.target.value))}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor={`${prefix}_max_tokens`}>Max Tokens</Label>
-          <Input
-            id={`${prefix}_max_tokens`}
-            type="number"
-            min="100"
-            max="10000"
-            value={config[`${prefix}_max_tokens` as keyof AgentConfig] as number || 500}
-            onChange={(e) => updateConfigValue(`${prefix}_max_tokens` as keyof AgentConfig, parseInt(e.target.value))}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor={`${prefix}_verbosity`}>Verbosity</Label>
-          <Select
-            value={config[`${prefix}_verbosity` as keyof AgentConfig] as string || 'low'}
-            onValueChange={(value) => updateConfigValue(`${prefix}_verbosity` as keyof AgentConfig, value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select verbosity level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor={`${prefix}_reasoning_effort`}>Reasoning Effort</Label>
-          <Select
-            value={config[`${prefix}_reasoning_effort` as keyof AgentConfig] as string || 'low'}
-            onValueChange={(value) => updateConfigValue(`${prefix}_reasoning_effort` as keyof AgentConfig, value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select reasoning effort" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="minimal">Minimal</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor={`${prefix}_response_format`}>Response Format</Label>
-          <Select
-            value={config[`${prefix}_response_format` as keyof AgentConfig] as string || 'json_object'}
-            onValueChange={(value) => updateConfigValue(`${prefix}_response_format` as keyof AgentConfig, value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select response format" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="json_object">JSON Object</SelectItem>
-              <SelectItem value="text">Text</SelectItem>
-              <SelectItem value="markdown">Markdown</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-);
 
 const SettingsTab = () => {
   const [config, setConfig] = useState<AgentConfig>({});
@@ -706,39 +484,7 @@ const SettingsTab = () => {
           ai_company_completion_reasoning_effort: "medium",
           ai_company_completion_verbosity: "medium",
           ai_company_completion_language: "en",
-          
-          // Technical Info Node defaults
-          technical_info_node_prompt: "You are an expert at providing technical information about products and services.",
-          technical_info_node_model: "gpt-5-mini",
-          technical_info_node_temperature: 0.1,
-          technical_info_node_max_tokens: 1000,
-          technical_info_node_verbosity: "low",
-          technical_info_node_reasoning_effort: "medium",
-          
-          // Technical Decision Node defaults
-          technical_decision_node_prompt: "You are an expert at making technical decisions based on product specifications and requirements.",
-          technical_decision_node_model: "gpt-5-mini",
-          technical_decision_node_temperature: 0.1,
-          technical_decision_node_max_tokens: 200,
-          technical_decision_node_verbosity: "low",
-          technical_decision_node_reasoning_effort: "low",
-          
-          // Company Info Node defaults
-          company_info_node_prompt: "You are an expert at providing detailed company information and business insights.",
-          company_info_node_model: "gpt-5-mini",
-          company_info_node_temperature: 0.1,
-          company_info_node_max_tokens: 1000,
-          company_info_node_verbosity: "low",
-          company_info_node_reasoning_effort: "medium",
-          
-          // Company Decision Node defaults
-          company_decision_node_prompt: "You are an expert at making business decisions based on company data and market conditions.",
-          company_decision_node_model: "gpt-5-mini",
-          company_decision_node_temperature: 0.1,
-          company_decision_node_max_tokens: 200,
-          company_decision_node_verbosity: "low",
-          company_decision_node_reasoning_effort: "low",
-          
+
           // Evaluation Node defaults
           evaluation_node_prompt: "You are an expert at evaluating products and services based on technical specifications and market requirements.",
           evaluation_node_model: "gpt-5-mini",
@@ -746,16 +492,6 @@ const SettingsTab = () => {
           evaluation_node_max_tokens: 2000,
           evaluation_node_verbosity: "low",
           evaluation_node_reasoning_effort: "medium",
-          
-          // Company Evaluation defaults
-          company_evaluation_system_prompt: "You are an expert at evaluating companies based on their business profile, capabilities, and market position.",
-          company_evaluation_user_prompt: "Evaluate the following company: {company_data}",
-          company_evaluation_model: "gpt-5-nano",
-          company_evaluation_temperature: 0.1,
-          company_evaluation_max_tokens: 500,
-          company_evaluation_verbosity: "low",
-          company_evaluation_reasoning_effort: "low",
-          company_evaluation_response_format: "json_object"
         };
         
         setConfig(defaultConfig);
@@ -949,20 +685,11 @@ const SettingsTab = () => {
         </TabsList>
         
         {/* Third Tab Row */}
-        <TabsList className="grid w-full grid-cols-4 mb-2">
-          <TabsTrigger value="technical-info-node">Technical Info Node</TabsTrigger>
-          <TabsTrigger value="technical-decision-node">Technical Decision Node</TabsTrigger>
-          <TabsTrigger value="company-info-node">Company Info Node</TabsTrigger>
-          <TabsTrigger value="company-decision-node">Company Decision Node</TabsTrigger>
-        </TabsList>
-        
-        {/* Fourth Tab Row */}
-        <TabsList className="grid w-full grid-cols-2 mb-2">
+        <TabsList className="grid w-full grid-cols-1 mb-2">
           <TabsTrigger value="evaluation-node">Evaluation Node</TabsTrigger>
-          <TabsTrigger value="company-evaluation">Company Evaluation</TabsTrigger>
         </TabsList>
-        
-        {/* Fifth Tab Row */}
+
+        {/* Fourth Tab Row */}
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-4">
           <TabsTrigger value="rfx-conversational">RFX Conversational</TabsTrigger>
           <TabsTrigger value="rfx-home-bootstrap">RFX Home Bootstrap</TabsTrigger>
@@ -1536,66 +1263,12 @@ const SettingsTab = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="technical-info-node" className="space-y-6">
-          <LLMGroupExtended
-            title="Technical Info Node"
-            prefix="technical_info_node"
-            description="Provides detailed technical information about products and services"
-            promptKey="technical_info_node_prompt"
-            config={config}
-            updateConfigValue={updateConfigValue}
-          />
-        </TabsContent>
-
-        <TabsContent value="technical-decision-node" className="space-y-6">
-          <LLMGroupExtended
-            title="Technical Decision Node"
-            prefix="technical_decision_node"
-            description="Makes technical decisions based on product specifications and requirements"
-            promptKey="technical_decision_node_prompt"
-            config={config}
-            updateConfigValue={updateConfigValue}
-          />
-        </TabsContent>
-
-        <TabsContent value="company-info-node" className="space-y-6">
-          <LLMGroupExtended
-            title="Company Info Node"
-            prefix="company_info_node"
-            description="Provides detailed company information and business insights"
-            promptKey="company_info_node_prompt"
-            config={config}
-            updateConfigValue={updateConfigValue}
-          />
-        </TabsContent>
-
-        <TabsContent value="company-decision-node" className="space-y-6">
-          <LLMGroupExtended
-            title="Company Decision Node"
-            prefix="company_decision_node"
-            description="Makes business decisions based on company data and market conditions"
-            promptKey="company_decision_node_prompt"
-            config={config}
-            updateConfigValue={updateConfigValue}
-          />
-        </TabsContent>
-
         <TabsContent value="evaluation-node" className="space-y-6">
           <LLMGroupExtended
             title="Evaluation Node"
             prefix="evaluation_node"
             description="Evaluates products and services based on technical specifications and market requirements"
             promptKey="evaluation_node_prompt"
-            config={config}
-            updateConfigValue={updateConfigValue}
-          />
-        </TabsContent>
-
-        <TabsContent value="company-evaluation" className="space-y-6">
-          <CompanyEvaluationGroup
-            title="Company Evaluation"
-            prefix="company_evaluation"
-            description="Evaluates companies based on their business profile, capabilities, and market position"
             config={config}
             updateConfigValue={updateConfigValue}
           />

@@ -1438,18 +1438,48 @@ const RFXSpecsPage = () => {
         <PromptEditorModal
           open={showPromptEditor}
           onOpenChange={setShowPromptEditor}
-          title={t('rfxs.specs_promptEditor_title', {
-            prompt: t('rfxs.specs_promptEditor_rfxAssistantLabel'),
-          })}
+          title={t('rfxs.specs_promptEditor_specsTitle')}
           groups={[
             {
               id: 'rfx-assistant',
               label: t('rfxs.specs_promptEditor_rfxAssistantLabel'),
+              description: t('rfxs.specs_promptEditor_rfxAssistantDescription'),
               prompts: [
                 {
                   key: 'rfx_conversational_system_prompt',
                   rows: 16,
                 },
+              ],
+              params: [
+                { key: 'rfx_conversational_model', type: 'model' },
+                { key: 'rfx_conversational_temperature', type: 'temperature' },
+                { key: 'rfx_conversational_reasoning_effort', type: 'reasoning_effort' },
+                { key: 'rfx_conversational_verbosity', type: 'verbosity' },
+                { key: 'rfx_conversational_max_tokens', type: 'max_tokens' },
+              ],
+            },
+            {
+              id: 'propose-edits',
+              label: t('rfxs.specs_promptEditor_proposeEditsLabel'),
+              description: t('rfxs.specs_promptEditor_proposeEditsDescription'),
+              prompts: [
+                {
+                  key: 'propose_edits_system_prompt',
+                  label: t('rfxs.specs_promptEditor_field_systemPrompt'),
+                  rows: 14,
+                },
+                {
+                  key: 'propose_edits_default_language',
+                  label: t('rfxs.specs_promptEditor_field_defaultLanguage'),
+                  hint: t('rfxs.specs_promptEditor_hint_defaultLanguage'),
+                  rows: 2,
+                },
+              ],
+              params: [
+                { key: 'propose_edits_model', type: 'model' },
+                { key: 'propose_edits_temperature', type: 'temperature' },
+                { key: 'propose_edits_reasoning_effort', type: 'reasoning_effort' },
+                { key: 'propose_edits_max_tokens', type: 'max_tokens' },
               ],
             },
           ]}

@@ -102,6 +102,7 @@ export interface WorkflowCard {
   discard_comment: string | null;
   discarded_at: string | null;
   discarded_by: string | null;
+  contacted_at: string | null;
   created_at: string;
   updated_at: string;
 }

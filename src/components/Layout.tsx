@@ -140,7 +140,7 @@ const MainContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <div
-      className={`flex-1 min-h-screen bg-background transition-all duration-300 ease-in-out ${
+      className={`flex-1 min-w-0 min-h-screen bg-background transition-all duration-300 ease-in-out ${
         isMobile ? 'pt-14' : 'pt-0'
       }`}
     >

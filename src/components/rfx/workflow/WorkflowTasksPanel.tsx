@@ -22,6 +22,8 @@ import {
   Scale,
   Users,
   FilePlus,
+  Mail,
+  Check,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,6 +46,8 @@ interface Props {
   candidateNameByCardId: Map<string, string>;
   onNewTask: () => void;
   onTaskClick: (task: UnifiedTask) => void;
+  // Marca manualmente una tarjeta como contactada (cierra contact_candidate).
+  onMarkContacted: (cardId: string) => void;
 }
 
 const derivedKindIcon = (kind: DerivedTaskKind) => {
@@ -58,6 +62,7 @@ const derivedKindIcon = (kind: DerivedTaskKind) => {
     case 'chase_nda_signature': return FileClock;
     case 'request_dd_item': return ShieldAlert;
     case 'review_dd_item': return FileSearch;
+    case 'contact_candidate': return Mail;
     case 'stale_contact': return Hourglass;
     case 'no_movement': return Hourglass;
     default: return ClipboardList;
@@ -82,11 +87,13 @@ const WorkflowTasksPanel: React.FC<Props> = ({
   candidateNameByCardId,
   onNewTask,
   onTaskClick,
+  onMarkContacted,
 }) => {
   const { t } = useTranslation();
-  // Abierto por defecto: el usuario entra al workflow y lo primero que debería
-  // ver es su lista de pendientes. Un click en el header colapsa si quiere espacio.
-  const [expanded, setExpanded] = useState<boolean>(true);
+  // Colapsado por defecto: ahora vive en la parte inferior de la página, así que
+  // arranca cerrado para no robar pantalla; el contador del header indica si hay
+  // algo pendiente y un click lo despliega.
+  const [expanded, setExpanded] = useState<boolean>(false);
 
   const summary = useMemo(() => {
     const breakdown = new Map<DerivedTaskKind, number>();
@@ -121,6 +128,7 @@ const WorkflowTasksPanel: React.FC<Props> = ({
       'chase_nda_signature',
       'review_dd_item',
       'request_dd_item',
+      'contact_candidate',
       'stale_contact',
     ];
     for (const kind of ordered) {
@@ -137,73 +145,87 @@ const WorkflowTasksPanel: React.FC<Props> = ({
     return parts.join(' · ');
   }, [summary, t]);
 
+  if (!expanded) {
+    return (
+      <button
+        type="button"
+        onClick={() => setExpanded(true)}
+        className="fixed left-1/2 -translate-x-1/2 bottom-24 z-40 flex items-center gap-3 bg-[#22183a] text-white pl-4 pr-1.5 py-1.5 rounded-full shadow-[0_12px_32px_-10px_rgba(34,24,58,0.4)] hover:bg-[#22183a]/90 transition-colors max-w-[calc(100vw-64px)]"
+        title={t('workflow.tasks.panel.title') as string}
+      >
+        <ClipboardList className="h-4 w-4 shrink-0" />
+        <span className="text-sm font-medium whitespace-nowrap">
+          {t('workflow.tasks.panel.title')}
+        </span>
+        {openCount > 0 && (
+          <span className="bg-[#f4a9aa] text-[#22183a] text-[11px] font-semibold rounded-full px-2 py-0.5 tabular-nums">
+            {openCount}
+          </span>
+        )}
+        <span className="hidden md:inline-block text-[11px] text-white/60 border-l border-white/15 pl-3 max-w-[260px] truncate whitespace-nowrap">
+          {summarySentence}
+        </span>
+        <span className="ml-1 h-7 w-7 rounded-full bg-white/10 grid place-items-center text-white text-xs">
+          <ChevronRight className="h-3.5 w-3.5 rotate-90" />
+        </span>
+      </button>
+    );
+  }
+
   return (
-    <div className="px-4 md:px-6 pt-3 pb-0">
-      <div className="border border-gray-200 rounded-lg bg-white shadow-sm">
+    <div
+      className="fixed left-1/2 -translate-x-1/2 bottom-24 z-40 bg-white border border-gray-200 rounded-xl shadow-[0_24px_60px_-20px_rgba(34,24,58,0.3)] overflow-hidden"
+      style={{ width: 'min(720px, calc(100vw - 64px))' }}
+    >
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200 bg-white">
+        <ClipboardList className="h-4 w-4 text-[#22183a] shrink-0" />
+        <span className="text-sm font-semibold text-[#22183a]">
+          {t('workflow.tasks.panel.title')}
+        </span>
+        {openCount > 0 && (
+          <Badge className="bg-[#f4a9aa] text-[#22183a] hover:bg-[#f4a9aa]/90">
+            {openCount}
+          </Badge>
+        )}
+        <span className="flex-1" />
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onNewTask}
+          className="border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
+        >
+          <Plus className="h-3.5 w-3.5 mr-1" />
+          {t('workflow.tasks.panel.newTask')}
+        </Button>
         <button
           type="button"
-          onClick={() => setExpanded((v) => !v)}
-          className="w-full flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-gray-50 rounded-lg"
+          onClick={() => setExpanded(false)}
+          className="h-7 w-7 rounded-full grid place-items-center text-gray-500 hover:bg-gray-100 hover:text-[#22183a]"
+          aria-label={t('common.close') as string}
         >
-          <div className="flex items-center gap-2 min-w-0">
-            {expanded ? (
-              <ChevronDown className="h-4 w-4 text-gray-500 shrink-0" />
-            ) : (
-              <ChevronRight className="h-4 w-4 text-gray-500 shrink-0" />
-            )}
-            <ClipboardList className="h-4 w-4 text-[#22183a] shrink-0" />
-            <div className="min-w-0 text-left">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-[#22183a]">
-                  {t('workflow.tasks.panel.title')}
-                </span>
-                {openCount > 0 && (
-                  <Badge className="bg-[#f4a9aa] text-[#22183a] hover:bg-[#f4a9aa]/90">
-                    {openCount}
-                  </Badge>
-                )}
-              </div>
-              <p className="text-xs text-gray-600 truncate">{summarySentence}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNewTask();
-              }}
-              className="border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
-            >
-              <Plus className="h-3.5 w-3.5 mr-1" />
-              {t('workflow.tasks.panel.newTask')}
-            </Button>
-          </div>
+          <ChevronDown className="h-4 w-4" />
         </button>
-
-        {expanded && (
-          <div className="border-t border-gray-100 max-h-[40vh] overflow-y-auto">
-            {loading && groups.length === 0 ? (
-              <p className="text-xs text-gray-500 py-6 text-center">
-                {t('common.loading')}
-              </p>
-            ) : groups.length === 0 ? (
-              <p className="text-xs text-gray-500 py-6 text-center flex items-center justify-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                {t('workflow.tasks.panel.empty')}
-              </p>
-            ) : (
-              groups.map((group) => (
-                <TaskGroupBlock
-                  key={group.key}
-                  group={group}
-                  candidateNameByCardId={candidateNameByCardId}
-                  onTaskClick={onTaskClick}
-                />
-              ))
-            )}
-          </div>
+      </div>
+      <div className="max-h-[40vh] overflow-y-auto">
+        {loading && groups.length === 0 ? (
+          <p className="text-xs text-gray-500 py-6 text-center">
+            {t('common.loading')}
+          </p>
+        ) : groups.length === 0 ? (
+          <p className="text-xs text-gray-500 py-6 text-center flex items-center justify-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+            {t('workflow.tasks.panel.empty')}
+          </p>
+        ) : (
+          groups.map((group) => (
+            <TaskGroupBlock
+              key={group.key}
+              group={group}
+              candidateNameByCardId={candidateNameByCardId}
+              onTaskClick={onTaskClick}
+              onMarkContacted={onMarkContacted}
+            />
+          ))
         )}
       </div>
     </div>
@@ -214,9 +236,15 @@ interface GroupProps {
   group: TaskGroup;
   candidateNameByCardId: Map<string, string>;
   onTaskClick: (task: UnifiedTask) => void;
+  onMarkContacted: (cardId: string) => void;
 }
 
-const TaskGroupBlock: React.FC<GroupProps> = ({ group, candidateNameByCardId, onTaskClick }) => {
+const TaskGroupBlock: React.FC<GroupProps> = ({
+  group,
+  candidateNameByCardId,
+  onTaskClick,
+  onMarkContacted,
+}) => {
   const { t } = useTranslation();
   const label =
     group.key === 'general'
@@ -235,6 +263,7 @@ const TaskGroupBlock: React.FC<GroupProps> = ({ group, candidateNameByCardId, on
             task={task}
             candidateNameByCardId={candidateNameByCardId}
             onClick={() => onTaskClick(task)}
+            onMarkContacted={onMarkContacted}
           />
         ))}
       </ul>
@@ -246,9 +275,15 @@ interface RowProps {
   task: UnifiedTask;
   candidateNameByCardId: Map<string, string>;
   onClick: () => void;
+  onMarkContacted: (cardId: string) => void;
 }
 
-const TaskRow: React.FC<RowProps> = ({ task, candidateNameByCardId, onClick }) => {
+const TaskRow: React.FC<RowProps> = ({
+  task,
+  candidateNameByCardId,
+  onClick,
+  onMarkContacted,
+}) => {
   const { t } = useTranslation();
   const candidate = task.card_id ? candidateNameByCardId.get(task.card_id) : null;
 
@@ -261,8 +296,10 @@ const TaskRow: React.FC<RowProps> = ({ task, candidateNameByCardId, onClick }) =
       task.kind === 'request_dd_item' || task.kind === 'review_dd_item'
         ? (meta.item_label as string | undefined) ?? null
         : null;
+    const canMarkContacted =
+      task.kind === 'contact_candidate' && task.card_id !== null;
     return (
-      <li>
+      <li className="relative group">
         <button
           type="button"
           onClick={onClick}
@@ -293,6 +330,19 @@ const TaskRow: React.FC<RowProps> = ({ task, candidateNameByCardId, onClick }) =
             )}
           </div>
         </button>
+        {canMarkContacted && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (task.card_id) onMarkContacted(task.card_id);
+            }}
+            title={t('workflow.tasks.row.markContacted') as string}
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 rounded-md bg-white border border-gray-200 shadow-sm flex items-center justify-center text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300 opacity-0 group-hover:opacity-100 focus:opacity-100"
+          >
+            <Check className="h-3.5 w-3.5" />
+          </button>
+        )}
       </li>
     );
   }

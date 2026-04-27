@@ -27,6 +27,7 @@ const mapRow = (row: any): WorkflowCard => ({
   discard_comment: row.discard_comment ?? null,
   discarded_at: row.discarded_at ?? null,
   discarded_by: row.discarded_by ?? null,
+  contacted_at: row.contacted_at ?? null,
   created_at: row.created_at,
   updated_at: row.updated_at,
 });
@@ -261,5 +262,36 @@ export const useRFXWorkflowCards = (
     [readOnly, toast, load],
   );
 
-  return { cards, loading, moveCard, discardCard, updateCard, reload: load };
+  // Marca/desmarca manualmente el contacto. Cierra la tarea derivada "contact_candidate"
+  // sin avanzar la tarjeta de stage (el avance ocurre solo cuando la startup contesta
+  // el cuestionario y un trigger SQL pasa la card a 'review_responses').
+  const setContacted = useCallback(
+    async (cardId: string, value: boolean) => {
+      if (readOnly) return;
+      const next = value ? new Date().toISOString() : null;
+      setCards((prev) =>
+        prev.map((c) => (c.id === cardId ? { ...c, contacted_at: next } : c)),
+      );
+      const { error } = await supabase
+        .from('rfx_workflow_cards' as any)
+        .update({ contacted_at: next })
+        .eq('id', cardId);
+      if (error) {
+        console.error('[useRFXWorkflowCards] setContacted error', error);
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        await load();
+      }
+    },
+    [readOnly, toast, load],
+  );
+
+  return {
+    cards,
+    loading,
+    moveCard,
+    discardCard,
+    updateCard,
+    setContacted,
+    reload: load,
+  };
 };

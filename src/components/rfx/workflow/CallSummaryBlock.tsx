@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Calendar,
@@ -30,6 +30,9 @@ export type CallAction =
 interface CallSummaryBlockProps {
   cardId: string;
   onAction: (action: CallAction) => void;
+  // Nonce gestionado por el padre: cada vez que cambia, recargamos las calls
+  // localmente sin esperar al evento Realtime de Supabase.
+  refreshKey?: number;
 }
 
 const formatDate = (iso: string | null, locale: string): string => {
@@ -60,11 +63,23 @@ const VERDICT_STYLES: Record<CallVerdict, { pill: string; icon: React.ReactNode 
   },
 };
 
-const CallSummaryBlock: React.FC<CallSummaryBlockProps> = ({ cardId, onAction }) => {
+const CallSummaryBlock: React.FC<CallSummaryBlockProps> = ({
+  cardId,
+  onAction,
+  refreshKey = 0,
+}) => {
   const { t, i18n } = useTranslation();
-  const { upcoming, history, loading } = useWorkflowCalls(cardId);
+  const { upcoming, history, loading, reload } = useWorkflowCalls(cardId);
 
-  const lastWithSummary = history.find((c) => c.summary);
+  // Padre acaba de mutar las calls de esta tarjeta: recargamos sin depender de Realtime.
+  useEffect(() => {
+    if (refreshKey === 0) return;
+    void reload();
+  }, [refreshKey, reload]);
+
+  // history viene ordenada desc por held_at|cancelled_at|created_at: la primera held
+  // es la más reciente. La distinguimos para dar feedback aunque aún no haya summary.
+  const lastHeld = history.find((c) => c.status === 'held');
 
   if (loading && !upcoming && history.length === 0) {
     return (
@@ -77,12 +92,18 @@ const CallSummaryBlock: React.FC<CallSummaryBlockProps> = ({ cardId, onAction })
   if (!upcoming) {
     return (
       <div className="space-y-2">
-        {lastWithSummary?.summary && (
+        {lastHeld?.summary ? (
           <LastSummaryStrip
-            call={lastWithSummary}
-            onView={() => onAction({ type: 'view_summary', call: lastWithSummary })}
+            call={lastHeld}
+            onView={() => onAction({ type: 'view_summary', call: lastHeld })}
           />
-        )}
+        ) : lastHeld ? (
+          <HeldNoSummaryStrip
+            call={lastHeld}
+            onAddSummary={() => onAction({ type: 'log', call: lastHeld })}
+            locale={i18n.language || 'es'}
+          />
+        ) : null}
         <button
           type="button"
           onClick={(e) => {
@@ -96,24 +117,26 @@ const CallSummaryBlock: React.FC<CallSummaryBlockProps> = ({ cardId, onAction })
           )}
         >
           <Plus className="h-3 w-3" />
-          {t('workflow.call.card.scheduleCta')}
+          {t(lastHeld ? 'workflow.call.card.scheduleNext' : 'workflow.call.card.scheduleCta')}
         </button>
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onAction({ type: 'prepare_new' });
-          }}
-          className={cn(
-            'w-full flex items-center justify-center gap-1.5 py-1.5 rounded-md',
-            'border border-[#f4a9aa] bg-[#f4a9aa]/10 text-[11px] text-[#22183a]',
-            'hover:bg-[#f4a9aa]/20 transition-colors',
-          )}
-          title={t('workflow.call.card.prepareBriefingStandalone') as string}
-        >
-          <Sparkles className="h-3 w-3" />
-          {t('workflow.call.card.prepareBriefingStandalone')}
-        </button>
+        {!lastHeld && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAction({ type: 'prepare_new' });
+            }}
+            className={cn(
+              'w-full flex items-center justify-center gap-1.5 py-1.5 rounded-md',
+              'border border-[#f4a9aa] bg-[#f4a9aa]/10 text-[11px] text-[#22183a]',
+              'hover:bg-[#f4a9aa]/20 transition-colors',
+            )}
+            title={t('workflow.call.card.prepareBriefingStandalone') as string}
+          >
+            <Sparkles className="h-3 w-3" />
+            {t('workflow.call.card.prepareBriefingStandalone')}
+          </button>
+        )}
       </div>
     );
   }
@@ -210,6 +233,46 @@ const CallSummaryBlock: React.FC<CallSummaryBlockProps> = ({ cardId, onAction })
           {t('workflow.call.card.historyCount', { count: history.length })}
         </div>
       )}
+    </div>
+  );
+};
+
+// Mostramos una franja compacta cuando la última call está marcada como held
+// pero aún no tiene summary IA. Sin esto, la card se queda muda tras pulsar
+// "Hecha" hasta que la summary llega (o nunca, si no había notas).
+const HeldNoSummaryStrip: React.FC<{
+  call: WorkflowCall;
+  onAddSummary: () => void;
+  locale: string;
+}> = ({ call, onAddSummary, locale }) => {
+  const { t } = useTranslation();
+  const dateLabel = call.held_at
+    ? new Date(call.held_at).toLocaleDateString(locale, {
+        day: '2-digit',
+        month: 'short',
+      })
+    : '';
+  return (
+    <div className="rounded-md border border-emerald-200 bg-emerald-50 p-2 text-[11px] space-y-1">
+      <div className="flex items-center gap-1.5 text-emerald-800 font-medium">
+        <CheckCircle2 className="h-3 w-3 shrink-0" />
+        <span className="truncate">
+          {dateLabel
+            ? t('workflow.call.card.heldOn', { date: dateLabel })
+            : t('workflow.call.card.markHeld')}
+        </span>
+      </div>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onAddSummary();
+        }}
+        className="w-full flex items-center justify-center gap-1 py-1 rounded border border-emerald-300 bg-white text-emerald-800 hover:bg-emerald-100 transition-colors"
+      >
+        <Pencil className="h-3 w-3" />
+        {t('workflow.call.card.addSummary')}
+      </button>
     </div>
   );
 };

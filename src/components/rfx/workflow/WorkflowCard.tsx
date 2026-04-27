@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getFaviconUrl } from '@/utils/logoUtils';
+import ScoreDonut from './ScoreDonut';
 import {
   DISCARD_REASON_I18N_KEYS,
   NDA_STATUS_I18N_KEYS,
@@ -48,6 +49,7 @@ interface WorkflowCardProps {
   onRefreshNda?: (card: WorkflowCardModel) => void;
   refreshingNda?: boolean;
   pendingTaskCount?: number;
+  onOpenMatchJustification?: (card: WorkflowCardModel) => void;
 }
 
 // Estados del envelope DocuSign que permiten (re)enviar. El resto bloquean el CTA.
@@ -78,23 +80,6 @@ const STAGE_CTA: Partial<Record<WorkflowStage, { key: string; Icon: LucideIcon }
   active_pilot: { key: 'workflow.card.ctaPilot', Icon: Rocket },
 };
 
-const MetricBar: React.FC<{ label: string; value?: number | null }> = ({ label, value }) => {
-  const hasValue = typeof value === 'number' && value > 0;
-  const pct = hasValue ? Math.min(100, Math.max(0, value)) : 0;
-  return (
-    <div className="flex items-center gap-2 text-[11px] text-gray-600">
-      <span className="w-16 shrink-0 font-inter">{label}</span>
-      <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-[#22183a] rounded-full"
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <span className="w-6 text-right tabular-nums">{hasValue ? Math.round(pct) : '—'}</span>
-    </div>
-  );
-};
-
 const WorkflowCard: React.FC<WorkflowCardProps> = ({
   card,
   candidate,
@@ -111,6 +96,7 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   onRefreshNda,
   refreshingNda = false,
   pendingTaskCount = 0,
+  onOpenMatchJustification,
 }) => {
   const { t } = useTranslation();
   const name = candidate?.empresa || t('workflow.card.unknownCompany');
@@ -118,6 +104,14 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
   const faviconUrl = getFaviconUrl(website);
   const isDiscarded = card.stage === 'discarded';
   const isNdaStage = card.stage === 'nda_sent';
+  // Score combinado: media de match (tecnología) y company_match (encaje).
+  // Si solo hay uno disponible, lo usamos tal cual; si no hay ninguno, null.
+  const scoreInputs = [candidate?.match, candidate?.company_match]
+    .filter((v): v is number => typeof v === 'number' && v > 0);
+  const combinedScore =
+    scoreInputs.length > 0
+      ? Math.round(scoreInputs.reduce((a, b) => a + b, 0) / scoreInputs.length)
+      : null;
   const canSendNda = isNdaStage && NDA_STATES_ALLOW_SEND.includes(card.nda_status);
 
   return (
@@ -130,53 +124,80 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
       }}
       onDragEnd={onDragEnd}
       className={cn(
-        'group bg-white border border-gray-200 rounded-lg p-3 shadow-sm',
-        'hover:shadow-md transition-shadow',
+        'group relative bg-white border border-gray-200 rounded-lg p-3',
+        'transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-[#22183a]/40',
         draggable ? 'cursor-grab active:cursor-grabbing' : 'cursor-default',
-        isDiscarded && 'bg-gray-50 border-gray-200',
+        isDiscarded && 'bg-gray-50 border-gray-200 opacity-80 hover:translate-y-0 hover:shadow-none',
+        suggestion && !isDiscarded && 'border-[#f4a9aa] bg-gradient-to-b from-white to-[#fff8f8]',
       )}
     >
-      <div className="flex items-start gap-1.5 mb-2 min-w-0">
+      {suggestion && !isDiscarded && (
+        <span
+          aria-hidden
+          className="absolute left-0 top-3.5 bottom-3.5 w-[3px] rounded-r bg-[#f4a9aa]"
+        />
+      )}
+      <div className="flex items-start gap-2.5 mb-1 min-w-0">
         {faviconUrl && (
           <img
             src={faviconUrl}
             alt=""
-            className="w-4 h-4 shrink-0 rounded-sm object-contain mt-0.5"
+            className="w-4 h-4 shrink-0 rounded-sm object-contain mt-1"
             onError={(e) => {
               // Oculta el img si el favicon no carga para no dejar icono roto.
               (e.currentTarget as HTMLImageElement).style.display = 'none';
             }}
           />
         )}
-        <h4
-          className={cn(
-            'font-semibold text-sm truncate font-intro flex-1 min-w-0',
-            isDiscarded ? 'text-gray-500 line-through' : 'text-[#22183a]',
-          )}
-        >
-          {name}
-        </h4>
-        {!isDiscarded && pendingTaskCount > 0 && (
-          <span
-            className="shrink-0 inline-flex items-center gap-0.5 text-[10px] font-semibold text-[#22183a] bg-[#f4a9aa]/40 border border-[#f4a9aa] rounded-full px-1.5 h-5"
-            title={t('workflow.tasks.card.countTooltip', { count: pendingTaskCount }) as string}
+        <div className="flex-1 min-w-0 flex items-start gap-1">
+          <h4
+            className={cn(
+              'font-semibold text-sm truncate font-intro flex-1 min-w-0 leading-tight pt-0.5',
+              isDiscarded ? 'text-gray-500 line-through' : 'text-[#22183a]',
+            )}
           >
-            <ClipboardList className="h-3 w-3" />
-            {pendingTaskCount}
-          </span>
-        )}
-        {onDiscard && !isDiscarded && (
+            {name}
+          </h4>
+          {!isDiscarded && pendingTaskCount > 0 && (
+            <span
+              className="shrink-0 inline-flex items-center gap-0.5 text-[10px] font-semibold text-[#22183a] bg-[#f4a9aa]/40 border border-[#f4a9aa] rounded-full px-1.5 h-5"
+              title={t('workflow.tasks.card.countTooltip', { count: pendingTaskCount }) as string}
+            >
+              <ClipboardList className="h-3 w-3" />
+              {pendingTaskCount}
+            </span>
+          )}
+          {onDiscard && !isDiscarded && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDiscard(card);
+              }}
+              className="shrink-0 p-1 -m-1 text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+              title={t('workflow.discard.buttonTooltip') as string}
+              aria-label={t('workflow.discard.buttonTooltip') as string}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+        {!isDiscarded && (
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onDiscard(card);
+              onOpenMatchJustification?.(card);
             }}
-            className="shrink-0 p-1 -m-1 text-gray-400 hover:text-red-600 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-            title={t('workflow.discard.buttonTooltip') as string}
-            aria-label={t('workflow.discard.buttonTooltip') as string}
+            disabled={!onOpenMatchJustification}
+            className="shrink-0 rounded-full disabled:cursor-default enabled:cursor-pointer enabled:hover:opacity-80 transition-opacity"
+            title={
+              onOpenMatchJustification
+                ? (t('workflow.matchJustification.openTooltip') as string)
+                : undefined
+            }
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <ScoreDonut value={combinedScore} />
           </button>
         )}
       </div>
@@ -194,11 +215,6 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
         </div>
       ) : (
         <>
-          <div className="space-y-1 mb-2">
-            <MetricBar label={t('workflow.metrics.technology')} value={candidate?.match} />
-            <MetricBar label={t('workflow.metrics.fit')} value={candidate?.company_match ?? null} />
-          </div>
-
           {extras && <div className="mb-2">{extras}</div>}
 
           {suggestion && onDiscard && (
@@ -263,35 +279,37 @@ const WorkflowCard: React.FC<WorkflowCardProps> = ({
           )}
 
           {showActions && isNdaStage && onSendNda && canSendNda && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full mt-1 bg-white border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSendNda(card);
-              }}
-            >
-              <FileSignature className="h-3.5 w-3.5 mr-1.5" />
-              {card.nda_status === 'declined' || card.nda_status === 'voided'
-                ? t('workflow.nda.card.resend')
-                : t('workflow.nda.card.send')}
-            </Button>
+            <div className="pt-2 border-t border-dashed border-gray-200">
+              <Button
+                size="sm"
+                className="w-full bg-[#22183a] text-white rounded-full hover:bg-[#22183a]/90"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSendNda(card);
+                }}
+              >
+                <FileSignature className="h-3.5 w-3.5 mr-1.5" />
+                {card.nda_status === 'declined' || card.nda_status === 'voided'
+                  ? t('workflow.nda.card.resend')
+                  : t('workflow.nda.card.send')}
+              </Button>
+            </div>
           )}
 
           {showActions && cta && !(isNdaStage && onSendNda) && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full mt-1 bg-white border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpenActions?.(card);
-              }}
-            >
-              <cta.Icon className="h-3.5 w-3.5 mr-1.5" />
-              {t(cta.key)}
-            </Button>
+            <div className="pt-2 border-t border-dashed border-gray-200">
+              <Button
+                size="sm"
+                className="w-full bg-[#22183a] text-white rounded-full hover:bg-[#22183a]/90"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenActions?.(card);
+                }}
+              >
+                <cta.Icon className="h-3.5 w-3.5 mr-1.5" />
+                {t(cta.key)}
+              </Button>
+            </div>
           )}
         </>
       )}

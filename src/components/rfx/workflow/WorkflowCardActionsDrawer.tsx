@@ -198,7 +198,7 @@ const WorkflowCardActionsDrawer: React.FC<Props> = ({
             </div>
 
             <Tabs defaultValue="email" className="w-full">
-              <TabsList className="grid w-full grid-cols-6">
+              <TabsList className="grid w-full grid-cols-6 gap-1">
                 <TabsTrigger value="email">
                   <Mail className="h-4 w-4 mr-1" />
                   {t('workflow.drawer.tabEmail')}

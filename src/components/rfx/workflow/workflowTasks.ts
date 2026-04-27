@@ -69,6 +69,7 @@ export type DerivedTaskKind =
   | 'chase_nda_signature'
   | 'request_dd_item'
   | 'review_dd_item'
+  | 'contact_candidate'
   | 'stale_contact'
   | 'no_movement';
 
@@ -134,6 +135,7 @@ export const DERIVED_TASK_I18N_KEYS: Record<DerivedTaskKind, string> = {
   chase_nda_signature: 'workflow.tasks.derived.chaseNdaSignature',
   request_dd_item: 'workflow.tasks.derived.requestDdItem',
   review_dd_item: 'workflow.tasks.derived.reviewDdItem',
+  contact_candidate: 'workflow.tasks.derived.contactCandidate',
   stale_contact: 'workflow.tasks.derived.staleContact',
   no_movement: 'workflow.tasks.derived.noMovement',
 };
@@ -152,6 +154,7 @@ export const DERIVED_TASK_STAGE: Record<DerivedTaskKind, WorkflowStage | 'genera
   chase_nda_signature: 'nda_sent',
   request_dd_item: 'due_diligence',
   review_dd_item: 'due_diligence',
+  contact_candidate: 'contact_and_maturity',
   stale_contact: 'contact_and_maturity',
   no_movement: 'contact_and_maturity',
 };

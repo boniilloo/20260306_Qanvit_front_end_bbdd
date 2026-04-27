@@ -25,18 +25,27 @@ const WorkflowCardEvaluationBadge: React.FC<Props> = ({ result, rank, totalEvalu
 
   const showRank = totalEvaluated >= 3 && typeof rank === 'number';
   const hasAlerts = result.alerts.length > 0;
+  // Cuando la evaluación está obsoleta (rúbrica o respuestas cambiadas tras
+  // ejecutarla) los datos numéricos pueden engañar al usuario. Apagamos los
+  // colores y dejamos visible solo lo informativo + un badge claro de stale.
+  const scoreClasses = stale
+    ? 'bg-gray-100 text-gray-500 border-gray-200 line-through'
+    : scoreColor(result.global_score);
 
   return (
-    <div className="flex items-center gap-1 flex-wrap">
-      <Badge className={`text-[10px] h-5 ${scoreColor(result.global_score)}`}>
+    <div className={`flex items-center gap-1 flex-wrap ${stale ? 'opacity-70' : ''}`}>
+      <Badge className={`text-[10px] h-5 ${scoreClasses}`}>
         {result.global_score.toFixed(1)}/10
       </Badge>
       {result.global_label && (
-        <Badge variant="outline" className="text-[10px] h-5 capitalize">
+        <Badge
+          variant="outline"
+          className={`text-[10px] h-5 capitalize ${stale ? 'text-gray-500 line-through' : ''}`}
+        >
           {result.global_label}
         </Badge>
       )}
-      {showRank && (
+      {!stale && showRank && (
         <Badge
           variant="outline"
           className="text-[10px] h-5 border-[#f4a9aa] text-[#22183a]"
@@ -45,14 +54,14 @@ const WorkflowCardEvaluationBadge: React.FC<Props> = ({ result, rank, totalEvalu
           {t('workflow.evaluation.rank', { rank, total: totalEvaluated })}
         </Badge>
       )}
-      {hasAlerts && (
+      {!stale && hasAlerts && (
         <Badge className="text-[10px] h-5 bg-red-50 text-red-700 border-red-200">
           <AlertTriangle className="h-3 w-3 mr-0.5" />
           {result.alerts.length}
         </Badge>
       )}
       {stale && (
-        <Badge variant="outline" className="text-[10px] h-5 border-dashed text-gray-500">
+        <Badge className="text-[10px] h-5 bg-amber-50 text-amber-800 border-amber-200">
           {t('workflow.evaluation.staleCardBadge')}
         </Badge>
       )}

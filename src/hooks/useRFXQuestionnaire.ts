@@ -131,8 +131,16 @@ export const useRFXQuestionnaire = (rfxId: string | undefined) => {
   );
 
   // Dispara la generación masiva de preguntas específicas por empresa. Idempotente.
+  // Recibe los ids (id_company_revision) de las startups seleccionadas para acotar
+  // el universo; el back rechazará la llamada si la lista llega vacía.
+  // Se invoca en background tras publicar el cuestionario, así que silenciamos
+  // los errores no críticos (ej.: no hay evaluation_results todavía) — el usuario
+  // podrá regenerar específicas manualmente desde el drawer si las necesita.
   const generateSpecificForAll = useCallback(
-    async (symmetricKey: string): Promise<boolean> => {
+    async (
+      symmetricKey: string,
+      selectedCandidateIds: string[],
+    ): Promise<boolean> => {
       if (!rfxId) return false;
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -141,19 +149,20 @@ export const useRFXQuestionnaire = (rfxId: string | undefined) => {
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ symmetric_key: symmetricKey, user_id: user?.id ?? null }),
+            body: JSON.stringify({
+              symmetric_key: symmetricKey,
+              user_id: user?.id ?? null,
+              selected_candidate_ids: selectedCandidateIds,
+            }),
           },
         );
         const json = await response.json();
         if (!json.success) throw new Error(json.error || 'Specific generation failed');
         return true;
       } catch (e: any) {
-        console.error('[useRFXQuestionnaire] generateSpecificForAll', e);
-        toast({
-          title: 'Error',
-          description: e.message || 'Failed to generate specific questions',
-          variant: 'destructive',
-        });
+        // No es un error crítico para el usuario: el cuestionario común ya se
+        // publicó correctamente y las específicas son un valor añadido.
+        console.warn('[useRFXQuestionnaire] generateSpecificForAll skipped:', e?.message || e);
         return false;
       }
     },

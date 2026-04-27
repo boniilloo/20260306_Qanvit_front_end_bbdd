@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Loader2, ArrowLeft, Plus, Sparkles, User, Scale, FileSignature, History, Shield, AlertTriangle } from 'lucide-react';
@@ -7,11 +7,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import { useRFXSelectedCandidates } from '@/hooks/useRFXSelectedCandidates';
+import { useRFXBestMatchesByCandidate } from '@/hooks/useRFXBestMatchesByCandidate';
+import PropuestaDetailsModal from '@/components/ui/PropuestaDetailsModal';
+import RFXFooter from '@/components/rfx/RFXFooter';
+import type { Propuesta } from '@/types/chat';
 import { useRFXWorkflowCards } from '@/hooks/useRFXWorkflowCards';
 import { usePublicRFXCrypto } from '@/hooks/usePublicRFXCrypto';
 import WorkflowColumn from '@/components/rfx/workflow/WorkflowColumn';
-import WorkflowTriggersSidebar from '@/components/rfx/workflow/WorkflowTriggersSidebar';
 import WorkflowCardActionsDrawer from '@/components/rfx/workflow/WorkflowCardActionsDrawer';
 import QuestionnaireGenerationDialog from '@/components/rfx/workflow/QuestionnaireGenerationDialog';
 import PlaybookDialog from '@/components/rfx/workflow/PlaybookDialog';
@@ -61,6 +65,7 @@ import {
   ACTIVE_STAGES,
   PILOT_STAGES,
   WORKFLOW_STAGES,
+  STAGE_I18N_KEYS,
   WorkflowCard as WorkflowCardModel,
   WorkflowStage,
   DiscardReason,
@@ -127,6 +132,48 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
   >(null);
   const calls = useWorkflowCalls(callDialog?.card.id ?? null);
   const summaryGenerator = useCallSummaryGenerator();
+  // Permite usar la rueda del ratón para mover el kanban horizontalmente cuando
+  // el cursor está sobre el área de columnas. Si el cursor está sobre una
+  // columna que aún tiene scroll vertical disponible, respetamos ese scroll
+  // vertical y solo desviamos a horizontal cuando ya no hay más que recorrer.
+  // Usamos callback ref (no useRef + useEffect) porque el div del kanban se
+  // monta DESPUÉS del primer render —tras pasar los guards de loading/rfx— y
+  // un useEffect con deps vacías no se vuelve a ejecutar cuando aparece.
+  const kanbanWheelCleanup = React.useRef<(() => void) | null>(null);
+  const kanbanScrollRef = React.useCallback((node: HTMLDivElement | null) => {
+    kanbanWheelCleanup.current?.();
+    kanbanWheelCleanup.current = null;
+    if (!node) return;
+    const handler = (e: WheelEvent) => {
+      if (e.deltaY === 0 && e.deltaX !== 0) return;
+      let walker: HTMLElement | null = e.target as HTMLElement | null;
+      while (walker && walker !== node) {
+        const style = window.getComputedStyle(walker);
+        if (/(auto|scroll)/.test(style.overflowY)) {
+          const canDown = walker.scrollTop + walker.clientHeight < walker.scrollHeight - 1;
+          const canUp = walker.scrollTop > 0;
+          if ((e.deltaY > 0 && canDown) || (e.deltaY < 0 && canUp)) return;
+        }
+        walker = walker.parentElement;
+      }
+      e.preventDefault();
+      node.scrollLeft += e.deltaY + e.deltaX;
+    };
+    node.addEventListener('wheel', handler, { passive: false });
+    kanbanWheelCleanup.current = () => node.removeEventListener('wheel', handler);
+  }, []);
+  // Nonce por tarjeta para invalidar el CallSummaryBlock tras una acción local
+  // (programar, reprogramar, cancelar, marcar hecha, briefing). Necesario porque
+  // Realtime puede tardar o caer; sin esto el cambio no se ve hasta recargar.
+  const [callsRefreshKeyByCard, setCallsRefreshKeyByCard] = useState<
+    Record<string, number>
+  >({});
+  const bumpCallsRefresh = useCallback((cardId: string) => {
+    setCallsRefreshKeyByCard((prev) => ({
+      ...prev,
+      [cardId]: (prev[cardId] ?? 0) + 1,
+    }));
+  }, []);
   const [shortlistOpen, setShortlistOpen] = useState(false);
   const callShortlist = useCallShortlist(rfxId ?? null);
   // Estado del diálogo de tareas custom: null = cerrado; task=null => crear nueva.
@@ -211,6 +258,7 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
     loading: loadingCards,
     moveCard,
     discardCard,
+    setContacted,
     reload: reloadCards,
   } = useRFXWorkflowCards(
     rfxId,
@@ -245,6 +293,7 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
     openCount: taskOpenCount,
     openCountByCardId: taskCountByCardId,
     loading: loadingTasks,
+    reload: reloadTasks,
   } = useWorkflowTasks({ rfxId, rfxState: readOnly ? undefined : taskRfxState });
   const customTasksApi = useCustomTasks({ rfxId });
 
@@ -288,6 +337,32 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
     return m;
   }, [selectedCandidates]);
 
+  // Best matches del agente (con justificación) indexados por id_company_revision.
+  // Se usan para mostrar el modal de razonamiento al pulsar el score donut.
+  const { byCandidate: bestMatchByCandidate } = useRFXBestMatchesByCandidate(rfxId);
+  const [matchModalCandidateId, setMatchModalCandidateId] = useState<string | null>(null);
+  const matchModalPropuesta = useMemo<Propuesta | null>(() => {
+    if (!matchModalCandidateId) return null;
+    const enriched = bestMatchByCandidate.get(matchModalCandidateId);
+    if (enriched) return enriched;
+    // Fallback: si aún no llegó la evaluación cacheada, usamos lo mínimo del
+    // selected candidate para que el modal abra con score visible aunque no
+    // tengamos la justificación.
+    const sel = candidatesById.get(matchModalCandidateId);
+    if (!sel) return null;
+    return {
+      id_company_revision: sel.id_company_revision,
+      id_product_revision: sel.id_product_revision ?? '',
+      empresa: sel.empresa,
+      producto: sel.producto ?? '',
+      match: sel.match,
+      company_match: sel.company_match ?? undefined,
+    } as Propuesta;
+  }, [matchModalCandidateId, bestMatchByCandidate, candidatesById]);
+  const handleOpenMatchJustification = (card: WorkflowCardModel) => {
+    setMatchModalCandidateId(card.candidate_id);
+  };
+
   const cardsByStage = useMemo(() => {
     const m = new Map<WorkflowStage, WorkflowCardModel[]>();
     WORKFLOW_STAGES.forEach((s) => m.set(s, []));
@@ -305,7 +380,10 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
     cards.forEach((c) => {
       if (c.stage === 'discarded') return;
       const evalResult = resultsByCandidate.get(c.candidate_id);
-      if (evalResult?.recommendation?.action === 'discard') {
+      // Solo confiamos en la recomendación de la IA cuando la evaluación está
+      // alineada con la rúbrica/respuestas actuales. Si está stale, su veredicto
+      // puede ser obsoleto y no debe disparar la sugerencia de descarte.
+      if (evalResult?.recommendation?.action === 'discard' && !evaluationStale) {
         m.set(c.id, {
           reason: 'no_fit',
           hintKey: 'workflow.discard.suggestionHints.evaluation',
@@ -330,7 +408,7 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
       }
     });
     return m;
-  }, [cards, resultsByCandidate, readOnly]);
+  }, [cards, resultsByCandidate, readOnly, evaluationStale]);
 
   const stats = useMemo(() => {
     const total = cards.length;
@@ -404,10 +482,18 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
         return;
       default:
         // register_call_outcome, chase_nda_signature, request/review_dd_item,
-        // stale_contact: el drawer general da acceso a todas las acciones de la
-        // tarjeta (NDA, DD, timeline, contacto), por lo que lo reutilizamos.
+        // contact_candidate, stale_contact: el drawer general da acceso a todas
+        // las acciones de la tarjeta (NDA, DD, timeline, contacto), por lo que
+        // lo reutilizamos.
         setActionsCard(card);
     }
+  };
+
+  const handleMarkContacted = async (cardId: string) => {
+    await setContacted(cardId, true);
+    // El panel de tareas mantiene su propio snapshot: invalidamos manualmente
+    // para que la fila desaparezca al instante sin esperar a Realtime.
+    void reloadTasks();
   };
 
   const handleSubmitCustomTask = async (payload: {
@@ -601,6 +687,8 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
             ? t('workflow.call.schedule.updatedToast')
             : t('workflow.call.schedule.scheduledToast'),
       });
+      bumpCallsRefresh(callDialog.card.id);
+      void reloadTasks();
       setCallDialog(null);
     } else {
       toast({
@@ -627,6 +715,9 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
       return;
     }
     toast({ title: t('workflow.call.log.doneToast') });
+    const callDialogCardId = callDialog.card.id;
+    bumpCallsRefresh(callDialogCardId);
+    void reloadTasks();
     const rfxIdValue = rfxId;
     const callId = callDialog.call.id;
     setCallDialog(null);
@@ -641,6 +732,7 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
         symmetricKey: key,
       });
       if (summary) {
+        bumpCallsRefresh(callDialogCardId);
         toast({
           title: t('workflow.call.summary.doneToastTitle'),
           description: t(
@@ -710,13 +802,6 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
     }
   };
 
-  const handleTriggerClick = (triggerId: string) => {
-    toast({
-      title: t('workflow.toasts.triggerComingSoonTitle'),
-      description: t('workflow.toasts.triggerComingSoonDesc', { trigger: triggerId }),
-    });
-  };
-
   const loading = loadingRfx || loadingSelection || loadingCards;
 
   if (loading) {
@@ -738,7 +823,7 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
   const backHref = isPublicExample ? `/rfx-example/${rfxId}` : `/rfxs/${rfxId}`;
 
   return (
-    <div className="flex-1 flex flex-col bg-background min-h-0">
+    <div className="flex-1 flex flex-col bg-background min-h-0 min-w-0 overflow-x-hidden">
       <div className="px-4 md:px-6 py-4 border-b border-gray-200 bg-white">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="min-w-0 flex-1">
@@ -791,58 +876,6 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
               </div>
             </div>
             <Button
-              variant="outline"
-              disabled={readOnly || !questionnairePublished}
-              className="border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
-              onClick={() => setRubricOpen(true)}
-              title={
-                !questionnairePublished
-                  ? (t('workflow.header.rubricNeedsQuestionnaire') as string)
-                  : undefined
-              }
-            >
-              <Scale className="h-4 w-4 mr-1" />
-              {t('workflow.header.rubric')}
-            </Button>
-            <Button
-              variant="outline"
-              disabled={readOnly}
-              className="border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
-              onClick={() => setNdaTemplateOpen(true)}
-              title={t('workflow.header.ndaTemplateTooltip') as string}
-            >
-              <FileSignature className="h-4 w-4 mr-1" />
-              {t('workflow.header.ndaTemplate')}
-            </Button>
-            <Button
-              variant="outline"
-              disabled={readOnly}
-              className="border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
-              onClick={() => setDdTemplateOpen(true)}
-              title={t('workflow.header.ddTemplateTooltip') as string}
-            >
-              <Shield className="h-4 w-4 mr-1" />
-              {t('workflow.header.ddTemplate')}
-            </Button>
-            <Button
-              variant="outline"
-              disabled={readOnly}
-              className="border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
-              onClick={() => setPlaybookOpen(true)}
-            >
-              <User className="h-4 w-4 mr-1" />
-              {t('workflow.header.playbook')}
-            </Button>
-            <Button
-              variant="outline"
-              className="border-[#22183a] text-[#22183a] hover:bg-[#22183a] hover:text-white"
-              onClick={() => setRfxTimelineOpen(true)}
-              title={t('workflow.header.rfxTimelineTooltip') as string}
-            >
-              <History className="h-4 w-4 mr-1" />
-              {t('workflow.header.rfxTimeline')}
-            </Button>
-            <Button
               disabled={readOnly}
               className="bg-[#f4a9aa] hover:bg-[#f4a9aa]/90 text-[#22183a]"
               onClick={() =>
@@ -859,21 +892,114 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
         </div>
       </div>
 
-      {!readOnly && rfxId && (
-        <WorkflowTasksPanel
-          groups={taskGroups}
-          openCount={taskOpenCount}
-          loading={loadingTasks}
-          candidateNameByCardId={candidateNameByCardId}
-          onNewTask={() => setCustomTaskDialog({ task: null })}
-          onTaskClick={handleTaskClick}
-        />
-      )}
+      <nav
+        aria-label={t('workflow.header.resourcesAria') as string}
+        className="px-4 md:px-6 pt-3"
+      >
+        <div className="inline-flex items-center gap-0.5 bg-[#f1e8f4]/60 rounded-full p-1">
+          <button
+            type="button"
+            disabled={readOnly || !questionnairePublished}
+            onClick={() => setRubricOpen(true)}
+            title={
+              !questionnairePublished
+                ? (t('workflow.header.rubricNeedsQuestionnaire') as string)
+                : undefined
+            }
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[#22183a]/70 hover:text-[#22183a] hover:bg-white hover:shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:shadow-none"
+          >
+            <Scale className="h-3.5 w-3.5" />
+            {t('workflow.header.rubric')}
+          </button>
+          <button
+            type="button"
+            disabled={readOnly}
+            onClick={() => setNdaTemplateOpen(true)}
+            title={t('workflow.header.ndaTemplateTooltip') as string}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[#22183a]/70 hover:text-[#22183a] hover:bg-white hover:shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:shadow-none"
+          >
+            <FileSignature className="h-3.5 w-3.5" />
+            {t('workflow.header.ndaTemplate')}
+          </button>
+          <button
+            type="button"
+            disabled={readOnly}
+            onClick={() => setDdTemplateOpen(true)}
+            title={t('workflow.header.ddTemplateTooltip') as string}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[#22183a]/70 hover:text-[#22183a] hover:bg-white hover:shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:shadow-none"
+          >
+            <Shield className="h-3.5 w-3.5" />
+            {t('workflow.header.ddTemplate')}
+          </button>
+          <button
+            type="button"
+            disabled={readOnly}
+            onClick={() => setPlaybookOpen(true)}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[#22183a]/70 hover:text-[#22183a] hover:bg-white hover:shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:shadow-none"
+          >
+            <User className="h-3.5 w-3.5" />
+            {t('workflow.header.playbook')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setRfxTimelineOpen(true)}
+            title={t('workflow.header.rfxTimelineTooltip') as string}
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[13px] font-medium text-[#22183a]/70 hover:text-[#22183a] hover:bg-white hover:shadow-sm transition-colors"
+          >
+            <History className="h-3.5 w-3.5" />
+            {t('workflow.header.rfxTimeline')}
+          </button>
+        </div>
+      </nav>
 
-      <div className="flex-1 flex min-h-0">
-        <WorkflowTriggersSidebar readOnly={readOnly} onTriggerClick={handleTriggerClick} />
-
-        <div className="flex-1 overflow-x-auto overflow-y-hidden">
+      <div className="flex-1 flex min-h-0 min-w-0 px-4 md:px-6 py-4">
+        <div className="flex-1 min-w-0 flex flex-col gap-3">
+          <div className="flex gap-1 overflow-x-auto pb-1">
+            {WORKFLOW_STAGES.filter((s) => s !== 'discarded').map((stage) => {
+              const stageCards = cardsByStage.get(stage) ?? [];
+              const count = stageCards.length;
+              const urgent = !readOnly && stageCards.some(
+                (c) =>
+                  suggestionByCard.has(c.id) ||
+                  (taskCountByCardId?.get(c.id) ?? 0) > 0,
+              );
+              return (
+                <div
+                  key={stage}
+                  className={cn(
+                    'flex-1 min-w-[120px] px-3 pb-2 pt-1 border-b-2 transition-colors',
+                    count === 0 && 'border-gray-200',
+                    count > 0 && !urgent && 'border-[#22183a]',
+                    urgent && 'border-[#f4a9aa]',
+                  )}
+                >
+                  <div className="text-[10px] uppercase tracking-wider text-gray-500 font-mono">
+                    {t(STAGE_I18N_KEYS[stage])}
+                  </div>
+                  <div className="flex items-baseline gap-1.5 mt-0.5">
+                    <span
+                      className={cn(
+                        'text-xl font-semibold tabular-nums',
+                        count > 0 ? 'text-[#22183a]' : 'text-gray-400',
+                      )}
+                    >
+                      {count}
+                    </span>
+                    {urgent && (
+                      <span
+                        aria-hidden
+                        className="h-1.5 w-1.5 rounded-full bg-[#f4a9aa] animate-pulse"
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        <div
+          ref={kanbanScrollRef}
+          className="flex-1 min-w-0 bg-white border border-gray-200 rounded-lg shadow-sm overflow-x-auto overflow-y-hidden"
+        >
           <div className="flex gap-4 p-4 h-full min-w-max">
             {WORKFLOW_STAGES.map((stage) => {
               const needsQuestionnaire =
@@ -942,26 +1068,34 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
                   </Button>
                 ) : undefined;
               const headerAction = reviewHeader ?? callHeader;
+              const renderEvaluationBadge = (card: WorkflowCardModel) => {
+                const result = resultsByCandidate.get(card.candidate_id);
+                if (!result) return null;
+                return (
+                  <WorkflowCardEvaluationBadge
+                    result={result}
+                    rank={rankingByCandidate.get(card.candidate_id)}
+                    totalEvaluated={evaluatedCount}
+                    stale={evaluationStale}
+                  />
+                );
+              };
               const renderCardExtras = isReviewColumn
+                ? renderEvaluationBadge
+                : isCallColumn && !readOnly
                 ? (card: WorkflowCardModel) => {
-                    const result = resultsByCandidate.get(card.candidate_id);
-                    if (!result) return null;
+                    const badge = renderEvaluationBadge(card);
                     return (
-                      <WorkflowCardEvaluationBadge
-                        result={result}
-                        rank={rankingByCandidate.get(card.candidate_id)}
-                        totalEvaluated={evaluatedCount}
-                        stale={evaluationStale}
-                      />
+                      <div className="space-y-2">
+                        {badge}
+                        <CallSummaryBlock
+                          cardId={card.id}
+                          refreshKey={callsRefreshKeyByCard[card.id] ?? 0}
+                          onAction={(action) => handleCallAction(card, action)}
+                        />
+                      </div>
                     );
                   }
-                : isCallColumn && !readOnly
-                ? (card: WorkflowCardModel) => (
-                    <CallSummaryBlock
-                      cardId={card.id}
-                      onAction={(action) => handleCallAction(card, action)}
-                    />
-                  )
                 : undefined;
               return (
                 <WorkflowColumn
@@ -975,7 +1109,6 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
                   onDragStartCard={setDraggingCard}
                   onDragEndCard={() => setDraggingCard(null)}
                   onDropCard={handleDropCard}
-                  onAddTrigger={(s) => handleTriggerClick(`column:${s}`)}
                   onOpenCardActions={readOnly ? undefined : handleOpenCardActions}
                   onDiscardCard={readOnly ? undefined : handleRequestDiscard}
                   onSendNda={readOnly ? undefined : handleRequestSendNda}
@@ -985,13 +1118,27 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
                   renderCardExtras={renderCardExtras}
                   headerAction={headerAction}
                   taskCountByCardId={taskCountByCardId}
+                  onOpenMatchJustification={readOnly ? undefined : handleOpenMatchJustification}
                   overlay={overlay}
                 />
               );
             })}
           </div>
         </div>
+        </div>
       </div>
+
+      {!readOnly && rfxId && (
+        <WorkflowTasksPanel
+          groups={taskGroups}
+          openCount={taskOpenCount}
+          loading={loadingTasks}
+          candidateNameByCardId={candidateNameByCardId}
+          onNewTask={() => setCustomTaskDialog({ task: null })}
+          onTaskClick={handleTaskClick}
+          onMarkContacted={handleMarkContacted}
+        />
+      )}
 
       {!readOnly && rfxId && playbookOpen && (
         <PlaybookDialog
@@ -1007,7 +1154,13 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
           onOpenChange={setQuestionnaireOpen}
           rfxId={rfxId}
           getSymmetricKey={privateCrypto.exportSymmetricKeyToBase64}
-          onPublished={() => void reloadQuestionnaire()}
+          onPublished={() => {
+            void reloadQuestionnaire();
+            void reloadTasks();
+          }}
+          selectedCandidateIds={selectedCandidates.map(
+            (c) => c.id_company_revision,
+          )}
         />
       )}
 
@@ -1017,7 +1170,10 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
           onOpenChange={setRubricOpen}
           rfxId={rfxId}
           getSymmetricKey={privateCrypto.exportSymmetricKeyToBase64}
-          onPublished={() => void reloadRubric()}
+          onPublished={() => {
+            void reloadRubric();
+            void reloadTasks();
+          }}
         />
       )}
 
@@ -1087,7 +1243,15 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
         />
       )}
 
-      {callDialog && callDialog.mode === 'view_summary' && (
+      {matchModalPropuesta && (
+        <PropuestaDetailsModal
+          open={!!matchModalCandidateId}
+          onOpenChange={(o) => !o && setMatchModalCandidateId(null)}
+          propuesta={matchModalPropuesta}
+        />
+      )}
+
+      {callDialog && callDialog.mode === 'view_summary' && rfxId && (
         <CallSummaryViewDialog
           open
           onOpenChange={(o) => !o && setCallDialog(null)}
@@ -1096,6 +1260,9 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
             t('workflow.card.unknownCompany')
           }
           call={callDialog.call}
+          rfxId={rfxId}
+          getSymmetricKey={privateCrypto.exportSymmetricKeyToBase64}
+          onUpdated={() => bumpCallsRefresh(callDialog.card.id)}
         />
       )}
 
@@ -1110,6 +1277,7 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
             t('workflow.card.unknownCompany')
           }
           getSymmetricKey={privateCrypto.exportSymmetricKeyToBase64}
+          onUpdated={() => bumpCallsRefresh(callDialog.card.id)}
         />
       )}
 
@@ -1298,6 +1466,8 @@ const RFXStartupsWorkflowPage: React.FC<RFXStartupsWorkflowPageProps> = ({
           readOnly={readOnly}
         />
       )}
+
+      <RFXFooter />
     </div>
   );
 };

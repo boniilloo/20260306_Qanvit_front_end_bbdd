@@ -172,7 +172,13 @@ const WorkflowTimeline: React.FC<Props> = ({
             rows={3}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder={t('workflow.timeline.placeholder') as string}
+            placeholder={
+              t(
+                cardId
+                  ? 'workflow.timeline.placeholder'
+                  : 'workflow.timeline.placeholderRfx',
+              ) as string
+            }
           />
           <div className="flex items-center justify-between">
             <span className="text-[11px] text-gray-500">

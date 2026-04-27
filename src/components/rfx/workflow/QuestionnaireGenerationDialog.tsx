@@ -20,6 +20,9 @@ interface Props {
   rfxId: string;
   getSymmetricKey: () => Promise<string | null>;
   onPublished?: () => void;
+  // Ids (id_company_revision) de las startups seleccionadas; las específicas solo
+  // se generan para estas, no para todo el universo de candidatos del agente.
+  selectedCandidateIds: string[];
 }
 
 type Phase = 'idle' | 'generating' | 'preview' | 'error';
@@ -30,6 +33,7 @@ const QuestionnaireGenerationDialog: React.FC<Props> = ({
   rfxId,
   getSymmetricKey,
   onPublished,
+  selectedCandidateIds,
 }) => {
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -95,11 +99,13 @@ const QuestionnaireGenerationDialog: React.FC<Props> = ({
     onOpenChange(false);
     onPublished?.();
 
-    // Fire-and-forget: genera específicas para todas las empresas.
+    // Fire-and-forget: genera específicas SOLO para las empresas seleccionadas.
+    // Si el usuario no ha seleccionado ninguna, se salta la generación masiva.
+    if (selectedCandidateIds.length === 0) return;
     void (async () => {
       const key = await getSymmetricKey();
       if (!key) return;
-      const okSpecific = await generateSpecificForAll(key);
+      const okSpecific = await generateSpecificForAll(key, selectedCandidateIds);
       if (okSpecific) {
         toast({
           title: t('workflow.questionnaire.specificReadyToastTitle'),

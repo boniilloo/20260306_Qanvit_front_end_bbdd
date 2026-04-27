@@ -3,7 +3,9 @@
     "loading": "Loading...",
     "error": "Error",
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "create": "Create",
+    "save": "Save"
   },
   "onboardingIntent": {
     "dialogTitle": "Account Setup",
@@ -477,6 +479,13 @@
     "specs_editPrompt": "Edit prompt",
     "specs_editPromptTooltip": "Edit the RFX assistant prompt (developers only)",
     "specs_promptEditor_rfxAssistantLabel": "RFX Assistant",
+    "specs_promptEditor_rfxAssistantDescription": "System prompt and parameters for the sidebar conversational chat (/ws-rfx-agent).",
+    "specs_promptEditor_proposeEditsLabel": "Propose Edits",
+    "specs_promptEditor_proposeEditsDescription": "Prompt and parameters for the tool that generates edit suggestions on the specifications.",
+    "specs_promptEditor_specsTitle": "Prompts — Specifications",
+    "specs_promptEditor_field_systemPrompt": "System prompt",
+    "specs_promptEditor_field_defaultLanguage": "Default language",
+    "specs_promptEditor_hint_defaultLanguage": "Language code or name the tool should assume when the conversation does not specify it (e.g. 'en', 'es').",
     "specs_promptEditor_title": "Prompt editor — {{prompt}}",
     "specs_promptEditor_description": "Edit the prompt and save a new version. Every version is kept in the history.",
     "specs_promptEditor_loading": "Loading configuration...",
@@ -505,8 +514,15 @@
     "specs_promptEditor_saveError": "Could not save the prompt.",
     "specs_promptEditor_activateError": "Could not activate this version.",
     "specs_promptEditor_noActiveConfig": "No active reference configuration found.",
-    "specs_promptEditor_dirtyCount_one": "{{count}} prompt has unsaved changes.",
-    "specs_promptEditor_dirtyCount_other": "{{count}} prompts have unsaved changes.",
+    "specs_promptEditor_dirtyCount_one": "{{count}} field has unsaved changes.",
+    "specs_promptEditor_dirtyCount_other": "{{count}} fields have unsaved changes.",
+    "specs_promptEditor_paramsTitle": "Model parameters",
+    "specs_promptEditor_param_model": "Model",
+    "specs_promptEditor_param_reasoning_effort": "Reasoning effort",
+    "specs_promptEditor_param_verbosity": "Verbosity",
+    "specs_promptEditor_param_temperature": "Temperature",
+    "specs_promptEditor_param_max_tokens": "Max tokens",
+    "specs_promptEditor_param_selectPlaceholder": "Select an option",
     "specs_completeFieldsToProceed": "Complete the requirement fields to move forward",
     "specs_back": "Back",
     "specs_generatingPdf": "Generating PDF...",
@@ -605,12 +621,10 @@
     "candidates_promptEditor_tab_chat": "Chat assistant",
     "candidates_promptEditor_tab_rubric": "Rubric",
     "candidates_promptEditor_tab_technicalEvaluation": "Technical evaluation",
-    "candidates_promptEditor_tab_companyEvaluation": "Company evaluation",
     "candidates_promptEditor_tab_enrichment": "Enrichment",
     "candidates_promptEditor_desc_chat": "System prompt for the candidates sidebar assistant (answers questions about evaluation results).",
     "candidates_promptEditor_desc_rubric": "System prompt used to generate the evaluation rubric from the RFX requirements.",
     "candidates_promptEditor_desc_technicalEvaluation": "Prompts that evaluate each product/candidate against the technical rubric.",
-    "candidates_promptEditor_desc_companyEvaluation": "Prompts that evaluate the company fit against the company requirements.",
     "candidates_promptEditor_desc_enrichment": "Prompts for the company enrichment agent (news, people, rounds, financials, stage classification).",
     "candidates_promptEditor_field_systemPrompt": "System prompt",
     "candidates_promptEditor_field_userPrompt": "User prompt",
@@ -896,7 +910,7 @@
       "copyQuestionnaireLink": "Copy questionnaire link",
       "questionnaireLink": "Questionnaire link",
       "tabQuestionnaire": "Questionnaire",
-      "tabDd": "Due Diligence",
+      "tabDd": "DD",
       "tabTimeline": "History",
       "specificEmpty": "No specific questions yet for this company.",
       "specificGenerate": "Generate specific",
@@ -964,6 +978,7 @@
       "addNoteRfx": "Add a note to the RFX",
       "addNoteCta": "Post note",
       "placeholder": "Write anything the team should remember about this card…",
+      "placeholderRfx": "Write anything the team should remember about this challenge…",
       "editHint": "You'll be able to edit or delete your note during the next 24 h.",
       "emptyCard": "No events or notes yet on this card.",
       "emptyRfx": "No team notes on this RFX yet.",
@@ -1001,7 +1016,11 @@
     "metrics": {
       "technology": "Technology",
       "traction": "Traction",
-      "fit": "Fit"
+      "fit": "Fit",
+      "match": "Match"
+    },
+    "matchJustification": {
+      "openTooltip": "See match reasoning"
     },
     "badges": {
       "ndaSigned": "NDA signed",
@@ -1082,7 +1101,10 @@
         "overduePrefix": "Past due",
         "noDate": "No date",
         "historyCount_one": "{{count}} previous call",
-        "historyCount_other": "{{count}} previous calls"
+        "historyCount_other": "{{count}} previous calls",
+        "heldOn": "Call held on {{date}}",
+        "addSummary": "Add summary",
+        "scheduleNext": "Schedule another"
       },
       "briefing": {
         "dialogTitle": "Briefing for call with {{name}}",
@@ -1114,7 +1136,14 @@
           "medium": "medium",
           "high": "high"
         },
-        "disclaimer": "AI-generated from your notes. Use it as a starting point, not a conclusion."
+        "disclaimer": "AI-generated from your notes. Use it as a starting point, not a conclusion.",
+        "editNotes": "Edit notes",
+        "saveAndRegenerate": "Save and regenerate summary",
+        "cancelEdit": "Cancel",
+        "notesPlaceholder": "Write the call notes here",
+        "regenerating": "Generating AI summary…",
+        "regenerateError": "Could not regenerate the summary.",
+        "savedToast": "Summary updated"
       },
       "shortlist": {
         "headerGenerate": "Generate shortlist",
@@ -1189,31 +1218,10 @@
       }
     },
     "column": {
-      "addTrigger": "+ Add trigger",
       "questionnaireRequiredDesc": "Generate the questionnaire to start contacting these startups.",
       "generateQuestionnaire": "Generate questionnaire",
       "rubricRequiredDesc": "Define and publish the rubric before evaluating responses.",
       "generateRubric": "Define rubric"
-    },
-    "sidebar": {
-      "sectionLabel": "Interview",
-      "addTrigger": "Add trigger",
-      "workingWithTriggers": "Working with triggers"
-    },
-    "triggers": {
-      "sendMessage": "Send message",
-      "addNote": "Add note",
-      "tagCandidate": "Tag candidate",
-      "shareTeam": "Share with team",
-      "adviceFit": "Advice & fit",
-      "talkQanvit": "Talk to Qanvit",
-      "scheduleSession": "Schedule session",
-      "sendNda": "Send NDA",
-      "requestExpert": "Request expert",
-      "evaluateMarket": "Evaluate market",
-      "advanceComment": "Advance & comment",
-      "sendRfxTest": "Send RFX test",
-      "restrict": "Restrict"
     },
     "header": {
       "back": "Back",
@@ -1229,6 +1237,7 @@
       "rfxTimelineTooltip": "RFX journal: team notes and key events across all cards.",
       "rfxTimelineDesc": "Team notes and events in chronological order. Notes can be edited by their author for 24 h.",
       "rubricNeedsQuestionnaire": "Publish the questionnaire first to define the rubric.",
+      "resourcesAria": "Challenge resources",
       "stats": {
         "total": "Total",
         "active": "Active",
@@ -1236,8 +1245,6 @@
       }
     },
     "toasts": {
-      "triggerComingSoonTitle": "Coming soon",
-      "triggerComingSoonDesc": "The \"{{trigger}}\" trigger will be available very soon.",
       "comingSoonTitle": "Coming soon",
       "addStartupDesc": "Adding startups manually will be available in a future iteration."
     },
@@ -1362,6 +1369,8 @@
         "request_dd_item_other": "{{count}} documents to request",
         "review_dd_item": "{{count}} document to review",
         "review_dd_item_other": "{{count}} documents to review",
+        "contact_candidate": "{{count}} company to contact",
+        "contact_candidate_other": "{{count}} companies to contact",
         "stale_contact": "{{count}} unanswered contact",
         "stale_contact_other": "{{count}} unanswered contacts"
       },
@@ -1383,13 +1392,15 @@
         "chaseNdaSignature": "Chase NDA signature",
         "requestDdItem": "Request DD document",
         "reviewDdItem": "Review DD document",
+        "contactCandidate": "Contact the company",
         "staleContact": "No response to contact",
         "noMovement": "Card without movement"
       },
       "row": {
         "daysWaiting": "{{count}} day ago",
         "daysWaiting_other": "{{count}} days ago",
-        "due": "Due {{date}}"
+        "due": "Due {{date}}",
+        "markContacted": "Mark as contacted"
       },
       "card": {
         "countTooltip": "{{count}} pending task on this card",
